@@ -1,6 +1,7 @@
 from pathlib import Path
 from muscima.io import parse_cropobject_list, CropObject
 from typing import List, Dict
+from .PointCloud import PointCloud
 import re
 
 
@@ -24,6 +25,9 @@ class MppPage:
             for c in self.crop_objects
         }
         "Dictionary for fast id lookup"
+
+        self.point_cloud = PointCloud()
+        "Stores extracted points in crop objects"
 
         assert mpp_writer >= 1 and mpp_writer <= 50
         self.mpp_writer = mpp_writer
@@ -57,6 +61,17 @@ class MppPage:
             if resolved_link.clsname == clsname:
                 return resolved_link
         raise Exception("Object has no outlink of requested clsname")
+    
+    def get_inlink_from(self, obj: CropObject, clsname: str) -> CropObject:
+        """
+        Returns the crop object at the end of any inlink
+        with the given classname
+        """
+        for l in obj.inlinks:
+            resolved_link = self.get(l)
+            if resolved_link.clsname == clsname:
+                return resolved_link
+        raise Exception("Object has no inlinks of requested clsname")
 
     def has_outlink_to(self, obj: CropObject, clsname: str) -> bool:
         """
@@ -64,6 +79,17 @@ class MppPage:
         with the given classname
         """
         for l in obj.outlinks:
+            resolved_link = self.get(l)
+            if resolved_link.clsname == clsname:
+                return True
+        return False
+
+    def has_inlink_from(self, obj: CropObject, clsname: str) -> bool:
+        """
+        Tests that there is a crop object at the end of any inlink
+        with the given classname
+        """
+        for l in obj.inlinks:
             resolved_link = self.get(l)
             if resolved_link.clsname == clsname:
                 return True

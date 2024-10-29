@@ -10,7 +10,8 @@ import cv2
 
 def get_line_endpoints(mask: np.ndarray) -> List[Point]:
     """Runs an algorithm to find all endpoints of lines in the given mask.
-    The input mask is a true/false mask with uint8 type from MPP crop object."""
+    The input mask is a true/false (1/0) mask with uint8 type from MPP
+    crop object."""
     assert len(mask.shape) == 2
     assert mask.dtype == np.uint8
 

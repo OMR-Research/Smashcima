@@ -1,6 +1,10 @@
 from enum import Enum
 
 
+# TODO: this is obsolete,
+# use the SMuFL and Smashcima glyph classes instead. Those can be mapped
+# to the MUSCIMA++ classes during MuNG rendering.
+# Also, this means we can remove the class mapping in MPP synthesizers.
 class MppGlyphClass(str, Enum):
     """
     Enum that represents glyphs from the MUSCIMA++ dataset.

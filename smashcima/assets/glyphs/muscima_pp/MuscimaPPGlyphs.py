@@ -18,7 +18,8 @@ from .get_symbols import \
     get_stems, \
     get_beams, \
     get_beam_hooks, \
-    get_ledger_lines
+    get_ledger_lines, \
+    get_flags
 from .SymbolRepository import SymbolRepository
 from .MppGlyphMetadata import MppGlyphMetadata
 from pathlib import Path
@@ -68,8 +69,12 @@ class MuscimaPPGlyphs(AssetBundle):
             repository.add_glyphs(get_beams(page))
             repository.add_glyphs(get_beam_hooks(page))
             repository.add_glyphs(get_ledger_lines(page))
+            # (flags must come after stems)
+            glyphs_8th_flag, glyphs_16th_flag = get_flags(page)
+            repository.add_glyphs(glyphs_8th_flag)
+            repository.add_glyphs(glyphs_16th_flag)
 
-            # and line indexes
+            # and construct line indexes
             repository.index_lines([
                 MppGlyphClass.stem.value,
                 MppGlyphClass.beam.value,

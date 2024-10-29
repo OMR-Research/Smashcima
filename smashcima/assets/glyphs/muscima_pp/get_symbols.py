@@ -1,11 +1,14 @@
 from muscima.io import CropObject
-from typing import List, Type, TypeVar, Callable, Optional
+from typing import List, Type, TypeVar, Callable, Optional, Tuple, Dict
 from .MppPage import MppPage
 from .MppGlyphMetadata import MppGlyphMetadata
 from .MppGlyphClass import MppGlyphClass
+from smashcima.synthesis.glyph.SmashcimaGlyphClass import SmashcimaGlyphClass
+from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
+from smashcima.geometry.Point import Point
+from smashcima.geometry.Vector2 import Vector2
 from smashcima.scene.Sprite import Sprite
 from smashcima.scene.ScenePoint import ScenePoint
-from smashcima.geometry.Point import Point
 from smashcima.scene.visual.Glyph import Glyph
 from smashcima.scene.visual.LineGlyph import LineGlyph
 from smashcima.scene.visual.Notehead import Notehead
@@ -14,6 +17,8 @@ from smashcima.scene.visual.Stem import Stem
 from smashcima.scene.visual.Beam import Beam
 from smashcima.scene.visual.BeamHook import BeamHook
 from smashcima.scene.visual.LedgerLine import LedgerLine
+from smashcima.scene.visual.Flag import Flag
+from smashcima.scene.visual.ComposedFlag import ComposedFlag
 from .get_line_endpoints import get_line_endpoints
 import numpy as np
 import cv2
@@ -171,6 +176,9 @@ def _crop_objects_to_line_glyphs(
             point=sprite.get_pixels_to_scene_transform().apply_to(points[-1]),
             space=glyph.space
         )
+
+        # store the points in the point cloud
+        page.point_cloud.set_points(o, [points[0], points[-1]])
 
         # return the glyph
         glyphs.append(glyph)
@@ -384,3 +392,137 @@ def get_ledger_lines(page: MppPage) -> List[LedgerLine]:
         horizontal_line=True, # horizontal line
         in_increasing_direction=True # pointing to the right
     )
+
+
+def get_flags(page: MppPage) -> Tuple[List[Flag], List[Flag]]:
+    # NOTE: There are no 32nd flags in the whole MUSCIMA++ dataset.
+    # Only 8th and 16th.
+
+    # === extract stem-flag-flag triplets ===
+
+    # stem-id --> (flag-8th, flag-16th)
+    extracted_triplets: Dict[
+        int,
+        Tuple[Optional[CropObject], Optional[CropObject]]
+    ] = dict()
+
+    for o in page.crop_objects:
+        if o.clsname not in ["8th_flag", "16th_flag"]:
+            continue
+
+        # get the stem through a notehead (any, of it's a chord)
+        # (ignore empty noteheads, since there will not be flags)
+        if not page.has_inlink_from(o, "notehead-full"):
+            continue # ignore weird cases
+        notehead = page.get_inlink_from(o, "notehead-full")
+
+        # there will be only one stem, because there is no piece in MPP
+        # that would have double-stemmed flag chords
+        if not page.has_outlink_to(notehead, "stem"):
+            continue # ignore weird cases
+        stem = page.get_outlink_to(notehead, "stem")
+
+        # store the flag in the triplets
+        extracted_triplets.setdefault(stem.objid, (None, None))
+        flag8th, flag16th = extracted_triplets[stem.objid]
+        
+        if o.clsname == "8th_flag":
+            flag8th = o
+        elif o.clsname == "16th_flag":
+            flag16th = o
+        
+        extracted_triplets[stem.objid] = (flag8th, flag16th)
+    
+    # === convert stem-flag-flag triplets to composite flags ===
+
+    glyphs_8th_flag: List[Flag] = []
+    glyphs_16th_flag: List[Flag] = []
+    
+    for stem_objid, (flag8th, flag16th) in extracted_triplets.items():
+        if flag8th is None:
+            continue # due to some error, 8th flag was not present 
+
+        _GLYPH_CLASS_LOOKUP: Dict[Tuple[bool, bool], str] = {
+            # (16th?, upward?) -> smufl class
+            (False, False): SmuflGlyphClass.flag8thDown.value,
+            (False, True): SmuflGlyphClass.flag8thUp.value,
+            (True, False): SmuflGlyphClass.flag16thDown.value,
+            (True, True): SmuflGlyphClass.flag16thUp.value,
+        }
+        _ISOLATED_GLYPH_CLASS_LOOKUP: Dict[Tuple[bool, bool], str] = {
+            # (16th?, upward?) -> smufl class
+            (False, False): SmashcimaGlyphClass.isolatedFlag8thDown.value,
+            (False, True): SmashcimaGlyphClass.isolatedFlag8thUp.value,
+            (True, False): SmashcimaGlyphClass.isolatedFlag16thDown.value,
+            (True, True): SmashcimaGlyphClass.isolatedFlag16thUp.value,
+        }
+
+        stem = page.get(stem_objid)
+
+        # determine flag orientation
+        stem_center_y = (stem.top + stem.bottom) // 2
+        flag_center_y = (flag8th.top + flag8th.bottom) // 2
+        is_upward_pointing = stem_center_y >= flag_center_y
+        is_16th_flag = flag16th is not None
+
+        # get the flag origin in global pixel coordinates
+        stem_points = page.point_cloud.get_points(stem)
+        if is_upward_pointing:
+            stem_tip_point = stem_points[1]
+        else:
+            stem_tip_point = stem_points[0]
+        global_flag_origin = stem_tip_point.vector + \
+            Vector2(stem.left, stem.top)
+
+        # create the composed glyph
+        flag_glyph = ComposedFlag(
+            glyph_class=_GLYPH_CLASS_LOOKUP[is_16th_flag, is_upward_pointing]
+        )
+
+        def _add_isolated_flag_glyph(flag: CropObject, glyph_class: str):
+            local_flag_origin = (
+                global_flag_origin - Vector2(flag.left, flag.top)
+            )
+            relative_flag_origin = Vector2(
+                local_flag_origin.x / flag.width,
+                local_flag_origin.y / flag.height
+            )
+            g = Glyph(glyph_class=glyph_class)
+            g.sprites = [
+                Sprite(
+                    space=g.space,
+                    bitmap=_mpp_mask_to_sprite_bitmap(flag.mask),
+                    bitmap_origin=relative_flag_origin,
+                    dpi=MUSCIMA_PP_DPI
+                )
+            ]
+            g.space.parent_space = flag_glyph.space
+            MppGlyphMetadata.stamp_glyph(g, page, int(flag.objid))
+            flag_glyph.sub_glyphs = [*flag_glyph.sub_glyphs, g]
+        
+        # add sub-glyphs
+        _add_isolated_flag_glyph(
+            flag8th,
+            _ISOLATED_GLYPH_CLASS_LOOKUP[False, is_upward_pointing]
+        )
+        if is_16th_flag:
+            _add_isolated_flag_glyph(
+                flag16th,
+                _ISOLATED_GLYPH_CLASS_LOOKUP[True, is_upward_pointing]
+            )
+
+        # finalize the composed glyph
+        flag_glyph.aggregate_sprites()
+        MppGlyphMetadata.stamp_glyph(
+            flag_glyph,
+            page,
+            int(flag8th.objid) # the composite gets the same ID as the 8th flag
+        )
+        
+        # collect up and split by type
+        if flag16th is None:
+            glyphs_8th_flag.append(flag_glyph)
+        else:
+            glyphs_16th_flag.append(flag_glyph)
+
+    return glyphs_8th_flag, glyphs_16th_flag

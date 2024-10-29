@@ -31,7 +31,7 @@ class SmuflGlyphClass(str, Enum):
 
     # Individual Notes
     # https://www.w3.org/2019/03/smufl13/tables/individual-notes.html
-    # NOTE: This should only be used for ligatures,
+    # IMPORTANT: This should only be used for ligatures,
     # the default usecase is synthesizing notehead-stem-flag separately.
     noteWhole = "smulf::noteWhole"
     noteHalfUp = "smulf::noteHalfUp"
@@ -44,12 +44,40 @@ class SmuflGlyphClass(str, Enum):
     note16thDown = "smulf::note16thDown"
     note32ndUp = "smulf::note32ndUp"
     note32ndDown = "smulf::note32ndDown"
-    # ...
+    note64thUp = "smufl::note64thUp"
+    note64thDown = "smufl::note64thDown"
+    note128thUp = "smufl::note128thUp"
+    note128thDown = "smufl::note128thDown"
+    note256thUp = "smufl::note256thUp"
+    note256thDown = "smufl::note256thDown"
+    note512thUp = "smufl::note512thUp"
+    note512thDown = "smufl::note512thDown"
+    note1024thUp = "smufl::note1024thUp"
+    note1024thDown = "smufl::note1024thDown"
     augmentationDot = "smulf::augmentationDot"
 
     # Stems
     # https://w3c.github.io/smufl/latest/tables/stems.html
     stem = "smufl::stem"
+
+    # Flags
+    # https://w3c.github.io/smufl/latest/tables/flags.html
+    flag8thUp = "smufl::flag8thUp"
+    flag8thDown = "smufl::flag8thDown"
+    flag16thUp = "smufl::flag16thUp"
+    flag16thDown = "smufl::flag16thDown"
+    flag32ndUp = "smufl::flag32ndUp"
+    flag32ndDown = "smufl::flag32ndDown"
+    flag64thUp = "smufl::flag64thUp"
+    flag64thDown = "smufl::flag64thDown"
+    flag128thUp = "smufl::flag128thUp"
+    flag128thDown = "smufl::flag128thDown"
+    flag256thUp = "smufl::flag256thUp"
+    flag256thDown = "smufl::flag256thDown"
+    flag512thUp = "smufl::flag512thUp"
+    flag512thDown = "smufl::flag512thDown"
+    flag1024thUp = "smufl::flag1024thUp"
+    flag1024thDown = "smufl::flag1024thDown"
 
     # Rests
     # https://www.w3.org/2019/03/smufl13/tables/rests.html
