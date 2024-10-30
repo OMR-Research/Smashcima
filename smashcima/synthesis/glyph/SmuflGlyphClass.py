@@ -26,6 +26,21 @@ class SmuflGlyphClass(str, Enum):
     cClefSmall = "smufl::cClefSmall"
     fClefSmall = "smufl::fClefSmall"
 
+    # Time signatures
+    # https://www.w3.org/2019/03/smufl13/tables/time-signatures.html
+    timeSig0 = "smufl::timeSig0"
+    timeSig1 = "smufl::timeSig1"
+    timeSig2 = "smufl::timeSig2"
+    timeSig3 = "smufl::timeSig3"
+    timeSig4 = "smufl::timeSig4"
+    timeSig5 = "smufl::timeSig5"
+    timeSig6 = "smufl::timeSig6"
+    timeSig7 = "smufl::timeSig7"
+    timeSig8 = "smufl::timeSig8"
+    timeSig9 = "smufl::timeSig9"
+    timeSigCommon = "smufl::timeSigCommon"
+    timeSigCutCommon = "smufl::timeSigCutCommon"
+
     # Noteheads
     # https://w3c.github.io/smufl/latest/tables/noteheads.html
     noteheadDoubleWhole = "smufl::noteheadDoubleWhole"

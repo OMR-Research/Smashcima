@@ -763,3 +763,42 @@ def get_brackets_and_braces(page: MppPage) -> List[LineGlyph]:
                 g.glyph_class = SmuflGlyphClass.brace.value
 
     return glyphs
+
+
+def get_time_marks(page: MppPage) -> List[Glyph]:
+    _GLYPH_CLASS_LOOKUP: Dict[str, str] = {
+        "numeral_0": SmuflGlyphClass.timeSig0.value, # NOT PRESENT
+        "numeral_1": SmuflGlyphClass.timeSig1.value, # NOT PRESENT
+        "numeral_2": SmuflGlyphClass.timeSig2.value,
+        "numeral_3": SmuflGlyphClass.timeSig3.value,
+        "numeral_4": SmuflGlyphClass.timeSig4.value,
+        "numeral_5": SmuflGlyphClass.timeSig5.value,
+        "numeral_6": SmuflGlyphClass.timeSig6.value,
+        "numeral_7": SmuflGlyphClass.timeSig7.value,
+        "numeral_8": SmuflGlyphClass.timeSig8.value,
+        "numeral_9": SmuflGlyphClass.timeSig9.value, # NOT PRESENT
+        "whole-time_mark": SmuflGlyphClass.timeSigCommon.value,
+        # cut time is not present in MUSCIMA++
+    }
+
+    crop_objects = [
+        o for o in page.crop_objects
+        if o.clsname == "time_signature"
+    ]
+
+    glyphs: List[Glyph] = []
+
+    for o in crop_objects:
+        for l in o.outlinks:
+            outlink = page.get(l)
+            if outlink.clsname == "staff":
+                continue
+
+            glyphs += _crop_objects_to_single_sprite_glyphs(
+                crop_objects=[outlink],
+                page=page,
+                glyph_type=Glyph,
+                glyph_class=_GLYPH_CLASS_LOOKUP[outlink.clsname]
+            )
+
+    return glyphs
