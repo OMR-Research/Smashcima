@@ -8,6 +8,11 @@ class SmuflGlyphClass(str, Enum):
     https://www.w3.org/2019/03/smufl13/
     """
 
+    # Brackets and dividers
+    # https://www.w3.org/2019/03/smufl13/tables/staff-brackets-and-dividers.html
+    brace = "smufl::brace"
+    bracket = "smufl::bracket"
+
     # Barlines
     # https://w3c.github.io/smufl/latest/tables/barlines.html
     barlineSingle = "smufl::barlineSingle"

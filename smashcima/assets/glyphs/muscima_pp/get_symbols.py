@@ -700,3 +700,66 @@ def get_accidentals(page: MppPage) -> List[Glyph]:
         glyphs.append(glyph)
 
     return glyphs
+
+
+def get_brackets_and_braces(page: MppPage) -> List[LineGlyph]:
+    brackets = _crop_objects_to_line_glyphs(
+        crop_objects=[
+            o for o in page.crop_objects
+            if o.clsname == "multi-staff_bracket"
+        ],
+        page=page,
+        glyph_type=LineGlyph,
+        glyph_class=SmuflGlyphClass.bracket.value,
+        horizontal_line=False, # vertical line
+        in_increasing_direction=True # drawn top-to-bottom
+    )
+    braces = _crop_objects_to_line_glyphs(
+        crop_objects=[
+            o for o in page.crop_objects
+            if o.clsname == "multi-staff_brace"
+        ],
+        page=page,
+        glyph_type=LineGlyph,
+        glyph_class=SmuflGlyphClass.brace.value,
+        horizontal_line=False, # vertical line
+        in_increasing_direction=True # drawn top-to-bottom
+    )
+    glyphs = brackets + braces
+
+    # mis-annotated classes
+    _MISTAKES = set([
+        # braces that are falsely labeled as brackets
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-08_N-10_D-ideal___720",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-08_N-10_D-ideal___721",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-08_N-10_D-ideal___722",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-21_N-05_D-ideal___579",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-24_N-18_D-ideal___282",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-24_N-18_D-ideal___283",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-24_N-18_D-ideal___284",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-41_N-03_D-ideal___458",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-42_N-05_D-ideal___576",
+
+        # brackets that are falsely labeled as braces
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-04_N-20_D-ideal___693",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-04_N-20_D-ideal___694",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-21_N-05_D-ideal___580",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-21_N-05_D-ideal___581",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-39_N-20_D-ideal___712",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-39_N-20_D-ideal___713",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-41_N-03_D-ideal___459",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-41_N-03_D-ideal___466",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-42_N-05_D-ideal___577",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-42_N-05_D-ideal___578",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-46_N-20_D-ideal___604",
+        "MUSCIMA-pp_1.0___CVC-MUSCIMA_W-46_N-20_D-ideal___714",
+    ])
+    for g in glyphs:
+        meta = MppGlyphMetadata.of_glyph(g)
+        if meta.mpp_crop_object_uid in _MISTAKES:
+            if g.glyph_class == SmuflGlyphClass.brace.value:
+                g.glyph_class = SmuflGlyphClass.bracket.value
+            elif g.glyph_class == SmuflGlyphClass.bracket.value:
+                g.glyph_class = SmuflGlyphClass.brace.value
+
+    return glyphs
