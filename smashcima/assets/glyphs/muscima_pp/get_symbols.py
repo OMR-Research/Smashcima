@@ -525,3 +525,27 @@ def get_flags(page: MppPage) -> Tuple[List[Flag], List[Flag]]:
             glyphs_16th_flag.append(flag_glyph)
 
     return glyphs_8th_flag, glyphs_16th_flag
+
+
+def get_duration_dots(page: MppPage) -> List[Glyph]:
+    return _crop_objects_to_single_sprite_glyphs(
+        crop_objects=[
+            o for o in page.crop_objects
+            if o.clsname == "duration-dot"
+        ],
+        page=page,
+        glyph_type=Glyph,
+        glyph_class=SmuflGlyphClass.augmentationDot.value
+    )
+
+
+def get_staccato_dots(page: MppPage) -> List[Glyph]:
+    return _crop_objects_to_single_sprite_glyphs(
+        crop_objects=[
+            o for o in page.crop_objects
+            if o.clsname == "staccato-dot"
+        ],
+        page=page,
+        glyph_type=Glyph,
+        glyph_class=SmuflGlyphClass.articStaccatoBelow.value
+    )
