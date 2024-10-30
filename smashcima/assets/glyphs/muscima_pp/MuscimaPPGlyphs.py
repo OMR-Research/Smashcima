@@ -22,7 +22,8 @@ from .get_symbols import \
     get_ledger_lines, \
     get_flags, \
     get_duration_dots, \
-    get_staccato_dots
+    get_staccato_dots, \
+    get_accidentals
 from .SymbolRepository import SymbolRepository
 from .MppGlyphMetadata import MppGlyphMetadata
 from pathlib import Path
@@ -74,6 +75,7 @@ class MuscimaPPGlyphs(AssetBundle):
             repository.add_glyphs(get_ledger_lines(page))
             repository.add_glyphs(get_duration_dots(page))
             repository.add_glyphs(get_staccato_dots(page))
+            repository.add_glyphs(get_accidentals(page))
             # (flags must come after stems)
             glyphs_8th_flag, glyphs_16th_flag = get_flags(page)
             repository.add_glyphs(glyphs_8th_flag)

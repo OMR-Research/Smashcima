@@ -185,6 +185,64 @@ def _crop_objects_to_line_glyphs(
     return glyphs
 
 
+def get_connected_components_not_touching_image_border(
+    mask: np.ndarray
+) -> List[np.ndarray]:
+    """
+    Takes a binary image and finds all components (areas with value 1)
+    that don't touch the image border.
+    """
+    height, width = mask.shape
+    ret, labels = cv2.connectedComponents(mask)
+
+    indices_to_remove = set()
+    for x in range(width):
+        indices_to_remove.add(labels[0, x])
+        indices_to_remove.add(labels[height - 1, x])
+    for y in range(height):
+        indices_to_remove.add(labels[y, 0])
+        indices_to_remove.add(labels[y, width - 1])
+    indices = set(range(1, ret)) - indices_to_remove
+
+    out_masks: List[np.ndarray] = []
+    for i in indices:
+        out_masks.append(labels == i)
+    return out_masks
+
+
+def get_center_of_component(mask: np.ndarray) -> Tuple[int, int]:
+    m = cv2.moments(mask.astype(np.uint8))
+    if m["m00"] == 0:
+        import matplotlib.pyplot as plt
+        plt.imshow(mask)
+        plt.show()
+    x = int(m["m10"] / m["m00"])
+    y = int(m["m01"] / m["m00"])
+    return x, y
+
+
+def point_distance_squared(ax: int, ay: int, bx: int, by: int) -> int:
+    """Returns distance between two points squared"""
+    return (ax - bx) ** 2 + (ay - by) ** 2
+
+
+def sort_components_by_proximity_to_point(
+        components: List[np.ndarray], x: int, y: int
+) -> List[np.ndarray]:
+    with_distances = [
+        {
+            "component": c,
+            "distanceSqr": point_distance_squared(
+                *get_center_of_component(c),
+                x, y
+            )
+        }
+        for c in components
+    ]
+    with_distances.sort(key=lambda x: x["distanceSqr"])
+    return [x["component"] for x in with_distances]
+
+
 ################################################
 # Code that actually extracts required symbols #
 ################################################
@@ -549,3 +607,96 @@ def get_staccato_dots(page: MppPage) -> List[Glyph]:
         glyph_type=Glyph,
         glyph_class=SmuflGlyphClass.articStaccatoBelow.value
     )
+
+
+def get_accidentals(page: MppPage) -> List[Glyph]:
+    _GLYPH_CLASS_LOOKUP: Dict[str, str] = {
+        "sharp": SmuflGlyphClass.accidentalSharp.value,
+        "flat": SmuflGlyphClass.accidentalFlat.value,
+        "natural": SmuflGlyphClass.accidentalNatural.value,
+        "double_sharp": SmuflGlyphClass.accidentalDoubleSharp.value,
+
+        # NOTE: there are no double-flats in MUSCIMA++
+        "double_flat": SmuflGlyphClass.accidentalDoubleFlat.value
+    }
+
+    crop_objects = [
+        o for o in page.crop_objects
+        if o.clsname in list(_GLYPH_CLASS_LOOKUP.keys())
+    ]
+
+    glyphs: List[Glyph] = []
+    
+    for o in crop_objects:
+        # obtain sprite from the center of the inner component
+        # and handle open accidentals by repeatedly dilating
+        # (dilate vertically twice as much)
+        object_center_x, object_center_y = get_center_of_component(o.mask)
+        mask = (o.mask * 255).astype(dtype=np.uint8)
+        glyph = Glyph(glyph_class=_GLYPH_CLASS_LOOKUP[o.clsname])
+        sprite: Optional[Sprite] = None
+        for i in range(5):
+            components = get_connected_components_not_touching_image_border(
+                1 - (mask // 255)
+            )
+            components = sort_components_by_proximity_to_point(
+                components,
+                object_center_x,
+                object_center_y
+            )
+
+            if len(components) == 0:
+                kernel = np.ones((5, 3), np.uint8)
+                mask = cv2.dilate(mask, kernel, iterations=1)
+                continue
+
+            component_center_x, component_center_y = get_center_of_component(
+                components[0]
+            )
+            sprite = Sprite(
+                space=glyph.space,
+                bitmap=_mpp_mask_to_sprite_bitmap(o.mask),
+                bitmap_origin=Point(
+                    component_center_x / o.width,
+                    component_center_y / o.height
+                ),
+                dpi=MUSCIMA_PP_DPI
+            )
+            break
+
+        # if it didn't succeed, try pulling the center out by the attached note
+        if sprite is None and len(o.inlinks) == 1:
+            link = page.get(o.inlinks[0])
+            if "notehead" in link.clsname:
+                sprite = Sprite(
+                    space=glyph.space,
+                    bitmap=_mpp_mask_to_sprite_bitmap(o.mask),
+                    bitmap_origin=Point(
+                        0.5,
+                        (((link.top + link.bottom) / 2) - o.top) / o.height
+                    ),
+                    dpi=MUSCIMA_PP_DPI
+                )
+
+        # still nothing, so resort to the crudest method possible
+        if sprite is None:
+            if o.clsname in ["flat", "double_flat"]:
+                sprite = Sprite(
+                    space=glyph.space,
+                    bitmap=_mpp_mask_to_sprite_bitmap(o.mask),
+                    bitmap_origin=Point(0.5, 0.75),
+                    dpi=MUSCIMA_PP_DPI
+                )
+            else:
+                sprite = Sprite(
+                    space=glyph.space,
+                    bitmap=_mpp_mask_to_sprite_bitmap(o.mask),
+                    bitmap_origin=Point(0.5, 0.5),
+                    dpi=MUSCIMA_PP_DPI
+                )
+        
+        glyph.sprites = [sprite]
+        MppGlyphMetadata.stamp_glyph(glyph, page, o.objid)
+        glyphs.append(glyph)
+
+    return glyphs

@@ -79,6 +79,23 @@ class SmuflGlyphClass(str, Enum):
     flag1024thUp = "smufl::flag1024thUp"
     flag1024thDown = "smufl::flag1024thDown"
 
+    # Accidentals
+    # https://www.w3.org/2019/03/smufl13/tables/standard-accidentals-12-edo.html
+    accidentalFlat = "smufl::accidentalFlat" 
+    accidentalNatural = "smufl::accidentalNatural" 
+    accidentalSharp = "smufl::accidentalSharp" 
+    accidentalDoubleSharp = "smufl::accidentalDoubleSharp" 
+    accidentalDoubleFlat = "smufl::accidentalDoubleFlat" 
+    accidentalTripleSharp = "smufl::accidentalTripleSharp" 
+    accidentalTripleFlat = "smufl::accidentalTripleFlat" 
+    accidentalNaturalFlat = "smufl::accidentalNaturalFlat" 
+    accidentalNaturalSharp = "smufl::accidentalNaturalSharp" 
+    accidentalSharpSharp = "smufl::accidentalSharpSharp" 
+    accidentalParensLeft = "smufl::accidentalParensLeft" 
+    accidentalParensRight = "smufl::accidentalParensRight" 
+    accidentalBracketLeft = "smufl::accidentalBracketLeft" 
+    accidentalBracketRight = "smufl::accidentalBracketRight" 
+
     # Articulation
     # https://www.w3.org/2019/03/smufl13/tables/articulation.html
     articAccentAbove = "smufl::articAccentAbove"
