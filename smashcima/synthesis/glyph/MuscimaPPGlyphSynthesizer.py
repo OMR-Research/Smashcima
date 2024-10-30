@@ -3,7 +3,6 @@ from .GlyphSynthesizer import GlyphSynthesizer, T
 from smashcima.scene.visual.Glyph import Glyph
 from smashcima.assets.AssetRepository import AssetRepository
 from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
-from smashcima.assets.glyphs.muscima_pp.MppGlyphClass import MppGlyphClass
 from .SmuflGlyphClass import SmuflGlyphClass
 from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
 import random
@@ -12,38 +11,27 @@ import copy
 
 _QUERY_TO_MPP_LOOKUP: Dict[str, str] = {
     # barlines
-    SmuflGlyphClass.barlineSingle.value: MppGlyphClass.thinBarline.value,
-    MppGlyphClass.thinBarline.value: MppGlyphClass.thinBarline.value,
+    SmuflGlyphClass.barlineSingle.value: SmuflGlyphClass.barlineSingle.value,
 
     # clefs    (clefs ignore the normal/small distinction)
-    SmuflGlyphClass.gClef: MppGlyphClass.gClef,
-    SmuflGlyphClass.gClefSmall: MppGlyphClass.gClef,
-    MppGlyphClass.gClef: MppGlyphClass.gClef,
-    SmuflGlyphClass.fClef: MppGlyphClass.fClef,
-    SmuflGlyphClass.fClefSmall: MppGlyphClass.fClef,
-    MppGlyphClass.fClef: MppGlyphClass.fClef,
-    SmuflGlyphClass.cClef: MppGlyphClass.cClef,
-    SmuflGlyphClass.cClefSmall: MppGlyphClass.cClef,
-    MppGlyphClass.cClef: MppGlyphClass.cClef,
+    SmuflGlyphClass.gClef: SmuflGlyphClass.gClef,
+    SmuflGlyphClass.gClefSmall: SmuflGlyphClass.gClef,
+    SmuflGlyphClass.fClef: SmuflGlyphClass.fClef,
+    SmuflGlyphClass.fClefSmall: SmuflGlyphClass.fClef,
+    SmuflGlyphClass.cClef: SmuflGlyphClass.cClef,
+    SmuflGlyphClass.cClefSmall: SmuflGlyphClass.cClef,
 
     # noteheads
-    SmuflGlyphClass.noteheadWhole.value: MppGlyphClass.noteheadEmpty.value,
-    SmuflGlyphClass.noteheadHalf.value: MppGlyphClass.noteheadEmpty.value,
-    SmuflGlyphClass.noteheadBlack.value: MppGlyphClass.noteheadFull.value,
-    MppGlyphClass.noteheadEmpty.value: MppGlyphClass.noteheadEmpty.value,
-    MppGlyphClass.noteheadFull.value: MppGlyphClass.noteheadFull.value,
+    SmuflGlyphClass.noteheadWhole.value: SmuflGlyphClass.noteheadWhole.value,
+    SmuflGlyphClass.noteheadHalf.value: SmuflGlyphClass.noteheadWhole.value,
+    SmuflGlyphClass.noteheadBlack.value: SmuflGlyphClass.noteheadBlack.value,
 
     # rests
-    SmuflGlyphClass.restWhole.value: MppGlyphClass.wholeRest.value,
-    SmuflGlyphClass.restHalf.value: MppGlyphClass.halfRest.value,
-    SmuflGlyphClass.restQuarter.value: MppGlyphClass.quarterRest.value,
-    SmuflGlyphClass.rest8th.value: MppGlyphClass.eighthRest.value,
-    SmuflGlyphClass.rest16th.value: MppGlyphClass.sixteenthRest.value,
-    MppGlyphClass.wholeRest.value: MppGlyphClass.wholeRest.value,
-    MppGlyphClass.halfRest.value: MppGlyphClass.halfRest.value,
-    MppGlyphClass.quarterRest.value: MppGlyphClass.quarterRest.value,
-    MppGlyphClass.eighthRest.value: MppGlyphClass.eighthRest.value,
-    MppGlyphClass.sixteenthRest.value: MppGlyphClass.sixteenthRest.value,
+    SmuflGlyphClass.restWhole.value: SmuflGlyphClass.restWhole.value,
+    SmuflGlyphClass.restHalf.value: SmuflGlyphClass.restHalf.value,
+    SmuflGlyphClass.restQuarter.value: SmuflGlyphClass.restQuarter.value,
+    SmuflGlyphClass.rest8th.value: SmuflGlyphClass.rest8th.value,
+    SmuflGlyphClass.rest16th.value: SmuflGlyphClass.rest16th.value,
 }
 
 

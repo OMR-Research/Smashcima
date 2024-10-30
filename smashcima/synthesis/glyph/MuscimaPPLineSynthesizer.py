@@ -2,7 +2,6 @@ from .NaiveLineSynthesizer import NaiveLineSynthesizer, T
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.assets.AssetRepository import AssetRepository
 from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
-from smashcima.assets.glyphs.muscima_pp.MppGlyphClass import MppGlyphClass
 from smashcima.assets.glyphs.muscima_pp.LineList import LineList
 from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
 from smashcima.synthesis.glyph.SmashcimaGlyphClass import SmashcimaGlyphClass
@@ -13,21 +12,10 @@ import copy
 
 
 _QUERY_TO_MPP_LOOKUP: Dict[str, str] = {
-    # ledger line
-    SmashcimaGlyphClass.ledgerLine.value: MppGlyphClass.ledgerLine.value,
-    MppGlyphClass.ledgerLine.value: MppGlyphClass.ledgerLine.value,
-
-    # stem
-    SmuflGlyphClass.stem.value: MppGlyphClass.stem.value,
-    MppGlyphClass.stem.value: MppGlyphClass.stem.value,
-
-    # beam
-    SmashcimaGlyphClass.beam.value: MppGlyphClass.beam.value,
-    MppGlyphClass.beam.value: MppGlyphClass.beam.value,
-
-    # beam hook
-    SmashcimaGlyphClass.beamHook.value: MppGlyphClass.beamHook.value,
-    MppGlyphClass.beamHook.value: MppGlyphClass.beamHook.value,
+    SmashcimaGlyphClass.ledgerLine.value: SmashcimaGlyphClass.ledgerLine.value,
+    SmuflGlyphClass.stem.value: SmuflGlyphClass.stem.value,
+    SmashcimaGlyphClass.beam.value: SmashcimaGlyphClass.beam.value,
+    SmashcimaGlyphClass.beamHook.value: SmashcimaGlyphClass.beamHook.value,
 }
 
 

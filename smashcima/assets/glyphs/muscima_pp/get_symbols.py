@@ -2,7 +2,6 @@ from muscima.io import CropObject
 from typing import List, Type, TypeVar, Callable, Optional, Tuple, Dict
 from .MppPage import MppPage
 from .MppGlyphMetadata import MppGlyphMetadata
-from .MppGlyphClass import MppGlyphClass
 from smashcima.synthesis.glyph.SmashcimaGlyphClass import SmashcimaGlyphClass
 from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
 from smashcima.geometry.Point import Point
@@ -49,14 +48,14 @@ def _crop_objects_to_single_sprite_glyphs(
     crop_objects: List[CropObject],
     page: MppPage,
     glyph_type: Type[T],
-    glyph_class: MppGlyphClass,
+    glyph_class: str,
     sprite_origin: Optional[Callable[[CropObject], Point]] = None
 ) -> List[T]:
     glyphs: List[T] = []
 
     for o in crop_objects:
         glyph = glyph_type(
-            glyph_class=glyph_class.value
+            glyph_class=glyph_class
         )
         MppGlyphMetadata.stamp_glyph(glyph, page, int(o.objid))
         glyph.sprites = [
@@ -100,7 +99,7 @@ def _get_symbols_centered_on_line(
     page: MppPage,
     clsname: str,
     glyph_type: Type[T],
-    glyph_class: MppGlyphClass,
+    glyph_class: str,
     line_from_top: int,
     when_center_outside_recenter: bool = False
 ) -> List[T]:
@@ -134,7 +133,7 @@ def _crop_objects_to_line_glyphs(
     crop_objects: List[CropObject],
     page: MppPage,
     glyph_type: Type[U],
-    glyph_class: MppGlyphClass,
+    glyph_class: str,
     horizontal_line: bool,
     in_increasing_direction: bool,
 ) -> List[U]:
@@ -143,7 +142,7 @@ def _crop_objects_to_line_glyphs(
     for o in crop_objects:
         # prepare the glyph
         glyph = glyph_type(
-            glyph_class=glyph_class.value
+            glyph_class=glyph_class
         )
         MppGlyphMetadata.stamp_glyph(glyph, page, int(o.objid))
         sprite = Sprite(
@@ -200,7 +199,7 @@ def get_full_noteheads(page: MppPage) -> List[Notehead]:
         ],
         page=page,
         glyph_type=Notehead,
-        glyph_class=MppGlyphClass.noteheadFull
+        glyph_class=SmuflGlyphClass.noteheadBlack.value
     )
 
 
@@ -213,7 +212,7 @@ def get_empty_noteheads(page: MppPage) -> List[Notehead]:
         ],
         page=page,
         glyph_type=Notehead,
-        glyph_class=MppGlyphClass.noteheadEmpty
+        glyph_class=SmuflGlyphClass.noteheadWhole.value
     )
 
 
@@ -222,7 +221,7 @@ def get_whole_rests(page: MppPage) -> List[RestGlyph]:
         page,
         clsname="whole_rest",
         glyph_type=RestGlyph,
-        glyph_class=MppGlyphClass.wholeRest,
+        glyph_class=SmuflGlyphClass.restWhole.value,
         line_from_top=1
     )
     # NOTE: these checks were in the old version, but they make situation
@@ -240,7 +239,7 @@ def get_half_rests(page: MppPage) -> List[RestGlyph]:
         page,
         clsname="half_rest",
         glyph_type=RestGlyph,
-        glyph_class=MppGlyphClass.halfRest,
+        glyph_class=SmuflGlyphClass.restHalf.value,
         line_from_top=2
     )
     # NOTE: these checks were in the old version, but they make situation
@@ -258,7 +257,7 @@ def get_quarter_rests(page: MppPage) -> List[RestGlyph]:
         page,
         clsname="quarter_rest",
         glyph_type=RestGlyph,
-        glyph_class=MppGlyphClass.quarterRest,
+        glyph_class=SmuflGlyphClass.restQuarter.value,
         line_from_top=2,
         when_center_outside_recenter=True
     )
@@ -269,7 +268,7 @@ def get_eighth_rests(page: MppPage) -> List[RestGlyph]:
         page,
         clsname="8th_rest",
         glyph_type=RestGlyph,
-        glyph_class=MppGlyphClass.eighthRest,
+        glyph_class=SmuflGlyphClass.rest8th.value,
         line_from_top=2,
         when_center_outside_recenter=True
     )
@@ -280,7 +279,7 @@ def get_sixteenth_rests(page: MppPage) -> List[RestGlyph]:
         page,
         clsname="16th_rest",
         glyph_type=RestGlyph,
-        glyph_class=MppGlyphClass.sixteenthRest,
+        glyph_class=SmuflGlyphClass.rest16th.value,
         line_from_top=2,
         when_center_outside_recenter=True
     )
@@ -300,7 +299,7 @@ def get_normal_barlines(page: MppPage) -> List[Glyph]:
         ],
         page=page,
         glyph_type=Glyph,
-        glyph_class=MppGlyphClass.thinBarline
+        glyph_class=SmuflGlyphClass.barlineSingle.value
     )
 
 
@@ -309,7 +308,7 @@ def get_g_clefs(page: MppPage) -> List[Glyph]:
         page,
         clsname="g-clef",
         glyph_type=Glyph,
-        glyph_class=MppGlyphClass.gClef,
+        glyph_class=SmuflGlyphClass.gClef.value,
         line_from_top=3
     )
 
@@ -319,7 +318,7 @@ def get_f_clefs(page: MppPage) -> List[Glyph]:
         page,
         clsname="f-clef",
         glyph_type=Glyph,
-        glyph_class=MppGlyphClass.fClef,
+        glyph_class=SmuflGlyphClass.fClef.value,
         line_from_top=1
     )
 
@@ -332,7 +331,7 @@ def get_c_clefs(page: MppPage) -> List[Glyph]:
         ],
         page=page,
         glyph_type=Glyph,
-        glyph_class=MppGlyphClass.cClef
+        glyph_class=SmuflGlyphClass.cClef.value
     )
 
 
@@ -344,7 +343,7 @@ def get_stems(page: MppPage) -> List[Stem]:
         ],
         page=page,
         glyph_type=Stem,
-        glyph_class=MppGlyphClass.stem,
+        glyph_class=SmuflGlyphClass.stem.value,
         horizontal_line=False, # vertical line
         in_increasing_direction=False # pointing upwards
     )
@@ -359,7 +358,7 @@ def get_beams(page: MppPage) -> List[Beam]:
         ],
         page=page,
         glyph_type=Beam,
-        glyph_class=MppGlyphClass.beam,
+        glyph_class=SmashcimaGlyphClass.beam.value,
         horizontal_line=True, # horizontal line
         in_increasing_direction=True # pointing to the right
     )
@@ -374,7 +373,7 @@ def get_beam_hooks(page: MppPage) -> List[BeamHook]:
         ],
         page=page,
         glyph_type=BeamHook,
-        glyph_class=MppGlyphClass.beamHook,
+        glyph_class=SmashcimaGlyphClass.beamHook.value,
         horizontal_line=True, # horizontal line
         in_increasing_direction=True # pointing to the right
     )
@@ -388,7 +387,7 @@ def get_ledger_lines(page: MppPage) -> List[LedgerLine]:
         ],
         page=page,
         glyph_type=LedgerLine,
-        glyph_class=MppGlyphClass.ledgerLine,
+        glyph_class=SmashcimaGlyphClass.ledgerLine.value,
         horizontal_line=True, # horizontal line
         in_increasing_direction=True # pointing to the right
     )
