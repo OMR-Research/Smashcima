@@ -2,6 +2,15 @@ from smashcima.scene.visual.Stafflines import Stafflines
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.visual.System import System
 from smashcima.scene.visual.Page import Page
+from smashcima.scene.visual.Stem import Stem
+from smashcima.scene.AffineSpace import AffineSpace
+from smashcima.scene.semantic.ScoreMeasure import ScoreMeasure
+from smashcima.scene.semantic.BeamedGroup import BeamedGroup
+from smashcima.scene.semantic.Chord import Chord
+from smashcima.scene.semantic.Note import Note
+from smashcima.scene.semantic.TypeDuration import TypeDuration
+from smashcima.geometry.Transform import Transform
+from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
 from ..BeamStemSynthesizer import BeamStemSynthesizer
 from ...glyph.LineSynthesizer import LineSynthesizer
@@ -303,7 +312,7 @@ class ColumnLayoutSynthesizer:
             measure_count=state.measure_count
         )
 
-        # === phase 4: synthesizing beams and stems ===
+        # === phase 4: synthesizing beams, stems and flags ===
 
         # TODO: get paper_space as an argument
         paper_space = staves[0].space.parent_space
@@ -316,5 +325,61 @@ class ColumnLayoutSynthesizer:
                 paper_space,
                 score_measure
             )
+            self.synthesize_flags_in_measure(
+                paper_space,
+                score_measure
+            )
+        
+        # === phase 5: replacing ligatures ===
+
+        # TODO: ligatures
+        # (this should probbably be done somewhere else than here)
 
         return system
+    
+    def synthesize_flags_in_measure(
+        self,
+        paper_space: AffineSpace,
+        score_measure: ScoreMeasure
+    ):
+        # get all chords
+        chords: List[Chord] = []
+        for score_event in score_measure.events:
+            for event in score_event.events:
+                for durable in event.durables:
+                    if isinstance(durable, Note):
+                        chord = Chord.of_note(durable)
+                        if chord is not None and chord not in chords:
+                            chords.append(chord)
+        
+        # go through the chords and add flags
+        for chord in chords:
+            stem = Stem.of_chord(chord)
+            if stem is None:
+                continue
+
+            if len(chord.notes) == 0:
+                continue
+            
+            if BeamedGroup.of_chord(chord) is not None:
+                continue
+
+            type_duration=chord.notes[0].type_duration
+            
+            if type_duration.to_quarter_multiple() > \
+                TypeDuration.eighth.to_quarter_multiple():
+                continue
+
+            # get the glyph class
+            glyph_class = SmuflGlyphClass.flag_from_type_duration_and_stem_value(
+                type_duration=type_duration,
+                stem_value=chord.stem_value
+            ).value
+
+            # create the glyph
+            glyph = self.glyph_synthesizer.synthesize_glyph(
+                glyph_class=glyph_class
+            )
+            glyph.space.parent_space = paper_space
+            attachment_point = stem.tip.transform_to(paper_space)
+            glyph.space.transform = Transform.translate(attachment_point.vector)

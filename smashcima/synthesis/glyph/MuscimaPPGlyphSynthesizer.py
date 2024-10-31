@@ -26,6 +26,12 @@ _QUERY_TO_MPP_LOOKUP: Dict[str, str] = {
     SmuflGlyphClass.noteheadHalf.value: SmuflGlyphClass.noteheadWhole.value,
     SmuflGlyphClass.noteheadBlack.value: SmuflGlyphClass.noteheadBlack.value,
 
+    # flags
+    SmuflGlyphClass.flag8thUp: SmuflGlyphClass.flag8thUp,
+    SmuflGlyphClass.flag8thDown: SmuflGlyphClass.flag8thDown,
+    SmuflGlyphClass.flag16thUp: SmuflGlyphClass.flag16thUp,
+    SmuflGlyphClass.flag16thDown: SmuflGlyphClass.flag16thDown,
+
     # rests
     SmuflGlyphClass.restWhole.value: SmuflGlyphClass.restWhole.value,
     SmuflGlyphClass.restHalf.value: SmuflGlyphClass.restHalf.value,

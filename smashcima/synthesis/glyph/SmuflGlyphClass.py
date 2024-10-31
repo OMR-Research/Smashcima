@@ -1,5 +1,6 @@
 from enum import Enum
 from smashcima.scene.semantic.TypeDuration import TypeDuration
+from smashcima.scene.semantic.StemValue import StemValue
 
 
 class SmuflGlyphClass(str, Enum):
@@ -187,7 +188,7 @@ class SmuflGlyphClass(str, Enum):
         }
         notehead = _LOOKUP.get(duration)
         if notehead is None:
-            raise Exception(f"Unsupported type duration " + duration)
+            raise Exception(f"Unsupported type duration " + repr(duration))
         return notehead
     
     @staticmethod
@@ -211,7 +212,7 @@ class SmuflGlyphClass(str, Enum):
         }
         notehead = _LOOKUP.get(duration)
         if notehead is None:
-            raise Exception(f"Unsupported type duration " + duration)
+            raise Exception(f"Unsupported type duration " + repr(duration))
         return notehead
     
     @staticmethod
@@ -227,5 +228,34 @@ class SmuflGlyphClass(str, Enum):
         key = (clef_sign, small)
         clef = _LOOKUP.get(key)
         if clef is None:
-            raise Exception(f"Unsupported clef " + key)
+            raise Exception(f"Unsupported clef " + repr(key))
         return clef
+
+    @staticmethod
+    def flag_from_type_duration_and_stem_value(
+        type_duration: TypeDuration,
+        stem_value: StemValue
+    ) -> "SmuflGlyphClass":
+        _LOOKUP = {
+            ("up", "eighth"): SmuflGlyphClass.flag8thUp,
+            ("down", "eighth"): SmuflGlyphClass.flag8thDown,
+            ("up", "16th"): SmuflGlyphClass.flag16thUp,
+            ("down", "16th"): SmuflGlyphClass.flag16thDown,
+            ("up", "32nd"): SmuflGlyphClass.flag32ndUp,
+            ("down", "32nd"): SmuflGlyphClass.flag32ndDown,
+            ("up", "64th"): SmuflGlyphClass.flag64thUp,
+            ("down", "64th"): SmuflGlyphClass.flag64thDown,
+            ("up", "128th"): SmuflGlyphClass.flag128thUp,
+            ("down", "128th"): SmuflGlyphClass.flag128thDown,
+            ("up", "256th"): SmuflGlyphClass.flag256thUp,
+            ("down", "256th"): SmuflGlyphClass.flag256thDown,
+            ("up", "512th"): SmuflGlyphClass.flag512thUp,
+            ("down", "512th"): SmuflGlyphClass.flag512thDown,
+            ("up", "1024th"): SmuflGlyphClass.flag1024thUp,
+            ("down", "1024th"): SmuflGlyphClass.flag1024thDown,
+        }
+        key = (stem_value.value, type_duration.value)
+        flag = _LOOKUP.get(key)
+        if flag is None:
+            raise Exception(f"Unsupported flag " + repr(key))
+        return flag
