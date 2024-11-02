@@ -23,6 +23,11 @@ class Stem(LineGlyph):
     def tip(self) -> ScenePoint:
         """Tip of the stem, in glyph space coordinates"""
         return self.end_point
+    
+    def detach(self):
+        """Unlink the glyph from the scene"""
+        super().detach()
+        self.chord = None
 
     @staticmethod
     def of_chord(

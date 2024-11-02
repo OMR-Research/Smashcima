@@ -21,3 +21,9 @@ class Beam(LineGlyph):
     beam_number: int = 1
     """Which beam is this beam (1 being the 8th notes beam).
     Uses the MusicXML numbering."""
+
+    def detach(self):
+        """Unlink the glyph from the scene"""
+        super().detach()
+        self.beamed_group = None
+        self.chords = []

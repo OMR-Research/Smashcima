@@ -444,7 +444,7 @@ class MusicXmlLoader:
             self._measure_state.measure.add_durable(
                 durable=Rest(
                     type_duration=type_duration,
-                    duration_dots=duration_dots,
+                    augmentation_dots=duration_dots,
                     fractional_duration=fractional_duration,
                     display_pitch=display_pitch
                 ),
@@ -457,7 +457,7 @@ class MusicXmlLoader:
         note = Note(
             pitch=pitch,
             type_duration=type_duration,
-            duration_dots=duration_dots,
+            augmentation_dots=duration_dots,
             fractional_duration=fractional_duration,
         )
         self._measure_state.measure.add_durable(

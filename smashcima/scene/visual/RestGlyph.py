@@ -4,7 +4,10 @@ from ..semantic.MeasureRest import MeasureRest
 from ..semantic.TypeDuration import TypeDuration
 from ..semantic.Pitch import Pitch
 from ..semantic.Clef import Clef
+from .Stafflines import Stafflines
 from .Glyph import Glyph
+from typing import Optional
+from smashcima.nameof_via_dummy import nameof_via_dummy
 
 
 # Display Pitch
@@ -45,6 +48,34 @@ class RestGlyph(Glyph):
 
     rest: Rest | MeasureRest | None = None
     "The semantic rest that this glyph represents"
+
+    clef: Clef = None
+    "What clef applies to the rest"
+
+    stafflines: Stafflines = None
+    "What stafflines is the rest placed onto"
+
+    pitch_position: int = None
+    "Display pitch position of the rest on the stafflines"
+
+    def detach(self):
+        """Unlink the glyph from the scene"""
+        super().detach()
+        self.rest = None
+        self.clef = None
+        self.stafflines = None
+
+    @staticmethod
+    def of_rest(
+        rest: Rest,
+        fail_if_none=False
+    ) -> Optional["RestGlyph"] | "RestGlyph":
+        return rest.get_inlinked(
+            RestGlyph,
+            nameof_via_dummy(RestGlyph, lambda g: g.rest),
+            at_most_one=True,
+            fail_if_none=fail_if_none
+        )
 
     @staticmethod
     def default_display_pitch(clef: Clef, type_duration: TypeDuration) -> Pitch:

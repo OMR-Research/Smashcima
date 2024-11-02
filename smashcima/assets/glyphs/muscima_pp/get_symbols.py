@@ -18,6 +18,7 @@ from smashcima.scene.visual.BeamHook import BeamHook
 from smashcima.scene.visual.LedgerLine import LedgerLine
 from smashcima.scene.visual.Flag import Flag
 from smashcima.scene.visual.ComposedFlag import ComposedFlag
+from smashcima.scene.visual.AugmentationDot import AugmentationDot
 from .get_line_endpoints import get_line_endpoints
 import numpy as np
 import cv2
@@ -585,14 +586,14 @@ def get_flags(page: MppPage) -> Tuple[List[Flag], List[Flag]]:
     return glyphs_8th_flag, glyphs_16th_flag
 
 
-def get_duration_dots(page: MppPage) -> List[Glyph]:
+def get_duration_dots(page: MppPage) -> List[AugmentationDot]:
     return _crop_objects_to_single_sprite_glyphs(
         crop_objects=[
             o for o in page.crop_objects
             if o.clsname == "duration-dot"
         ],
         page=page,
-        glyph_type=Glyph,
+        glyph_type=AugmentationDot,
         glyph_class=SmuflGlyphClass.augmentationDot.value
     )
 

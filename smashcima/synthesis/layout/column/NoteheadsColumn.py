@@ -39,15 +39,6 @@ class _NoteheadContext:
     note: Note
     "A representative note of that notehead (WLOG the first one)"
 
-    clef: Clef
-    "What clef applies to the note"
-
-    stafflines: Stafflines
-    "What stafflines is the note placed onto"
-
-    pitch_position: int
-    "Pitch position of the notehead on the stafflines"
-
     kick_asif_stem_up: bool
     "Perform kick off to the right, else to the left"
 
@@ -69,11 +60,7 @@ class NoteheadsColumn(ColumnBase):
         self.glyphs.append(notehead)
         
         note = notehead.notes[0]
-        event = Event.of_durable(note, fail_if_none=True)
         chord = Chord.of_note(note, fail_if_none=True)
-        staff = Staff.of_durable(note, fail_if_none=True)
-        clef = event.attributes.clefs[staff.staff_number]
-        stafflines = self.get_stafflines_of_glyph(notehead)
 
         if chord.stem_value == StemValue.up:
             kick_asif_stem_up = True
@@ -87,9 +74,6 @@ class NoteheadsColumn(ColumnBase):
         self.notehead_contexts.append(_NoteheadContext(
             notehead=notehead,
             note=note,
-            clef=clef,
-            stafflines=stafflines,
-            pitch_position=clef.pitch_to_pitch_position(note.pitch),
             kick_asif_stem_up=kick_asif_stem_up
         ))
     
@@ -107,7 +91,7 @@ class NoteheadsColumn(ColumnBase):
     def kick_off_noteheads_on_stafflines(self, stafflines: Stafflines):
         contexts = [
             c for c in self.notehead_contexts
-            if c.stafflines is stafflines
+            if c.notehead.stafflines is stafflines
         ]
         contexts.sort(key=lambda c: c.note.pitch.get_linear_pitch())
         
@@ -156,7 +140,7 @@ class NoteheadsColumn(ColumnBase):
             return
         
         center_notehead_stack_width = sum(
-            ctx.notehead.get_bbox_in_space(ctx.stafflines.space).width
+            ctx.notehead.get_bbox_in_space(ctx.notehead.stafflines.space).width
             for ctx in self.notehead_contexts
         ) / len(self.notehead_contexts) # average
         kick_off_distance = center_notehead_stack_width \
@@ -164,10 +148,10 @@ class NoteheadsColumn(ColumnBase):
 
         for ctx in self.notehead_contexts:
             notehead = ctx.notehead
-            sl = ctx.stafflines
+            sl = ctx.notehead.stafflines
 
             notehead.space.transform = sl.staff_coordinate_system.get_transform(
-                pitch_position=ctx.pitch_position,
+                pitch_position=ctx.notehead.pitch_position,
                 time_position=self.time_position \
                     + (ctx.kick_off * kick_off_distance)
             )
@@ -175,7 +159,7 @@ class NoteheadsColumn(ColumnBase):
     def place_ledger_lines(self, stafflines: Stafflines):
         contexts = [
             c for c in self.notehead_contexts
-            if c.stafflines is stafflines
+            if c.notehead.stafflines is stafflines
         ]
 
         if len(contexts) == 0:
@@ -184,8 +168,8 @@ class NoteheadsColumn(ColumnBase):
         def _ledger_line_temporal_bounds(ctx: _NoteheadContext) -> float:
             """Gets the time position of the two start and end of a basic
             ledger line for a given (already placed) notehead"""
-            bbox = ctx.notehead.get_bbox_in_space(ctx.stafflines.space)
-            pos_x = ctx.stafflines.staff_coordinate_system.get_transform(
+            bbox = ctx.notehead.get_bbox_in_space(ctx.notehead.stafflines.space)
+            pos_x = ctx.notehead.stafflines.staff_coordinate_system.get_transform(
                 pitch_position=0, time_position=self.time_position
             ).apply_to(Point(0, 0)).x
             center = self.time_position + (bbox.center.x - pos_x)
@@ -199,7 +183,7 @@ class NoteheadsColumn(ColumnBase):
             return start, end
         
         max_abs_pitch_position = max(
-            abs(ctx.pitch_position) for ctx in contexts
+            abs(ctx.notehead.pitch_position) for ctx in contexts
         )
 
         # top-down, then bottom-up
@@ -218,7 +202,7 @@ class NoteheadsColumn(ColumnBase):
             ):
                 # expand affected noteheads by the current noteheads
                 for ctx in contexts:
-                    if ctx.pitch_position == pitch_position:
+                    if ctx.notehead.pitch_position == pitch_position:
                         affected_noteheads.append(ctx.notehead)
                         start, end = _ledger_line_temporal_bounds(ctx)
                         time_position_start = min(time_position_start, start)
@@ -308,6 +292,12 @@ def synthesize_noteheads_column(
                 if notehead is not None:
                     notehead.notes = [*notehead.notes, note]
                     continue
+
+                # resolve context
+                event = Event.of_durable(note, fail_if_none=True)
+                staff = Staff.of_durable(note, fail_if_none=True)
+                clef = event.attributes.clefs[staff.staff_number]
+                stafflines = staves[stafflines_index]
                 
                 # new notehead for a note
                 notehead = glyph_synthesizer.synthesize_glyph(
@@ -316,8 +306,11 @@ def synthesize_noteheads_column(
                     ).value,
                     expected_glyph_type=Notehead
                 )
-                notehead.space.parent_space = staves[stafflines_index].space
                 notehead.notes = [*notehead.notes, note]
+                notehead.clef=clef
+                notehead.stafflines=stafflines
+                notehead.pitch_position=clef.pitch_to_pitch_position(note.pitch)
+                notehead.space.parent_space = stafflines.space
                 _store_notehead(note, stafflines_index, notehead)
     
     # add noteheads to the column

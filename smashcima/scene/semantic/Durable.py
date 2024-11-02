@@ -11,8 +11,9 @@ class Durable(SceneObject):
     type_duration: TypeDuration
     """The duration type that the note has visually (e.g. an eighth note)"""
     
-    duration_dots: int
-    """How many duration dots are there to augment the note's duration"""
+    augmentation_dots: int
+    """How many augmentation (duration) dots are there
+    to augment the note's duration"""
     
     fractional_duration: Fraction
     """How many quarter notes does the note actually take up (e.g. an eighth

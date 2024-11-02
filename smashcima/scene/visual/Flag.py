@@ -9,3 +9,8 @@ class Flag(Glyph):
 
     stem: Stem = None
     "The stem that the flag is attached to"
+
+    def detach(self):
+        """Unlink the glyph from the scene"""
+        super().detach()
+        self.stem = None

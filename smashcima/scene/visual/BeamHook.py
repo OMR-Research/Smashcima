@@ -22,3 +22,9 @@ class BeamHook(LineGlyph):
 
     hook_type: BeamValue = None
     """Either forward hook or backward hook. Any other value is invalid."""
+
+    def detach(self):
+        """Unlink the glyph from the scene"""
+        super().detach()
+        self.beamed_group = None
+        self.chord = None

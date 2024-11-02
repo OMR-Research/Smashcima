@@ -6,11 +6,13 @@ from smashcima.synthesis.glyph.LineSynthesizer import LineSynthesizer
 from .NoteheadsColumn import NoteheadsColumn, synthesize_noteheads_column
 from .RestsColumn import RestsColumn, synthesize_rests_column
 from .ColumnBase import ColumnBase
+from .AugmentationDotsColumn import AugmentationDotsColumn, \
+    synthesize_augmentation_dots_column
 from typing import List
 import random
 
 
-class EventColumn(NoteheadsColumn, RestsColumn):
+class EventColumn(NoteheadsColumn, RestsColumn, AugmentationDotsColumn):
     def __init__(self, *args, **kwargs):
         # ignore constructors of parents, initialize only the super-parent
         ColumnBase.__init__(self, *args, **kwargs)
@@ -18,10 +20,12 @@ class EventColumn(NoteheadsColumn, RestsColumn):
     def __post_init__(self):
         NoteheadsColumn.__post_init__(self)
         RestsColumn.__post_init__(self)
+        AugmentationDotsColumn.__post_init__(self)
 
     def _position_glyphs(self):
         NoteheadsColumn._position_glyphs(self)
         RestsColumn._position_glyphs(self)
+        AugmentationDotsColumn._position_glyphs(self)
 
 
 def synthesize_event_column(
@@ -51,6 +55,14 @@ def synthesize_event_column(
         score=score,
         score_event=score_event,
         rng=rng
+    )
+
+    synthesize_augmentation_dots_column(
+        column=column,
+        staves=staves,
+        glyph_synthesizer=glyph_synthesizer,
+        score=score,
+        score_event=score_event
     )
     
     return column

@@ -20,3 +20,9 @@ class LedgerLine(LineGlyph):
     """A ledger line is also needed for whole and half rests. Here, the
     placement is simpler, because there are no intermediate lines drawn,
     only the one that directly touches the rest."""
+
+    def detach(self):
+        """Unlink the glyph from the scene"""
+        super().detach()
+        self.affected_noteheads = None
+        self.affected_rest = None

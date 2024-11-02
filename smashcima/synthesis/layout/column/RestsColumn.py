@@ -1,4 +1,3 @@
-from smashcima.scene.semantic.Clef import Clef
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.Event import Event
 from smashcima.scene.semantic.Staff import Staff
@@ -15,65 +14,36 @@ from smashcima.geometry.Point import Point
 from smashcima.random_between import random_between
 from .ColumnBase import ColumnBase
 from typing import List
-from dataclasses import dataclass
 import random
-
-
-@dataclass
-class _RestContext:
-    glyph: RestGlyph
-    "The rest glyph"
-
-    clef: Clef
-    "What clef applies to the rest"
-
-    stafflines: Stafflines
-    "What stafflines is the rest placed onto"
 
 
 class RestsColumn(ColumnBase):
     def __post_init__(self):
-        self.rest_contexts: List[_RestContext] = []
+        self.rest_glyphs: List[RestGlyph] = []
 
     def add_rest(self, glyph: RestGlyph):
         assert glyph.rest is not None
-        
         self.glyphs.append(glyph)
-
-        rest = glyph.rest
-        event = Event.of_durable(rest, fail_if_none=True)
-        staff = Staff.of_durable(rest, fail_if_none=True)
-        clef = event.attributes.clefs[staff.staff_number]
-        stafflines = self.get_stafflines_of_glyph(glyph)
-
-        self.rest_contexts.append(_RestContext(
-            glyph=glyph,
-            clef=clef,
-            stafflines=stafflines
-        ))
+        self.rest_glyphs.append(glyph)
     
     def _position_glyphs(self):
         self.position_rests()
     
     def position_rests(self):
-        for ctx in self.rest_contexts:
-            rest = ctx.glyph.rest
-            glyph = ctx.glyph
-            clef = ctx.clef
-            sl = ctx.stafflines
-
-            display_pitch = rest.display_pitch \
+        for glyph in self.rest_glyphs:
+            display_pitch = glyph.rest.display_pitch \
                 or RestGlyph.default_display_pitch(
-                    clef, rest.type_duration
+                    glyph.clef, glyph.rest.type_duration
                 )
             pitch_position = RestGlyph.display_pitch_to_glyph_pitch_position(
-                clef, display_pitch, rest.type_duration
+                glyph.clef, display_pitch, glyph.rest.type_duration
             )
 
-            glyph.space.transform = sl.staff_coordinate_system.get_transform(
-                pitch_position=pitch_position,
-                time_position=self.time_position
-            )
+            glyph.space.transform = glyph.stafflines.staff_coordinate_system \
+                .get_transform(
+                    pitch_position=pitch_position,
+                    time_position=self.time_position
+                )
 
 
 def synthesize_rests_column(
@@ -91,8 +61,21 @@ def synthesize_rests_column(
             if not isinstance(durable, Rest): # inlcudes MeasureRest
                 continue
             
+            # resolve context
+            event = Event.of_durable(durable, fail_if_none=True)
+            staff = Staff.of_durable(durable, fail_if_none=True)
+            clef = event.attributes.clefs[staff.staff_number]
             stafflines_index = score.staff_index_of_durable(durable)
             stafflines = staves[stafflines_index]
+
+            # resolve pitch position
+            display_pitch = durable.display_pitch \
+                or RestGlyph.default_display_pitch(
+                    clef, durable.type_duration
+                )
+            pitch_position = RestGlyph.display_pitch_to_glyph_pitch_position(
+                clef, display_pitch, durable.type_duration
+            )
 
             # create the rest
             glyph_class = SmuflGlyphClass.rest_from_type_duration(
@@ -102,6 +85,9 @@ def synthesize_rests_column(
                 glyph_class.value,
                 expected_glyph_type=RestGlyph
             )
+            rest_glyph.clef = clef
+            rest_glyph.stafflines = stafflines
+            rest_glyph.pitch_position = pitch_position
             rest_glyph.space.parent_space = stafflines.space
             rest_glyph.rest = durable
             column.add_rest(rest_glyph)
@@ -109,7 +95,6 @@ def synthesize_rests_column(
             # create ledger line for whole/half rests
             # (and attach it under the glyph space for simplicity)
             _synthesize_ledger_line_if_necessary(
-                rest=durable,
                 rest_glyph=rest_glyph,
                 glyph_class=glyph_class,
                 line_synthesizer=line_synthesizer,
@@ -118,7 +103,6 @@ def synthesize_rests_column(
 
 
 def _synthesize_ledger_line_if_necessary(
-    rest: Rest,
     rest_glyph: RestGlyph,
     glyph_class: SmuflGlyphClass,
     line_synthesizer: LineSynthesizer,
@@ -128,19 +112,8 @@ def _synthesize_ledger_line_if_necessary(
     if glyph_class not in [SmuflGlyphClass.restWhole, SmuflGlyphClass.restHalf]:
         return
 
-    event = Event.of_durable(rest, fail_if_none=True)
-    staff = Staff.of_durable(rest, fail_if_none=True)
-    clef = event.attributes.clefs[staff.staff_number]
-    display_pitch = rest.display_pitch \
-        or RestGlyph.default_display_pitch(
-            clef, rest.type_duration
-        )
-    pitch_position = RestGlyph.display_pitch_to_glyph_pitch_position(
-        clef, display_pitch, rest.type_duration
-    )
-
     # the rest is still within the staff, no ledgerline needed
-    if abs(pitch_position) < 4:
+    if abs(rest_glyph.pitch_position) < 4:
         return
         
     width = rest_glyph.get_bbox_in_space(rest_glyph.space).width \
