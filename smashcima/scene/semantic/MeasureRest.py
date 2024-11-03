@@ -17,7 +17,7 @@ class MeasureRest(Rest):
         the whole measure (the number of beats)"""
         super().__init__(
             type_duration=TypeDuration.whole,
-            duration_dots=0,
+            augmentation_dots=0,
             fractional_duration=fractional_duration,
             display_pitch=display_pitch
         )

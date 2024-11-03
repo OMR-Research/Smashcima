@@ -16,6 +16,7 @@ from ..scene.semantic.Chord import Chord
 from ..scene.semantic.StemValue import StemValue
 from ..scene.semantic.BeamedGroup import BeamedGroup
 from ..scene.semantic.BeamValue import BeamValue
+from ..scene.semantic.AccidentalValue import AccidentalValue
 from typing import List, TextIO, Optional, Dict
 from fractions import Fraction
 from dataclasses import dataclass, field
@@ -330,7 +331,11 @@ class MusicXmlLoader:
         def _dot() -> int:
             return len(note_element.findall("dot"))
         
-        # TODO: <accidental>
+        # <accidental>
+        def _accidental() -> Optional[AccidentalValue]:
+            if note_element.find("accidental") is None:
+                return None # no accidental
+            return AccidentalValue(note_element.find("accidental").text)
         
         # <stem>
         def _stem() -> StemValue:
@@ -377,6 +382,7 @@ class MusicXmlLoader:
         type_duration = _type(is_measure_rest) # None for measure rests
         time_modification = _time_modification()
         duration_dots = _dot()
+        accidental_value = _accidental()
         stem_value = _stem()
         staff_number = _staff()
         beam_values = _beam()
@@ -459,6 +465,7 @@ class MusicXmlLoader:
             type_duration=type_duration,
             augmentation_dots=duration_dots,
             fractional_duration=fractional_duration,
+            accidental_value=accidental_value,
         )
         self._measure_state.measure.add_durable(
             durable=note,

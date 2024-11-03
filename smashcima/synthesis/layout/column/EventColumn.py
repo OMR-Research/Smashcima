@@ -8,11 +8,17 @@ from .RestsColumn import RestsColumn, synthesize_rests_column
 from .ColumnBase import ColumnBase
 from .AugmentationDotsColumn import AugmentationDotsColumn, \
     synthesize_augmentation_dots_column
+from .AccidentalsColumn import AccidentalsColumn, synthesize_accidentals_column
 from typing import List
 import random
 
 
-class EventColumn(NoteheadsColumn, RestsColumn, AugmentationDotsColumn):
+class EventColumn(
+    NoteheadsColumn,
+    RestsColumn,
+    AugmentationDotsColumn,
+    AccidentalsColumn
+):
     def __init__(self, *args, **kwargs):
         # ignore constructors of parents, initialize only the super-parent
         ColumnBase.__init__(self, *args, **kwargs)
@@ -21,11 +27,13 @@ class EventColumn(NoteheadsColumn, RestsColumn, AugmentationDotsColumn):
         NoteheadsColumn.__post_init__(self)
         RestsColumn.__post_init__(self)
         AugmentationDotsColumn.__post_init__(self)
+        AccidentalsColumn.__post_init__(self)
 
     def _position_glyphs(self):
         NoteheadsColumn._position_glyphs(self)
         RestsColumn._position_glyphs(self)
         AugmentationDotsColumn._position_glyphs(self)
+        AccidentalsColumn._position_glyphs(self)
 
 
 def synthesize_event_column(
@@ -58,6 +66,14 @@ def synthesize_event_column(
     )
 
     synthesize_augmentation_dots_column(
+        column=column,
+        staves=staves,
+        glyph_synthesizer=glyph_synthesizer,
+        score=score,
+        score_event=score_event
+    )
+
+    synthesize_accidentals_column(
         column=column,
         staves=staves,
         glyph_synthesizer=glyph_synthesizer,

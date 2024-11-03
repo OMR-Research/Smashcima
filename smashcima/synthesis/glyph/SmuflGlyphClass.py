@@ -1,6 +1,7 @@
 from enum import Enum
 from smashcima.scene.semantic.TypeDuration import TypeDuration
 from smashcima.scene.semantic.StemValue import StemValue
+from smashcima.scene.semantic.AccidentalValue import AccidentalValue
 
 
 class SmuflGlyphClass(str, Enum):
@@ -102,20 +103,20 @@ class SmuflGlyphClass(str, Enum):
 
     # Accidentals
     # https://www.w3.org/2019/03/smufl13/tables/standard-accidentals-12-edo.html
-    accidentalFlat = "smufl::accidentalFlat" 
-    accidentalNatural = "smufl::accidentalNatural" 
-    accidentalSharp = "smufl::accidentalSharp" 
-    accidentalDoubleSharp = "smufl::accidentalDoubleSharp" 
-    accidentalDoubleFlat = "smufl::accidentalDoubleFlat" 
-    accidentalTripleSharp = "smufl::accidentalTripleSharp" 
-    accidentalTripleFlat = "smufl::accidentalTripleFlat" 
-    accidentalNaturalFlat = "smufl::accidentalNaturalFlat" 
-    accidentalNaturalSharp = "smufl::accidentalNaturalSharp" 
-    accidentalSharpSharp = "smufl::accidentalSharpSharp" 
-    accidentalParensLeft = "smufl::accidentalParensLeft" 
-    accidentalParensRight = "smufl::accidentalParensRight" 
-    accidentalBracketLeft = "smufl::accidentalBracketLeft" 
-    accidentalBracketRight = "smufl::accidentalBracketRight" 
+    accidentalFlat = "smufl::accidentalFlat"
+    accidentalNatural = "smufl::accidentalNatural"
+    accidentalSharp = "smufl::accidentalSharp"
+    accidentalDoubleSharp = "smufl::accidentalDoubleSharp"
+    accidentalDoubleFlat = "smufl::accidentalDoubleFlat"
+    accidentalTripleSharp = "smufl::accidentalTripleSharp"
+    accidentalTripleFlat = "smufl::accidentalTripleFlat"
+    accidentalNaturalFlat = "smufl::accidentalNaturalFlat"
+    accidentalNaturalSharp = "smufl::accidentalNaturalSharp"
+    accidentalSharpSharp = "smufl::accidentalSharpSharp"
+    accidentalParensLeft = "smufl::accidentalParensLeft"
+    accidentalParensRight = "smufl::accidentalParensRight"
+    accidentalBracketLeft = "smufl::accidentalBracketLeft"
+    accidentalBracketRight = "smufl::accidentalBracketRight"
 
     # Articulation
     # https://www.w3.org/2019/03/smufl13/tables/articulation.html
@@ -259,3 +260,18 @@ class SmuflGlyphClass(str, Enum):
         if flag is None:
             raise Exception(f"Unsupported flag " + repr(key))
         return flag
+
+    @staticmethod
+    def accidental_from_accidental_value(
+        accidental_value: AccidentalValue
+    ) -> "SmuflGlyphClass":
+        _LOOKUP = {
+            AccidentalValue.natural: SmuflGlyphClass.accidentalNatural,
+            AccidentalValue.flat: SmuflGlyphClass.accidentalFlat,
+            AccidentalValue.sharp: SmuflGlyphClass.accidentalSharp,
+            AccidentalValue.doubleSharp: SmuflGlyphClass.accidentalDoubleSharp,
+        }
+        glyph_class = _LOOKUP.get(accidental_value)
+        if glyph_class is None:
+            raise Exception(f"Unsupported accidental " + repr(accidental_value))
+        return glyph_class

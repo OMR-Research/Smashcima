@@ -19,6 +19,7 @@ from smashcima.scene.visual.LedgerLine import LedgerLine
 from smashcima.scene.visual.Flag import Flag
 from smashcima.scene.visual.ComposedFlag import ComposedFlag
 from smashcima.scene.visual.AugmentationDot import AugmentationDot
+from smashcima.scene.visual.Accidental import Accidental
 from .get_line_endpoints import get_line_endpoints
 import numpy as np
 import cv2
@@ -610,7 +611,7 @@ def get_staccato_dots(page: MppPage) -> List[Glyph]:
     )
 
 
-def get_accidentals(page: MppPage) -> List[Glyph]:
+def get_accidentals(page: MppPage) -> List[Accidental]:
     _GLYPH_CLASS_LOOKUP: Dict[str, str] = {
         "sharp": SmuflGlyphClass.accidentalSharp.value,
         "flat": SmuflGlyphClass.accidentalFlat.value,
@@ -626,7 +627,7 @@ def get_accidentals(page: MppPage) -> List[Glyph]:
         if o.clsname in list(_GLYPH_CLASS_LOOKUP.keys())
     ]
 
-    glyphs: List[Glyph] = []
+    glyphs: List[Accidental] = []
     
     for o in crop_objects:
         # obtain sprite from the center of the inner component
@@ -634,7 +635,7 @@ def get_accidentals(page: MppPage) -> List[Glyph]:
         # (dilate vertically twice as much)
         object_center_x, object_center_y = get_center_of_component(o.mask)
         mask = (o.mask * 255).astype(dtype=np.uint8)
-        glyph = Glyph(glyph_class=_GLYPH_CLASS_LOOKUP[o.clsname])
+        glyph = Accidental(glyph_class=_GLYPH_CLASS_LOOKUP[o.clsname])
         sprite: Optional[Sprite] = None
         for i in range(5):
             components = get_connected_components_not_touching_image_border(
