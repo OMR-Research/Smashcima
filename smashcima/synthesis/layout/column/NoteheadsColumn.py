@@ -66,7 +66,8 @@ class NoteheadsColumn(ColumnBase):
             kick_asif_stem_up = True
         elif chord.stem_value == StemValue.down:
             kick_asif_stem_up = False
-        elif chord.stem_value == StemValue.none: # whole notes
+        elif chord.stem_value == StemValue.none \
+                or chord.stem_value is None: # whole notes or unknown
             kick_asif_stem_up = True # assume invisible up-stem
         else:
             raise Exception(f"Unexpected stem value: {chord.stem_value}")

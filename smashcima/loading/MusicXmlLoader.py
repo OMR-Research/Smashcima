@@ -149,7 +149,7 @@ class MusicXmlLoader:
 
         # go through all the parts
         part_list_element = score_partwise_element.find("part-list")
-        for score_part_element in part_list_element:
+        for score_part_element in part_list_element.findall("score-part"):
             part_id = score_part_element.attrib.get("id")
             if part_id is None:
                 raise Exception("<score-part> element is missing an ID.")
@@ -338,10 +338,10 @@ class MusicXmlLoader:
             return AccidentalValue(note_element.find("accidental").text)
         
         # <stem>
-        def _stem() -> StemValue:
+        def _stem() -> Optional[StemValue]:
             stem_element = note_element.find("stem")
             if stem_element is None:
-                return StemValue.none
+                return None # stem orientation is unknown
             if stem_element.text not in ["up", "down", "double", "none"]:
                 self._error(
                     f"Unknown stem type '{stem_element.text}'.",

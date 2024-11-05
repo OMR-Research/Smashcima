@@ -4,6 +4,7 @@ from typing import List, Optional
 from .Note import Note
 from .Event import Event
 from .StemValue import StemValue
+from .TypeDuration import TypeDuration
 from smashcima.nameof_via_dummy import nameof_via_dummy
 
 
@@ -18,8 +19,11 @@ class Chord(SceneObject):
     notes: List[Note] = field(default_factory=list)
     "Links to all notes within this chord"
 
-    stem_value: StemValue = StemValue.none
-    "What orientation does the stem have. If none, infer when rendering."
+    stem_value: Optional[StemValue] = None
+    """What orientation does the stem have.
+    If StemValue.none, the stem is missing (e.g. whole note).
+    If None, the stem orientation is unknown
+    and must be inferred during rendering."""
 
     @staticmethod
     def of_note(
@@ -39,14 +43,20 @@ class Chord(SceneObject):
             raise Exception("The chord is empty, there are no notes.")
         return Event.of_durable(self.notes[0], fail_if_none=True)
     
-    def add_note(self, note: Note, stem_value: StemValue = None):
+    def get_type_duration(self) -> TypeDuration:
+        """Returns the type duration of all notes in this chord"""
+        if len(self.notes) == 0:
+            raise Exception("The chord is empty, there are no notes.")
+        return self.notes[0].type_duration
+    
+    def add_note(self, note: Note, stem_value: Optional[StemValue] = None):
         """Adds a note into the chord with a stem value"""
         # store stem value if missing
-        if self.stem_value == StemValue.none:
+        if self.stem_value is None:
             self.stem_value = stem_value
 
         # validate stem value if present
-        if self.stem_value != StemValue.none and stem_value != StemValue.none:
+        if self.stem_value is not None and stem_value is not None:
             assert self.stem_value == stem_value, \
                 "All notes in a chord must have the same stem value"
         
@@ -56,6 +66,12 @@ class Chord(SceneObject):
             inserted_event = Event.of_durable(note, fail_if_none=True)
             assert event is inserted_event, \
                 "All notes in a chord must be in the same event (same onset)"
+        
+        # validate that all the notes have the same type duration
+        if len(self.notes) > 0:
+            type_duration = self.notes[0].type_duration
+            assert type_duration == note.type_duration, \
+                "All notes in a chord must have the same type duration"
         
         # update the list of notes
         notes = [*self.notes, note]

@@ -6,6 +6,7 @@ from smashcima.scene.semantic.Part import Part
 from smashcima.scene.semantic.Chord import Chord
 from smashcima.scene.semantic.Measure import Measure
 from smashcima.scene.semantic.StemValue import StemValue
+from smashcima.scene.semantic.TypeDuration import TypeDuration
 from smashcima.scene.AffineSpace import AffineSpace
 from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.visual.NoteheadSide import NoteheadSide
@@ -94,7 +95,7 @@ class BeamStemSynthesizer:
         # get stem orientation
         stem_value = chord.stem_value or self.infer_stem_orientation(chord)
         assert stem_value in [StemValue.none, StemValue.up, StemValue.down], \
-            f"Invalid stem value {stem_value}, must be only up or down."
+            f"Invalid stem value {stem_value}, must be only up or down or none."
         
         # if no stem, do not render one
         if stem_value == StemValue.none:
@@ -120,6 +121,16 @@ class BeamStemSynthesizer:
         stem.chord = chord
     
     def infer_stem_orientation(self, chord: Chord) -> StemValue:
+        # whole notes have no stem
+        type_duration = chord.get_type_duration()
+        if type_duration == TypeDuration.whole:
+            return StemValue.none
+        
+        # for all other notes, the inference is complicated:
+        # 1) pitch position
+        # 2) average pitch position per beamed group?
+        # 3) two voices too close
+
         # NOTE: could be implemented in the future,
         # or can be subclassed and overriden by the user
         event = chord.get_event()
