@@ -74,6 +74,6 @@ class Model(abc.ABC):
     @abc.abstractmethod
     def call(self, *args, **kwargs):
         raise NotImplementedError(
-            f"Model {self.__class__.__name__} does not have a `call()` "
+            f"Model {self.__class__.__name__} does not have the `call()` "
             "method implemented."
         )

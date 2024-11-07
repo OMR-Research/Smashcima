@@ -18,6 +18,13 @@ from smashcima.synthesis.glyph.MuscimaPPLineSynthesizer \
 from smashcima.synthesis.layout.BeamStemSynthesizer import BeamStemSynthesizer
 from smashcima.scene.visual.Page import Page
 from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
+from smashcima.synthesis.page.PaperSynthesizer import PaperSynthesizer
+from smashcima.synthesis.page.SolidColorPaperSynthesizer \
+    import SolidColorPaperSynthesizer
+from smashcima.synthesis.page.MzkQuiltingPaperSynthesizer \
+    import MzkQuiltingPaperSynthesizer
+from smashcima.synthesis.style.MzkPaperStyleDomain \
+    import MzkPaperStyleDomain
 import numpy as np
 from typing import List
 
@@ -39,6 +46,10 @@ class BaseHandwrittenModel(Model):
         super().register_services()
         c = self.container
 
+        # TODO: there is some issue and the style domains are not being
+        # resolved as singletons but as transients. Add unit tests,
+        # maybe it has to do with a specific version of punq
+        
         c.type(ColumnLayoutSynthesizer)
         c.type(BeamStemSynthesizer)
         c.interface(StafflinesSynthesizer, NaiveStafflinesSynthesizer)
@@ -46,6 +57,9 @@ class BaseHandwrittenModel(Model):
         c.interface(LineSynthesizer, MuscimaPPLineSynthesizer)
         c.type(SimplePageSynthesizer)
         c.type(MuscimaPPStyleDomain)
+        c.type(MzkPaperStyleDomain)
+        # c.interface(PaperSynthesizer, SolidColorPaperSynthesizer)
+        c.interface(PaperSynthesizer, MzkQuiltingPaperSynthesizer)
 
     def resolve_services(self):
         super().resolve_services()
@@ -60,6 +74,10 @@ class BaseHandwrittenModel(Model):
         self.styler.register_domain(
             MuscimaPPStyleDomain,
             self.container.resolve(MuscimaPPStyleDomain)
+        )
+        self.styler.register_domain(
+            MzkPaperStyleDomain,
+            self.container.resolve(MzkPaperStyleDomain)
         )
 
     def __call__(self, annotation_file_path: str) -> np.ndarray:
@@ -104,13 +122,6 @@ class BaseHandwrittenModel(Model):
         return self.render(page_index=0)
     
     def render(self, page_index: int) -> np.ndarray:
-        # render PNG (only first page)
         renderer = BitmapRenderer()
         bitmap = renderer.render(self.scene, self.pages[page_index].view_box)
-
-        # add white background
-        # TODO: synthesize background
-        mask = bitmap[:, :, 3] == 0
-        bitmap[mask, :] = 255
-
         return bitmap

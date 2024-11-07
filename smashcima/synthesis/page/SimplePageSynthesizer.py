@@ -6,6 +6,7 @@ from smashcima.geometry.Transform import Transform
 from smashcima.scene.ViewBox import ViewBox
 from smashcima.scene.AffineSpace import AffineSpace
 from .StafflinesSynthesizer import StafflinesSynthesizer
+from .PaperSynthesizer import PaperSynthesizer
 from typing import List
 from dataclasses import dataclass
 
@@ -47,8 +48,13 @@ MUSESCORE_PAGE_SETUP = PageSetup(
 
 class SimplePageSynthesizer:
     """Synthesizes page layout"""
-    def __init__(self, stafflines_synthesizer: StafflinesSynthesizer):
+    def __init__(
+        self,
+        stafflines_synthesizer: StafflinesSynthesizer,
+        paper_synthesizer: PaperSynthesizer
+    ):
         self.stafflines_synthesizer = stafflines_synthesizer
+        self.paper_synthesizer = paper_synthesizer
 
         self.page_setup = MUSESCORE_PAGE_SETUP
 
@@ -56,13 +62,23 @@ class SimplePageSynthesizer:
         page_space = AffineSpace(
             transform=Transform.translate(page_origin)
         )
-        
+
+        # TODO: view box should be attached to an affine space
         view_box = ViewBox(Rectangle(
             page_origin.x,
             page_origin.y,
             self.page_setup.size.x,
             self.page_setup.size.y
         ))
+
+        self.paper_synthesizer.synthesize_paper(
+            page_space=page_space,
+            placement=Rectangle(
+                0, 0,
+                self.page_setup.size.x,
+                self.page_setup.size.y
+            )
+        )
 
         staves = self._synthesize_stafflines(page_space)
 

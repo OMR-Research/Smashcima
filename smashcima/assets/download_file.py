@@ -3,10 +3,11 @@ import tqdm
 from pathlib import Path
 
 
-def download_file(url: str, path: Path):
+def download_file(url: str, path: Path, with_progress_bar=True):
     """Downloads a file with a progress bar and saves it to a path"""
-    print("Downloading " + str(url))
-    print("and saving it to " + str(path))
+    if with_progress_bar:
+        print("Downloading " + str(url))
+        print("and saving it to " + str(path))
     
     # taken from:
     # https://stackoverflow.com/questions/37573483/progress-bar-while-download-file-over-http-with-requests/37573701
@@ -16,7 +17,8 @@ def download_file(url: str, path: Path):
     progress_bar = tqdm.tqdm(
         total=total_size_in_bytes,
         unit="iB",
-        unit_scale=True
+        unit_scale=True,
+        disable=not with_progress_bar
     )
     with open(path, "wb") as file:
         for data in response.iter_content(block_size):
