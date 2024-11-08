@@ -1,7 +1,10 @@
 from smashcima.orchestration.BaseHandwrittenModel import BaseHandwrittenModel
 from smashcima.synthesis.style.MzkPaperStyleDomain import MzkPaperStyleDomain
+from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
+from smashcima.synthesis.style.Styler import Styler
 from smashcima.assets.AssetRepository import AssetRepository
 from smashcima.assets.textures.MzkPaperPatches import MzkPaperPatches, Patch
+from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
 from pathlib import Path
 from dataclasses import dataclass
 from typing import List
@@ -26,24 +29,60 @@ def img_smashcima2gradio(img: np.ndarray) -> np.ndarray:
 
 
 ############################
-# Smashcima initialization #
+# Smashcima Initialization #
 ############################
 
-model = BaseHandwrittenModel()
-assets = model.container.resolve(AssetRepository)
-paper_patches_bundle = assets.resolve_bundle(MzkPaperPatches)
-paper_style_domain = model.styler.resolve_domain(MzkPaperStyleDomain)
+ASSET_REPO = AssetRepository(REPO_FOLDER / "smashcima_assets")
+
+
+class StaticStyler(Styler):
+    def pick_style(self):
+        pass # do nothing, keep the current style unchanged
+
+
+class DemoModel(BaseHandwrittenModel):
+    def register_services(self):
+        super().register_services()
+
+        # change the styler used by the model
+        self.container.interface(Styler, StaticStyler)
+
+        # use one shared asset repository for the demo
+        self.container.instance(AssetRepository, ASSET_REPO)
+    
+    def resolve_services(self):
+        super().resolve_services()
+
+        # keep style domains as fields
+        self.mpp_style_domain = self.container.resolve(MuscimaPPStyleDomain)
+        self.paper_style_domain = self.container.resolve(MzkPaperStyleDomain)
+
+
+model = DemoModel()
+
+
+#################
+# Writer Styles #
+#################
+
+mpp_glyphs = ASSET_REPO.resolve_bundle(MuscimaPPGlyphs)
+mpp_symbol_repo = mpp_glyphs.load_symbol_repository()
+WRITERS = list(sorted(mpp_symbol_repo.all_writers))
 
 
 ######################
 # Background Samples #
 ######################
 
+
 @dataclass
 class BackgroundSample:
     patch: Patch
     title: str
     gradio_image: np.ndarray
+
+
+paper_patches_bundle = ASSET_REPO.resolve_bundle(MzkPaperPatches)
 
 BACKGROUND_SAMPLES: List[BackgroundSample] = [
     BackgroundSample(
@@ -53,7 +92,7 @@ BACKGROUND_SAMPLES: List[BackgroundSample] = [
             paper_patches_bundle.load_bitmap_for_patch(patch)
         )
     )
-    for patch in paper_style_domain.all_patches
+    for patch in paper_patches_bundle.load_patch_index()
 ]
 
 
@@ -101,17 +140,24 @@ with gr.Blocks() as demo:
                 synthesize_btn = gr.Button("Synthesize", variant="primary")
 
             mxl_file_radio = gr.Radio(
-                label="Input MusicXML files",
+                label="Input MusicXML Files",
                 choices=[p.name for p in MXL_FILES],
                 value=MXL_FILES[0].name
             )
+            
+            with gr.Accordion("Style Controls", open=False):
+                writer_radio = gr.Radio(
+                    label="Handwriting Style",
+                    choices=WRITERS,
+                    value=WRITERS[0]
+                )
 
-            gallery = gr.Gallery(
-                label="Background Sample",
-                columns=3,
-                value=[(s.gradio_image, s.title) for s in BACKGROUND_SAMPLES],
-                interactive=False, # disable user's uploads
-            )
+                background_gallery = gr.Gallery(
+                    label="Background Sample",
+                    columns=3,
+                    value=[(s.gradio_image, s.title) for s in BACKGROUND_SAMPLES],
+                    interactive=False, # disable user's uploads
+                )
 
         with gr.Column(scale=1):
             output_canvas = gr.Image(
@@ -123,26 +169,50 @@ with gr.Blocks() as demo:
 
     def change_background(select_data: gr.SelectData) -> int:
         return select_data.index
+    
+    def randomize():
+        new_mxl_file_name = random.choice(MXL_FILES).name
+        new_writer = random.choice(WRITERS)
+        new_bg_index = random.randint(0, len(BACKGROUND_SAMPLES) - 1)
+        return (
+            gr.Radio(value=new_mxl_file_name),
+            gr.Radio(value=new_writer),
+            gr.Gallery(selected_index=new_bg_index)
+        )
 
-    def synthesize(bg_index: int, mxl_file_name: str) -> np.ndarray:
-        path = next(f for f in MXL_FILES if f.name == mxl_file_name)
-        print("Render:", bg_index, path)
-        # TODO: modify the model style according to arguments
+    def synthesize(mxl_file_name: str, writer: int, bg_index: int) -> np.ndarray:
+        global model
         # TODO: keep the model instance in session state
-        # TODO: have one instance of AssetRepository that points to this repo
-        img = model(str(path))
+
+        mxl_path = str(next(f for f in MXL_FILES if f.name == mxl_file_name))
+
+        # set the writer style
+        model.mpp_style_domain.current_writer = writer
+
+        # set the background paper style
+        model.paper_style_domain.current_patch \
+            = BACKGROUND_SAMPLES[bg_index].patch
+
+        img = model(mxl_path)
         return img_smashcima2gradio(img)
     
     # === bind events ===
 
     synth_evt_args = (
         synthesize,
-        [background, mxl_file_radio],
+        [mxl_file_radio, writer_radio, background],
         [output_canvas]
     )
 
-    gallery.select(change_background, [], [background]).then(*synth_evt_args)
+    randomize_btn.click(
+        randomize, [],
+        [mxl_file_radio, writer_radio, background_gallery]
+    )
     synthesize_btn.click(*synth_evt_args)
+    mxl_file_radio.change(*synth_evt_args)
+    writer_radio.change(*synth_evt_args)
+    background_gallery.select(change_background, [], [background]) \
+        .then(*synth_evt_args)
 
 
 # .venv/bin/python3 -m gradio_demo

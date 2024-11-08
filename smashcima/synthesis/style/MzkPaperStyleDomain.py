@@ -12,8 +12,6 @@ class MzkPaperStyleDomain(StyleDomain):
     def __init__(self, assets: AssetRepository, rng: random.Random):
         bundle = assets.resolve_bundle(MzkPaperPatches)
         
-        # print(self)
-
         self.all_patches: List[Patch] = bundle.load_patch_index()
         "All paper texture patches available in the bundle"
         
@@ -29,4 +27,3 @@ class MzkPaperStyleDomain(StyleDomain):
 
     def pick_style(self):
         self.current_patch = self.rng.choice(self.all_patches)
-        # print(id(self), self.current_patch.mzk_uuid)
