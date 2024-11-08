@@ -39,6 +39,10 @@ jupyter = [
     "ipympl",
     "ipycytoscape"
 ]
+gradio = [
+    "gradio",
+    "coolname"
+]
 
 [tool.hatch.version]
 path = "smashcima/__init__.py"

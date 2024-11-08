@@ -35,6 +35,9 @@ python3 -m venv .venv
 
 # to run jupyter notebooks:
 .venv/bin/pip3 install -e .[jupyter]
+
+# to run the gradio demo:
+.venv/bin/pip3 install -e .[gradio]
 ```
 
 

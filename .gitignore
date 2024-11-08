@@ -1,12 +1,14 @@
 # editors
 .idea/
 
-# here we can add our own additional rules
+# AssetRepository folder used in jupyter notebooks and the demo
 smashcima_assets/
-# ...
 
 # MuseScore
 .mscbackup
+
+# gradio folders
+.gradio
 
 
 ###############################
