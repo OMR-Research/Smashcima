@@ -1,6 +1,8 @@
 # Smashcima
 
-A library and a framework for synthesizing images containing music, intended for use as training data for OMR models.
+A library and a framework for synthesizing images containing music, intended for the creation of training data for OMR models.
+
+**Try out the demo on [🤗 Huggingface Spaces](https://huggingface.co/spaces/Jirka-Mayer/Smashcima) right now!**
 
 Install with:
 
