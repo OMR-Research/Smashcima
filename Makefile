@@ -14,7 +14,30 @@ push-test:
 	.venv/bin/python3 -m twine upload --repository testpypi dist/*
 
 demo-serve:
-	.venv/bin/voila --no-browser --port 8866 jupyter/
+	.venv/bin/python3 -m gradio_demo
 
 clear-jupyter-outputs:
 	.venv/bin/jupyter nbconvert --clear-output --inplace jupyter/*.ipynb jupyter/*/*.ipynb jupyter/*/*/*.ipynb jupyter/*/*/*/*.ipynb
+
+
+######################
+# Docker Gradio Demo #
+######################
+
+VERSION=$$(grep -oP "__version__\\s*=\\s*\"\K[^\"]+" smashcima/__init__.py)
+TAG=jirkamayer/smashcima-demo:$(VERSION)
+
+.PHONY: docker-demo-build docker-demo-push docker-demo-run docker-demo-shell
+
+docker-demo-build:
+	docker build --tag $(TAG) .
+
+docker-demo-push:
+	docker push $(TAG)
+
+docker-demo-run:
+	@echo Open the demo at http://localhost:7860/
+	docker run --rm -it -p 7860:7860 $(TAG)
+
+docker-demo-shell:
+	docker run --rm -it --entrypoint bash $(TAG)
