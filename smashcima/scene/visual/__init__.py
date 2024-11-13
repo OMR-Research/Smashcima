@@ -8,7 +8,7 @@ from .LedgerLine import LedgerLine
 from .Notehead import Notehead
 from .NoteheadSide import NoteheadSide
 from .Page import Page
-from .RestGlyph import RestGlyph
+from .RestVisual import RestVisual
 from .StaffCoordinateSystem import StaffCoordinateSystem
 from .StaffVisual import StaffVisual
 from .Stem import Stem

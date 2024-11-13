@@ -1,7 +1,7 @@
 from ..Glyph import Glyph
 from ..SceneObject import SceneObject
 from .Notehead import Notehead
-from .RestGlyph import RestGlyph
+from .RestVisual import RestVisual
 from dataclasses import dataclass
 from typing import List, Union
 
@@ -13,7 +13,7 @@ class AugmentationDot(SceneObject):
     glyph: Glyph
     """The dot glyph"""
 
-    owners: List[Union[Notehead | RestGlyph]]
+    owners: List[Union[Notehead | RestVisual]]
     """The glyph(s) that is(are) affected by this augmentation dot.
     For noteheads in dense chords, augmentation dots may be shared.
     Otherwise it's usually one-to-one"""

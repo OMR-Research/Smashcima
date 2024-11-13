@@ -3,7 +3,7 @@ from ..scene.semantic.Score import Score
 from ..scene.semantic.Part import Part
 from ..scene.semantic.Measure import Measure
 from ..scene.semantic.Note import Note
-from ..scene.semantic.Rest import Rest
+from ..scene.semantic.RestSemantic import RestSemantic
 from ..scene.semantic.MeasureRest import MeasureRest
 from ..scene.semantic.TypeDuration import TypeDuration
 from ..scene.semantic.Pitch import Pitch
@@ -451,7 +451,7 @@ class MusicXmlLoader:
         # handle rests
         if pitch is None:
             self._measure_state.measure.add_durable(
-                durable=Rest(
+                durable=RestSemantic(
                     type_duration=type_duration,
                     augmentation_dots=duration_dots,
                     fractional_duration=fractional_duration,

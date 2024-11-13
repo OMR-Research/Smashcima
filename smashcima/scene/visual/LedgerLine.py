@@ -1,7 +1,7 @@
 from ..SceneObject import SceneObject
 from ..LineGlyph import LineGlyph
 from .Notehead import Notehead
-from .RestGlyph import RestGlyph
+from .RestVisual import RestVisual
 from dataclasses import dataclass, field
 from typing import List, Optional
 
@@ -19,7 +19,7 @@ class LedgerLine(SceneObject):
     The list contains only noteheads from the same onset event.)
     If this list is empty, then this ledger line affects a (whole/half) rest."""
 
-    affected_rest: Optional[RestGlyph] = None
+    affected_rest: Optional[RestVisual] = None
     """A ledger line is also needed for whole and half rests. Here, the
     placement is simpler, because there are no intermediate lines drawn,
     only the one that directly touches the rest."""

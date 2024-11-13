@@ -2,12 +2,12 @@ from smashcima.scene.Glyph import Glyph
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.ScoreEvent import ScoreEvent
 from smashcima.scene.semantic.Note import Note
-from smashcima.scene.semantic.Rest import Rest
+from smashcima.scene.semantic.RestSemantic import RestSemantic
 from smashcima.scene.semantic.Durable import Durable
 from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.visual.AugmentationDot import AugmentationDot
 from smashcima.scene.visual.Notehead import Notehead
-from smashcima.scene.visual.RestGlyph import RestGlyph
+from smashcima.scene.visual.RestVisual import RestVisual
 from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
 from smashcima.geometry.Point import Point
@@ -35,7 +35,7 @@ class AugmentationDotsColumn(ColumnBase):
     def place_augmentation_dots_for_staff(self, staff: StaffVisual):
         noteheads: List[Notehead] = []
         notehead_dots: List[AugmentationDot] = []
-        rests: List[RestGlyph] = []
+        rests: List[RestVisual] = []
         rest_dots: List[AugmentationDot] = []
         for dot in self.augmentation_dots:
             for owner in dot.owners:
@@ -44,7 +44,7 @@ class AugmentationDotsColumn(ColumnBase):
                 if isinstance(owner, Notehead):
                     noteheads.append(owner)
                     notehead_dots.append(dot)
-                elif isinstance(owner, RestGlyph):
+                elif isinstance(owner, RestVisual):
                     rests.append(owner)
                     rest_dots.append(dot)
         
@@ -117,7 +117,7 @@ def synthesize_augmentation_dots_column(
         )
 
         for durable in sorted_durables:
-            owner: Union[None, Notehead, RestGlyph] = None
+            owner: Union[None, Notehead, RestVisual] = None
             pitch_position: Optional[int] = None
             augmentation_dot_count: int = 0
 
@@ -133,8 +133,8 @@ def synthesize_augmentation_dots_column(
                 augmentation_dot_count = durable.augmentation_dots
 
             # handle rests
-            elif isinstance(durable, Rest):
-                rest_glyph = RestGlyph.of_rest(durable, fail_if_none=True)
+            elif isinstance(durable, RestSemantic):
+                rest_glyph = RestVisual.of_rest(durable, fail_if_none=True)
                 owner = rest_glyph
                 pitch_position = rest_glyph.pitch_position
                 augmentation_dot_count = durable.augmentation_dots

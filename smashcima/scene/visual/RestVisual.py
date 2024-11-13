@@ -5,7 +5,7 @@ from smashcima.nameof_via_dummy import nameof_via_dummy
 
 from ..Glyph import Glyph
 from ..SceneObject import SceneObject
-from ..semantic import Clef, MeasureRest, Pitch, Rest, TypeDuration
+from ..semantic import Clef, MeasureRest, Pitch, RestSemantic, TypeDuration
 from .StaffVisual import StaffVisual
 
 # Display Pitch
@@ -41,13 +41,13 @@ from .StaffVisual import StaffVisual
 
 
 @dataclass
-class RestGlyph(SceneObject):
+class RestVisual(SceneObject):
     """Glyph of a rest symbol"""
 
     glyph: Glyph
     "The glyph of the rest object"
 
-    rest: Union[Rest, MeasureRest, None]
+    rest_semantic: Union[RestSemantic, MeasureRest, None]
     "The semantic rest that this glyph represents"
 
     clef: Clef
@@ -62,18 +62,18 @@ class RestGlyph(SceneObject):
     def detach(self):
         """Unlink the glyph from the scene"""
         self.glyph.detach()
-        self.rest = None
+        self.rest_semantic = None
         self.clef = None
         self.staff = None
 
     @staticmethod
     def of_rest(
-        rest: Rest,
+        rest: RestSemantic,
         fail_if_none=False
-    ) -> Optional["RestGlyph"] | "RestGlyph":
+    ) -> Optional["RestVisual"] | "RestVisual":
         return rest.get_inlinked(
-            RestGlyph,
-            nameof_via_dummy(RestGlyph, lambda g: g.rest),
+            RestVisual,
+            nameof_via_dummy(RestVisual, lambda g: g.rest_semantic),
             at_most_one=True,
             fail_if_none=fail_if_none
         )

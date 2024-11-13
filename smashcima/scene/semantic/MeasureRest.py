@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from .Rest import Rest
+from .RestSemantic import RestSemantic
 from .TypeDuration import TypeDuration
 from .Pitch import Pitch
 from fractions import Fraction
@@ -7,7 +7,7 @@ from typing import Optional
 
 
 @dataclass
-class MeasureRest(Rest):
+class MeasureRest(RestSemantic):
     def __init__(
         self,
         fractional_duration: Fraction,

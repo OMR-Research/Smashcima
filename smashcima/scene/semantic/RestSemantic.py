@@ -5,7 +5,7 @@ from typing import Optional
 
 
 @dataclass
-class Rest(Durable):
+class RestSemantic(Durable):
     display_pitch: Optional[Pitch]
     """Display pitch controls where the rest is placed vertically.
     If none, default placement should be used. For more information

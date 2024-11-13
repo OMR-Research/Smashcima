@@ -14,7 +14,7 @@ from .MeasureRest import MeasureRest
 from .Note import Note
 from .Part import Part
 from .Pitch import Pitch
-from .Rest import Rest
+from .RestSemantic import RestSemantic
 from .ScoreEvent import ScoreEvent
 from .ScoreMeasure import ScoreMeasure
 from .Score import Score
