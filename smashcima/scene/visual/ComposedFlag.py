@@ -1,4 +1,4 @@
-from .ComposedGlyph import ComposedGlyph
+from ..ComposedGlyph import ComposedGlyph
 from .Flag import Flag
 from .Stem import Stem
 from dataclasses import dataclass

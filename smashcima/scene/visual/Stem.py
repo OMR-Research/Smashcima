@@ -1,4 +1,4 @@
-from .LineGlyph import LineGlyph
+from ..LineGlyph import LineGlyph
 from ..semantic.Chord import Chord
 from dataclasses import dataclass
 from typing import Optional

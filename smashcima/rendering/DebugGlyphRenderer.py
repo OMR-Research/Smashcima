@@ -1,4 +1,5 @@
-from smashcima.scene.visual.Glyph import Glyph
+from smashcima.scene.AffineSpace import AffineSpace
+from smashcima.scene.Glyph import Glyph
 from smashcima.scene.ViewBox import ViewBox
 from smashcima.scene.Scene import Scene
 from .BitmapRenderer import BitmapRenderer
@@ -14,7 +15,7 @@ class DebugGlyphRenderer:
         # add sprites to display debug points
         glyph.place_debug_overlay()
 
-        scene = Scene()
+        scene = Scene(AffineSpace())
         glyph.space.parent_space = scene.root_space
         scene.add_closure()
 

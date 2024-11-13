@@ -1,6 +1,6 @@
 from .Glyph import Glyph
-from ..ScenePoint import ScenePoint
-from ..Sprite import Sprite
+from .ScenePoint import ScenePoint
+from .Sprite import Sprite
 from dataclasses import dataclass
 from typing import List
 

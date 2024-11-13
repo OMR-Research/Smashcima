@@ -1,6 +1,6 @@
 from smashcima.rendering.traverse_sprites import traverse_sprites
 from smashcima.geometry.Vector2 import Vector2
-from smashcima.scene.visual.Glyph import Glyph
+from smashcima.scene.Glyph import Glyph
 import matplotlib.pyplot as plt
 from typing import List
 import cv2

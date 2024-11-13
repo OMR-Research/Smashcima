@@ -1,4 +1,4 @@
-from .Glyph import Glyph
+from ..Glyph import Glyph
 from .Notehead import Notehead
 from .RestGlyph import RestGlyph
 from dataclasses import dataclass, field

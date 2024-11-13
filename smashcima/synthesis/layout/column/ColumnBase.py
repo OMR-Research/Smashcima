@@ -2,7 +2,7 @@ import abc
 from typing import List
 from .Column import Column
 from smashcima.scene.visual.Stafflines import Stafflines
-from smashcima.scene.visual.Glyph import Glyph
+from smashcima.scene.Glyph import Glyph
 from smashcima.scene.Sprite import Sprite
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.geometry.Rectangle import Rectangle

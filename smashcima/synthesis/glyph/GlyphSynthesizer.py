@@ -1,6 +1,6 @@
 import abc
 from typing import Set, Type, TypeVar
-from smashcima.scene.visual.Glyph import Glyph
+from smashcima.scene.Glyph import Glyph
 
 
 T = TypeVar("T", bound=Glyph)

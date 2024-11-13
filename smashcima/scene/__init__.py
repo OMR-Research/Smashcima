@@ -1,7 +1,10 @@
 # -----------------------------------------------------------------------------
 # import local types
 from .AffineSpace import AffineSpace
+from .ComposedGlyph import ComposedGlyph
+from .Glyph import Glyph
 from .LabeledRegion import LabeledRegion
+from .LineGlyph import LineGlyph
 from .Region import Region
 from .Scene import Scene
 from .SceneObject import SceneObject

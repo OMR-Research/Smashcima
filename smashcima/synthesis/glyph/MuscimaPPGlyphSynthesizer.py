@@ -1,6 +1,6 @@
 from typing import Set, Type, Dict
 from .GlyphSynthesizer import GlyphSynthesizer, T
-from smashcima.scene.visual.Glyph import Glyph
+from smashcima.scene.Glyph import Glyph
 from smashcima.assets.AssetRepository import AssetRepository
 from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
 from ...scene.SmuflLabels import SmuflLabels

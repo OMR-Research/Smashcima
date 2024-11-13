@@ -1,4 +1,4 @@
-from .Glyph import Glyph
+from ..Glyph import Glyph
 from .Stem import Stem
 from dataclasses import dataclass
 

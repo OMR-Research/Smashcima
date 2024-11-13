@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
-from ..SceneObject import SceneObject
-from ..Sprite import Sprite
-from ..AffineSpace import AffineSpace
-from ..ScenePoint import ScenePoint
+from .SceneObject import SceneObject
+from .Sprite import Sprite
+from .AffineSpace import AffineSpace
+from .ScenePoint import ScenePoint
 from smashcima.geometry.Polygon import Polygon
 from smashcima.geometry.Rectangle import Rectangle
 from smashcima.geometry.Point import Point

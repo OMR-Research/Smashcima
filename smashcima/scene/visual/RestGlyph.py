@@ -5,7 +5,7 @@ from ..semantic.TypeDuration import TypeDuration
 from ..semantic.Pitch import Pitch
 from ..semantic.Clef import Clef
 from .Stafflines import Stafflines
-from .Glyph import Glyph
+from ..Glyph import Glyph
 from typing import Optional
 from smashcima.nameof_via_dummy import nameof_via_dummy
 

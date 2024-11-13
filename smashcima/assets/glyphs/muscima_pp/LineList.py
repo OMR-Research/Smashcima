@@ -1,4 +1,4 @@
-from smashcima.scene.visual.LineGlyph import LineGlyph
+from smashcima.scene.LineGlyph import LineGlyph
 import bisect
 import random
 

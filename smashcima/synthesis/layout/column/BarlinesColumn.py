@@ -1,5 +1,5 @@
 from smashcima.scene.visual.Stafflines import Stafflines
-from smashcima.scene.visual.Glyph import Glyph
+from smashcima.scene.Glyph import Glyph
 from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
 from .ColumnBase import ColumnBase

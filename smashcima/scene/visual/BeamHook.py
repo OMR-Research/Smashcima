@@ -1,4 +1,4 @@
-from .LineGlyph import LineGlyph
+from ..LineGlyph import LineGlyph
 from .BeamCoordinateSystem import BeamCoordinateSystem
 from ..semantic.Chord import Chord
 from ..semantic.BeamedGroup import BeamedGroup

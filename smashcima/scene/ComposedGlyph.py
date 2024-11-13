@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from ..Sprite import Sprite
+from .Sprite import Sprite
 from smashcima.geometry.Polygon import Polygon
 from .Glyph import Glyph
 from dataclasses import dataclass, field

@@ -9,8 +9,8 @@ from smashcima.geometry.Point import Point
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.scene.Sprite import Sprite
 from smashcima.scene.ScenePoint import ScenePoint
-from smashcima.scene.visual.Glyph import Glyph
-from smashcima.scene.visual.LineGlyph import LineGlyph
+from smashcima.scene.Glyph import Glyph
+from smashcima.scene.LineGlyph import LineGlyph
 from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.visual.RestGlyph import RestGlyph
 from smashcima.scene.visual.Stem import Stem

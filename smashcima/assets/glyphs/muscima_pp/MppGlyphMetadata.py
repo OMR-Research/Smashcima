@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from smashcima.scene.SceneObject import SceneObject
-from smashcima.scene.visual.Glyph import Glyph
+from smashcima.scene.Glyph import Glyph
 from .MppPage import MppPage
 from typing import Optional
 from smashcima.nameof_via_dummy import nameof_via_dummy

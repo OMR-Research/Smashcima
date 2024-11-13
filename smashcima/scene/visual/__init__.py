@@ -4,11 +4,8 @@ from .BeamCoordinateSystem import BeamCoordinateSystem
 from .BeamHook import BeamHook
 from .Beam import Beam
 from .ComposedFlag import ComposedFlag
-from .ComposedGlyph import ComposedGlyph
 from .Flag import Flag
-from .Glyph import Glyph
 from .LedgerLine import LedgerLine
-from .LineGlyph import LineGlyph
 from .Notehead import Notehead
 from .NoteheadSide import NoteheadSide
 from .Page import Page

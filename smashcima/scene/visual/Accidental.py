@@ -1,4 +1,4 @@
-from .Glyph import Glyph
+from ..Glyph import Glyph
 from .Notehead import Notehead
 from dataclasses import dataclass
 from typing import List, Union, Optional

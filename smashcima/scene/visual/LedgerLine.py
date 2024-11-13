@@ -1,4 +1,4 @@
-from .LineGlyph import LineGlyph
+from ..LineGlyph import LineGlyph
 from .Notehead import Notehead
 from .RestGlyph import RestGlyph
 from dataclasses import dataclass, field

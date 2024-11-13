@@ -1,5 +1,5 @@
 from typing import List, Dict, Tuple, Set
-from smashcima.scene.visual.Glyph import Glyph
+from smashcima.scene.Glyph import Glyph
 from .MppGlyphMetadata import MppGlyphMetadata
 from .LineList import LineList
 
