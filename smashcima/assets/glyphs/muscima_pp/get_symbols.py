@@ -1,9 +1,10 @@
 from muscima.io import CropObject
 from typing import List, Type, TypeVar, Callable, Optional, Tuple, Dict
+
+from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from .MppPage import MppPage
 from .MppGlyphMetadata import MppGlyphMetadata
-from smashcima.synthesis.glyph.SmashcimaGlyphClass import SmashcimaGlyphClass
-from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
+from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.geometry.Point import Point
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.scene.Sprite import Sprite
@@ -259,7 +260,7 @@ def get_full_noteheads(page: MppPage) -> List[Notehead]:
         ],
         page=page,
         glyph_type=Notehead,
-        glyph_class=SmuflGlyphClass.noteheadBlack.value
+        glyph_class=SmuflLabels.noteheadBlack.value
     )
 
 
@@ -272,7 +273,7 @@ def get_empty_noteheads(page: MppPage) -> List[Notehead]:
         ],
         page=page,
         glyph_type=Notehead,
-        glyph_class=SmuflGlyphClass.noteheadWhole.value
+        glyph_class=SmuflLabels.noteheadWhole.value
     )
 
 
@@ -281,7 +282,7 @@ def get_whole_rests(page: MppPage) -> List[RestGlyph]:
         page,
         clsname="whole_rest",
         glyph_type=RestGlyph,
-        glyph_class=SmuflGlyphClass.restWhole.value,
+        glyph_class=SmuflLabels.restWhole.value,
         line_from_top=1
     )
     # NOTE: these checks were in the old version, but they make situation
@@ -299,7 +300,7 @@ def get_half_rests(page: MppPage) -> List[RestGlyph]:
         page,
         clsname="half_rest",
         glyph_type=RestGlyph,
-        glyph_class=SmuflGlyphClass.restHalf.value,
+        glyph_class=SmuflLabels.restHalf.value,
         line_from_top=2
     )
     # NOTE: these checks were in the old version, but they make situation
@@ -317,7 +318,7 @@ def get_quarter_rests(page: MppPage) -> List[RestGlyph]:
         page,
         clsname="quarter_rest",
         glyph_type=RestGlyph,
-        glyph_class=SmuflGlyphClass.restQuarter.value,
+        glyph_class=SmuflLabels.restQuarter.value,
         line_from_top=2,
         when_center_outside_recenter=True
     )
@@ -328,7 +329,7 @@ def get_eighth_rests(page: MppPage) -> List[RestGlyph]:
         page,
         clsname="8th_rest",
         glyph_type=RestGlyph,
-        glyph_class=SmuflGlyphClass.rest8th.value,
+        glyph_class=SmuflLabels.rest8th.value,
         line_from_top=2,
         when_center_outside_recenter=True
     )
@@ -339,7 +340,7 @@ def get_sixteenth_rests(page: MppPage) -> List[RestGlyph]:
         page,
         clsname="16th_rest",
         glyph_type=RestGlyph,
-        glyph_class=SmuflGlyphClass.rest16th.value,
+        glyph_class=SmuflLabels.rest16th.value,
         line_from_top=2,
         when_center_outside_recenter=True
     )
@@ -359,7 +360,7 @@ def get_normal_barlines(page: MppPage) -> List[Glyph]:
         ],
         page=page,
         glyph_type=Glyph,
-        glyph_class=SmuflGlyphClass.barlineSingle.value
+        glyph_class=SmuflLabels.barlineSingle.value
     )
 
 
@@ -368,7 +369,7 @@ def get_g_clefs(page: MppPage) -> List[Glyph]:
         page,
         clsname="g-clef",
         glyph_type=Glyph,
-        glyph_class=SmuflGlyphClass.gClef.value,
+        glyph_class=SmuflLabels.gClef.value,
         line_from_top=3
     )
 
@@ -378,7 +379,7 @@ def get_f_clefs(page: MppPage) -> List[Glyph]:
         page,
         clsname="f-clef",
         glyph_type=Glyph,
-        glyph_class=SmuflGlyphClass.fClef.value,
+        glyph_class=SmuflLabels.fClef.value,
         line_from_top=1
     )
 
@@ -391,7 +392,7 @@ def get_c_clefs(page: MppPage) -> List[Glyph]:
         ],
         page=page,
         glyph_type=Glyph,
-        glyph_class=SmuflGlyphClass.cClef.value
+        glyph_class=SmuflLabels.cClef.value
     )
 
 
@@ -403,7 +404,7 @@ def get_stems(page: MppPage) -> List[Stem]:
         ],
         page=page,
         glyph_type=Stem,
-        glyph_class=SmuflGlyphClass.stem.value,
+        glyph_class=SmuflLabels.stem.value,
         horizontal_line=False, # vertical line
         in_increasing_direction=False # pointing upwards
     )
@@ -418,7 +419,7 @@ def get_beams(page: MppPage) -> List[Beam]:
         ],
         page=page,
         glyph_type=Beam,
-        glyph_class=SmashcimaGlyphClass.beam.value,
+        glyph_class=SmashcimaLabels.beam.value,
         horizontal_line=True, # horizontal line
         in_increasing_direction=True # pointing to the right
     )
@@ -433,7 +434,7 @@ def get_beam_hooks(page: MppPage) -> List[BeamHook]:
         ],
         page=page,
         glyph_type=BeamHook,
-        glyph_class=SmashcimaGlyphClass.beamHook.value,
+        glyph_class=SmashcimaLabels.beamHook.value,
         horizontal_line=True, # horizontal line
         in_increasing_direction=True # pointing to the right
     )
@@ -447,7 +448,7 @@ def get_ledger_lines(page: MppPage) -> List[LedgerLine]:
         ],
         page=page,
         glyph_type=LedgerLine,
-        glyph_class=SmashcimaGlyphClass.ledgerLine.value,
+        glyph_class=SmashcimaLabels.ledgerLine.value,
         horizontal_line=True, # horizontal line
         in_increasing_direction=True # pointing to the right
     )
@@ -503,17 +504,17 @@ def get_flags(page: MppPage) -> Tuple[List[Flag], List[Flag]]:
 
         _GLYPH_CLASS_LOOKUP: Dict[Tuple[bool, bool], str] = {
             # (16th?, upward?) -> smufl class
-            (False, False): SmuflGlyphClass.flag8thDown.value,
-            (False, True): SmuflGlyphClass.flag8thUp.value,
-            (True, False): SmuflGlyphClass.flag16thDown.value,
-            (True, True): SmuflGlyphClass.flag16thUp.value,
+            (False, False): SmuflLabels.flag8thDown.value,
+            (False, True): SmuflLabels.flag8thUp.value,
+            (True, False): SmuflLabels.flag16thDown.value,
+            (True, True): SmuflLabels.flag16thUp.value,
         }
         _ISOLATED_GLYPH_CLASS_LOOKUP: Dict[Tuple[bool, bool], str] = {
             # (16th?, upward?) -> smufl class
-            (False, False): SmashcimaGlyphClass.isolatedFlag8thDown.value,
-            (False, True): SmashcimaGlyphClass.isolatedFlag8thUp.value,
-            (True, False): SmashcimaGlyphClass.isolatedFlag16thDown.value,
-            (True, True): SmashcimaGlyphClass.isolatedFlag16thUp.value,
+            (False, False): SmashcimaLabels.isolatedFlag8thDown.value,
+            (False, True): SmashcimaLabels.isolatedFlag8thUp.value,
+            (True, False): SmashcimaLabels.isolatedFlag16thDown.value,
+            (True, True): SmashcimaLabels.isolatedFlag16thUp.value,
         }
 
         stem = page.get(stem_objid)
@@ -595,7 +596,7 @@ def get_duration_dots(page: MppPage) -> List[AugmentationDot]:
         ],
         page=page,
         glyph_type=AugmentationDot,
-        glyph_class=SmuflGlyphClass.augmentationDot.value
+        glyph_class=SmuflLabels.augmentationDot.value
     )
 
 
@@ -607,19 +608,19 @@ def get_staccato_dots(page: MppPage) -> List[Glyph]:
         ],
         page=page,
         glyph_type=Glyph,
-        glyph_class=SmuflGlyphClass.articStaccatoBelow.value
+        glyph_class=SmuflLabels.articStaccatoBelow.value
     )
 
 
 def get_accidentals(page: MppPage) -> List[Accidental]:
     _GLYPH_CLASS_LOOKUP: Dict[str, str] = {
-        "sharp": SmuflGlyphClass.accidentalSharp.value,
-        "flat": SmuflGlyphClass.accidentalFlat.value,
-        "natural": SmuflGlyphClass.accidentalNatural.value,
-        "double_sharp": SmuflGlyphClass.accidentalDoubleSharp.value,
+        "sharp": SmuflLabels.accidentalSharp.value,
+        "flat": SmuflLabels.accidentalFlat.value,
+        "natural": SmuflLabels.accidentalNatural.value,
+        "double_sharp": SmuflLabels.accidentalDoubleSharp.value,
 
         # NOTE: there are no double-flats in MUSCIMA++
-        "double_flat": SmuflGlyphClass.accidentalDoubleFlat.value
+        "double_flat": SmuflLabels.accidentalDoubleFlat.value
     }
 
     crop_objects = [
@@ -712,7 +713,7 @@ def get_brackets_and_braces(page: MppPage) -> List[LineGlyph]:
         ],
         page=page,
         glyph_type=LineGlyph,
-        glyph_class=SmuflGlyphClass.bracket.value,
+        glyph_class=SmuflLabels.bracket.value,
         horizontal_line=False, # vertical line
         in_increasing_direction=True # drawn top-to-bottom
     )
@@ -723,7 +724,7 @@ def get_brackets_and_braces(page: MppPage) -> List[LineGlyph]:
         ],
         page=page,
         glyph_type=LineGlyph,
-        glyph_class=SmuflGlyphClass.brace.value,
+        glyph_class=SmuflLabels.brace.value,
         horizontal_line=False, # vertical line
         in_increasing_direction=True # drawn top-to-bottom
     )
@@ -759,27 +760,27 @@ def get_brackets_and_braces(page: MppPage) -> List[LineGlyph]:
     for g in glyphs:
         meta = MppGlyphMetadata.of_glyph(g)
         if meta.mpp_crop_object_uid in _MISTAKES:
-            if g.glyph_class == SmuflGlyphClass.brace.value:
-                g.glyph_class = SmuflGlyphClass.bracket.value
-            elif g.glyph_class == SmuflGlyphClass.bracket.value:
-                g.glyph_class = SmuflGlyphClass.brace.value
+            if g.glyph_class == SmuflLabels.brace.value:
+                g.glyph_class = SmuflLabels.bracket.value
+            elif g.glyph_class == SmuflLabels.bracket.value:
+                g.glyph_class = SmuflLabels.brace.value
 
     return glyphs
 
 
 def get_time_marks(page: MppPage) -> List[Glyph]:
     _GLYPH_CLASS_LOOKUP: Dict[str, str] = {
-        "numeral_0": SmuflGlyphClass.timeSig0.value, # NOT PRESENT
-        "numeral_1": SmuflGlyphClass.timeSig1.value, # NOT PRESENT
-        "numeral_2": SmuflGlyphClass.timeSig2.value,
-        "numeral_3": SmuflGlyphClass.timeSig3.value,
-        "numeral_4": SmuflGlyphClass.timeSig4.value,
-        "numeral_5": SmuflGlyphClass.timeSig5.value,
-        "numeral_6": SmuflGlyphClass.timeSig6.value,
-        "numeral_7": SmuflGlyphClass.timeSig7.value,
-        "numeral_8": SmuflGlyphClass.timeSig8.value,
-        "numeral_9": SmuflGlyphClass.timeSig9.value, # NOT PRESENT
-        "whole-time_mark": SmuflGlyphClass.timeSigCommon.value,
+        "numeral_0": SmuflLabels.timeSig0.value, # NOT PRESENT
+        "numeral_1": SmuflLabels.timeSig1.value, # NOT PRESENT
+        "numeral_2": SmuflLabels.timeSig2.value,
+        "numeral_3": SmuflLabels.timeSig3.value,
+        "numeral_4": SmuflLabels.timeSig4.value,
+        "numeral_5": SmuflLabels.timeSig5.value,
+        "numeral_6": SmuflLabels.timeSig6.value,
+        "numeral_7": SmuflLabels.timeSig7.value,
+        "numeral_8": SmuflLabels.timeSig8.value,
+        "numeral_9": SmuflLabels.timeSig9.value, # NOT PRESENT
+        "whole-time_mark": SmuflLabels.timeSigCommon.value,
         # cut time is not present in MUSCIMA++
     }
 

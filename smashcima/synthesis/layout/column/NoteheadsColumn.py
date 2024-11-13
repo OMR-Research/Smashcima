@@ -1,3 +1,4 @@
+from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from smashcima.scene.semantic.Clef import Clef
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.Event import Event
@@ -10,10 +11,9 @@ from smashcima.scene.visual.Stafflines import Stafflines
 from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.visual.NoteheadSide import NoteheadSide
 from smashcima.scene.visual.LedgerLine import LedgerLine
-from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
+from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
 from smashcima.synthesis.glyph.LineSynthesizer import LineSynthesizer
-from smashcima.synthesis.glyph.SmashcimaGlyphClass import SmashcimaGlyphClass
 from smashcima.geometry.Point import Point
 from smashcima.random_between import random_between
 from .ColumnBase import ColumnBase
@@ -245,7 +245,7 @@ class NoteheadsColumn(ColumnBase):
 
         line = self.line_synthesizer.synthesize_line(
             glyph_type=LedgerLine,
-            glyph_class=SmashcimaGlyphClass.ledgerLine.value,
+            glyph_class=SmashcimaLabels.ledgerLine.value,
             start_point=start_point,
             end_point=end_point
         )
@@ -302,7 +302,7 @@ def synthesize_noteheads_column(
                 
                 # new notehead for a note
                 notehead = glyph_synthesizer.synthesize_glyph(
-                    SmuflGlyphClass.notehead_from_type_duration(
+                    SmuflLabels.notehead_from_type_duration(
                         note.type_duration
                     ).value,
                     expected_glyph_type=Notehead

@@ -1,6 +1,6 @@
 from smashcima.scene.visual.Stafflines import Stafflines
 from smashcima.scene.visual.Glyph import Glyph
-from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
+from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
 from .ColumnBase import ColumnBase
 from typing import List
@@ -36,7 +36,7 @@ def synthesize_barlines_column(
 
     for stafflines in staves:
         barline = glyph_synthesizer.synthesize_glyph(
-            SmuflGlyphClass.barlineSingle.value
+            SmuflLabels.barlineSingle.value
         )
         barline.space.parent_space = stafflines.space
         column.add_barline(barline)

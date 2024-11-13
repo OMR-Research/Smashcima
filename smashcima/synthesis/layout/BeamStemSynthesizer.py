@@ -1,3 +1,4 @@
+from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from smashcima.scene.semantic.Note import Note
 from smashcima.scene.semantic.BeamedGroup import BeamedGroup
 from smashcima.scene.semantic.BeamValue import BeamValue
@@ -17,8 +18,7 @@ from smashcima.scene.visual.BeamCoordinateSystem import BeamCoordinateSystem
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.geometry.Point import Point
 from smashcima.synthesis.glyph.LineSynthesizer import LineSynthesizer
-from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
-from smashcima.synthesis.glyph.SmashcimaGlyphClass import SmashcimaGlyphClass
+from smashcima.scene.SmuflLabels import SmuflLabels
 from typing import List, Optional
 from collections import Counter
 import cv2
@@ -113,7 +113,7 @@ class BeamStemSynthesizer:
         # synthesize the stem glyph
         stem = self.line_synthesizer.synthesize_line(
             glyph_type=Stem,
-            glyph_class=SmuflGlyphClass.stem.value,
+            glyph_class=SmuflLabels.stem.value,
             start_point=stem_base,
             end_point=stem_tip
         )
@@ -304,7 +304,7 @@ class BeamStemSynthesizer:
             stem_value = _determine_beam_orientation(chords)
             beam = self.line_synthesizer.synthesize_line(
                 glyph_type=Beam,
-                glyph_class=SmashcimaGlyphClass.beam.value,
+                glyph_class=SmashcimaLabels.beam.value,
                 start_point=f.point(start_tip.x, beam_number, stem_value),
                 end_point=f.point(end_tip.x, beam_number, stem_value)
             )
@@ -322,7 +322,7 @@ class BeamStemSynthesizer:
             )
             hook = self.line_synthesizer.synthesize_line(
                 glyph_type=BeamHook,
-                glyph_class=SmashcimaGlyphClass.beamHook.value,
+                glyph_class=SmashcimaLabels.beamHook.value,
                 start_point=f.point(start_x, beam_number, stem_value),
                 end_point=f.point(end_x, beam_number, stem_value)
             )

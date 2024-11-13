@@ -2,8 +2,8 @@ from ...AssetBundle import AssetBundle
 from ...datasets.MuscimaPP import MuscimaPP
 from smashcima.rendering.DebugGlyphRenderer import DebugGlyphRenderer
 from .MppPage import MppPage
-from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
-from smashcima.synthesis.glyph.SmashcimaGlyphClass import SmashcimaGlyphClass
+from smashcima.scene.SmuflLabels import SmuflLabels
+from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from .get_symbols import \
     get_full_noteheads, \
     get_empty_noteheads, \
@@ -87,10 +87,10 @@ class MuscimaPPGlyphs(AssetBundle):
 
             # and construct line indexes
             repository.index_lines([
-                SmuflGlyphClass.stem.value,
-                SmashcimaGlyphClass.beam.value,
-                SmashcimaGlyphClass.beamHook.value,
-                SmashcimaGlyphClass.ledgerLine.value
+                SmuflLabels.stem.value,
+                SmashcimaLabels.beam.value,
+                SmashcimaLabels.beamHook.value,
+                SmashcimaLabels.ledgerLine.value
             ])
 
             # TODO: and extract distributions

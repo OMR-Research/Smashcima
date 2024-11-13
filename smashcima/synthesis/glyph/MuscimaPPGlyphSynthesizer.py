@@ -3,7 +3,7 @@ from .GlyphSynthesizer import GlyphSynthesizer, T
 from smashcima.scene.visual.Glyph import Glyph
 from smashcima.assets.AssetRepository import AssetRepository
 from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
-from .SmuflGlyphClass import SmuflGlyphClass
+from ...scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
 import random
 import copy
@@ -11,41 +11,41 @@ import copy
 
 _QUERY_TO_MPP_LOOKUP: Dict[str, str] = {
     # barlines
-    SmuflGlyphClass.barlineSingle.value: SmuflGlyphClass.barlineSingle.value,
+    SmuflLabels.barlineSingle.value: SmuflLabels.barlineSingle.value,
 
     # clefs    (clefs ignore the normal/small distinction)
-    SmuflGlyphClass.gClef: SmuflGlyphClass.gClef,
-    SmuflGlyphClass.gClefSmall: SmuflGlyphClass.gClef,
-    SmuflGlyphClass.fClef: SmuflGlyphClass.fClef,
-    SmuflGlyphClass.fClefSmall: SmuflGlyphClass.fClef,
-    SmuflGlyphClass.cClef: SmuflGlyphClass.cClef,
-    SmuflGlyphClass.cClefSmall: SmuflGlyphClass.cClef,
+    SmuflLabels.gClef.value: SmuflLabels.gClef.value,
+    SmuflLabels.gClefSmall.value: SmuflLabels.gClef.value,
+    SmuflLabels.fClef.value: SmuflLabels.fClef.value,
+    SmuflLabels.fClefSmall.value: SmuflLabels.fClef.value,
+    SmuflLabels.cClef.value: SmuflLabels.cClef.value,
+    SmuflLabels.cClefSmall.value: SmuflLabels.cClef.value,
 
     # noteheads
-    SmuflGlyphClass.noteheadWhole.value: SmuflGlyphClass.noteheadWhole.value,
-    SmuflGlyphClass.noteheadHalf.value: SmuflGlyphClass.noteheadWhole.value,
-    SmuflGlyphClass.noteheadBlack.value: SmuflGlyphClass.noteheadBlack.value,
+    SmuflLabels.noteheadWhole.value: SmuflLabels.noteheadWhole.value,
+    SmuflLabels.noteheadHalf.value: SmuflLabels.noteheadWhole.value,
+    SmuflLabels.noteheadBlack.value: SmuflLabels.noteheadBlack.value,
 
     # augmentation dot
-    SmuflGlyphClass.augmentationDot.value:SmuflGlyphClass.augmentationDot.value,
+    SmuflLabels.augmentationDot.value:SmuflLabels.augmentationDot.value,
 
     # flags
-    SmuflGlyphClass.flag8thUp: SmuflGlyphClass.flag8thUp,
-    SmuflGlyphClass.flag8thDown: SmuflGlyphClass.flag8thDown,
-    SmuflGlyphClass.flag16thUp: SmuflGlyphClass.flag16thUp,
-    SmuflGlyphClass.flag16thDown: SmuflGlyphClass.flag16thDown,
+    SmuflLabels.flag8thUp.value: SmuflLabels.flag8thUp.value,
+    SmuflLabels.flag8thDown.value: SmuflLabels.flag8thDown.value,
+    SmuflLabels.flag16thUp.value: SmuflLabels.flag16thUp.value,
+    SmuflLabels.flag16thDown.value: SmuflLabels.flag16thDown.value,
 
     # accidentals
-    SmuflGlyphClass.accidentalFlat: SmuflGlyphClass.accidentalFlat,
-    SmuflGlyphClass.accidentalNatural: SmuflGlyphClass.accidentalNatural,
-    SmuflGlyphClass.accidentalSharp: SmuflGlyphClass.accidentalSharp,
+    SmuflLabels.accidentalFlat.value: SmuflLabels.accidentalFlat.value,
+    SmuflLabels.accidentalNatural.value: SmuflLabels.accidentalNatural.value,
+    SmuflLabels.accidentalSharp.value: SmuflLabels.accidentalSharp.value,
 
     # rests
-    SmuflGlyphClass.restWhole.value: SmuflGlyphClass.restWhole.value,
-    SmuflGlyphClass.restHalf.value: SmuflGlyphClass.restHalf.value,
-    SmuflGlyphClass.restQuarter.value: SmuflGlyphClass.restQuarter.value,
-    SmuflGlyphClass.rest8th.value: SmuflGlyphClass.rest8th.value,
-    SmuflGlyphClass.rest16th.value: SmuflGlyphClass.rest16th.value,
+    SmuflLabels.restWhole.value: SmuflLabels.restWhole.value,
+    SmuflLabels.restHalf.value: SmuflLabels.restHalf.value,
+    SmuflLabels.restQuarter.value: SmuflLabels.restQuarter.value,
+    SmuflLabels.rest8th.value: SmuflLabels.rest8th.value,
+    SmuflLabels.rest16th.value: SmuflLabels.rest16th.value,
 }
 
 

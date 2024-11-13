@@ -1,13 +1,11 @@
 from enum import Enum
-from smashcima.scene.semantic.TypeDuration import TypeDuration
-from smashcima.scene.semantic.StemValue import StemValue
-from smashcima.scene.semantic.AccidentalValue import AccidentalValue
+from .semantic import TypeDuration,StemValue, AccidentalValue
 
 
-class SmuflGlyphClass(str, Enum):
-    """
-    Enum that represents glyphs from the SMuFL specification.
-    https://www.w3.org/2019/03/smufl13/
+class SmuflLabels(str, Enum):
+    """Classification labels from the SMuFL specification.
+    
+    Learn more at: https://www.w3.org/2019/03/smufl13/
     """
 
     # Brackets and dividers
@@ -169,23 +167,23 @@ class SmuflGlyphClass(str, Enum):
     rest1024th = "smulf::rest1024th"
 
     @staticmethod
-    def notehead_from_type_duration(duration: TypeDuration) -> "SmuflGlyphClass":
+    def notehead_from_type_duration(duration: TypeDuration) -> "SmuflLabels":
         # https://www.w3.org/2021/06/musicxml40/musicxml-reference/data-types/note-type-value/
         _LOOKUP = {
-            TypeDuration.thousand_twenty_fourth: SmuflGlyphClass.noteheadBlack,
-            TypeDuration.five_hundred_twelfth: SmuflGlyphClass.noteheadBlack,
-            TypeDuration.two_hundred_fifty_sixth: SmuflGlyphClass.noteheadBlack,
-            TypeDuration.hundred_twenty_eighth: SmuflGlyphClass.noteheadBlack,
-            TypeDuration.sixty_fourth: SmuflGlyphClass.noteheadBlack,
-            TypeDuration.thirty_second: SmuflGlyphClass.noteheadBlack,
-            TypeDuration.sixteenth: SmuflGlyphClass.noteheadBlack,
-            TypeDuration.eighth: SmuflGlyphClass.noteheadBlack,
-            TypeDuration.quarter: SmuflGlyphClass.noteheadBlack,
-            TypeDuration.half: SmuflGlyphClass.noteheadHalf,
-            TypeDuration.whole: SmuflGlyphClass.noteheadWhole,
-            TypeDuration.breve: SmuflGlyphClass.noteheadDoubleWhole,
-            TypeDuration.long: SmuflGlyphClass.noteheadDoubleWholeSquare,
-            TypeDuration.maxima: SmuflGlyphClass.noteheadDoubleWholeSquare,
+            TypeDuration.thousand_twenty_fourth: SmuflLabels.noteheadBlack,
+            TypeDuration.five_hundred_twelfth: SmuflLabels.noteheadBlack,
+            TypeDuration.two_hundred_fifty_sixth: SmuflLabels.noteheadBlack,
+            TypeDuration.hundred_twenty_eighth: SmuflLabels.noteheadBlack,
+            TypeDuration.sixty_fourth: SmuflLabels.noteheadBlack,
+            TypeDuration.thirty_second: SmuflLabels.noteheadBlack,
+            TypeDuration.sixteenth: SmuflLabels.noteheadBlack,
+            TypeDuration.eighth: SmuflLabels.noteheadBlack,
+            TypeDuration.quarter: SmuflLabels.noteheadBlack,
+            TypeDuration.half: SmuflLabels.noteheadHalf,
+            TypeDuration.whole: SmuflLabels.noteheadWhole,
+            TypeDuration.breve: SmuflLabels.noteheadDoubleWhole,
+            TypeDuration.long: SmuflLabels.noteheadDoubleWholeSquare,
+            TypeDuration.maxima: SmuflLabels.noteheadDoubleWholeSquare,
         }
         notehead = _LOOKUP.get(duration)
         if notehead is None:
@@ -193,23 +191,23 @@ class SmuflGlyphClass(str, Enum):
         return notehead
     
     @staticmethod
-    def rest_from_type_duration(duration: TypeDuration) -> "SmuflGlyphClass":
+    def rest_from_type_duration(duration: TypeDuration) -> "SmuflLabels":
         # https://www.w3.org/2021/06/musicxml40/musicxml-reference/data-types/note-type-value/
         _LOOKUP = {
-            TypeDuration.thousand_twenty_fourth: SmuflGlyphClass.rest1024th,
-            TypeDuration.five_hundred_twelfth: SmuflGlyphClass.rest512th,
-            TypeDuration.two_hundred_fifty_sixth: SmuflGlyphClass.rest256th,
-            TypeDuration.hundred_twenty_eighth: SmuflGlyphClass.rest128th,
-            TypeDuration.sixty_fourth: SmuflGlyphClass.rest64th,
-            TypeDuration.thirty_second: SmuflGlyphClass.rest32nd,
-            TypeDuration.sixteenth: SmuflGlyphClass.rest16th,
-            TypeDuration.eighth: SmuflGlyphClass.rest8th,
-            TypeDuration.quarter: SmuflGlyphClass.restQuarter,
-            TypeDuration.half: SmuflGlyphClass.restHalf,
-            TypeDuration.whole: SmuflGlyphClass.restWhole,
-            TypeDuration.breve: SmuflGlyphClass.restDoubleWhole,
-            TypeDuration.long: SmuflGlyphClass.restLonga,
-            TypeDuration.maxima: SmuflGlyphClass.restMaxima,
+            TypeDuration.thousand_twenty_fourth: SmuflLabels.rest1024th,
+            TypeDuration.five_hundred_twelfth: SmuflLabels.rest512th,
+            TypeDuration.two_hundred_fifty_sixth: SmuflLabels.rest256th,
+            TypeDuration.hundred_twenty_eighth: SmuflLabels.rest128th,
+            TypeDuration.sixty_fourth: SmuflLabels.rest64th,
+            TypeDuration.thirty_second: SmuflLabels.rest32nd,
+            TypeDuration.sixteenth: SmuflLabels.rest16th,
+            TypeDuration.eighth: SmuflLabels.rest8th,
+            TypeDuration.quarter: SmuflLabels.restQuarter,
+            TypeDuration.half: SmuflLabels.restHalf,
+            TypeDuration.whole: SmuflLabels.restWhole,
+            TypeDuration.breve: SmuflLabels.restDoubleWhole,
+            TypeDuration.long: SmuflLabels.restLonga,
+            TypeDuration.maxima: SmuflLabels.restMaxima,
         }
         notehead = _LOOKUP.get(duration)
         if notehead is None:
@@ -217,14 +215,14 @@ class SmuflGlyphClass(str, Enum):
         return notehead
     
     @staticmethod
-    def clef_from_clef_sign(clef_sign: str, small=False) -> "SmuflGlyphClass":
+    def clef_from_clef_sign(clef_sign: str, small=False) -> "SmuflLabels":
         _LOOKUP = {
-            ("G", False): SmuflGlyphClass.gClef,
-            ("G", True): SmuflGlyphClass.gClefSmall,
-            ("F", False): SmuflGlyphClass.fClef,
-            ("F", True): SmuflGlyphClass.fClefSmall,
-            ("C", False): SmuflGlyphClass.cClef,
-            ("C", True): SmuflGlyphClass.cClefSmall,
+            ("G", False): SmuflLabels.gClef,
+            ("G", True): SmuflLabels.gClefSmall,
+            ("F", False): SmuflLabels.fClef,
+            ("F", True): SmuflLabels.fClefSmall,
+            ("C", False): SmuflLabels.cClef,
+            ("C", True): SmuflLabels.cClefSmall,
         }
         key = (clef_sign, small)
         clef = _LOOKUP.get(key)
@@ -236,24 +234,24 @@ class SmuflGlyphClass(str, Enum):
     def flag_from_type_duration_and_stem_value(
         type_duration: TypeDuration,
         stem_value: StemValue
-    ) -> "SmuflGlyphClass":
+    ) -> "SmuflLabels":
         _LOOKUP = {
-            ("up", "eighth"): SmuflGlyphClass.flag8thUp,
-            ("down", "eighth"): SmuflGlyphClass.flag8thDown,
-            ("up", "16th"): SmuflGlyphClass.flag16thUp,
-            ("down", "16th"): SmuflGlyphClass.flag16thDown,
-            ("up", "32nd"): SmuflGlyphClass.flag32ndUp,
-            ("down", "32nd"): SmuflGlyphClass.flag32ndDown,
-            ("up", "64th"): SmuflGlyphClass.flag64thUp,
-            ("down", "64th"): SmuflGlyphClass.flag64thDown,
-            ("up", "128th"): SmuflGlyphClass.flag128thUp,
-            ("down", "128th"): SmuflGlyphClass.flag128thDown,
-            ("up", "256th"): SmuflGlyphClass.flag256thUp,
-            ("down", "256th"): SmuflGlyphClass.flag256thDown,
-            ("up", "512th"): SmuflGlyphClass.flag512thUp,
-            ("down", "512th"): SmuflGlyphClass.flag512thDown,
-            ("up", "1024th"): SmuflGlyphClass.flag1024thUp,
-            ("down", "1024th"): SmuflGlyphClass.flag1024thDown,
+            ("up", "eighth"): SmuflLabels.flag8thUp,
+            ("down", "eighth"): SmuflLabels.flag8thDown,
+            ("up", "16th"): SmuflLabels.flag16thUp,
+            ("down", "16th"): SmuflLabels.flag16thDown,
+            ("up", "32nd"): SmuflLabels.flag32ndUp,
+            ("down", "32nd"): SmuflLabels.flag32ndDown,
+            ("up", "64th"): SmuflLabels.flag64thUp,
+            ("down", "64th"): SmuflLabels.flag64thDown,
+            ("up", "128th"): SmuflLabels.flag128thUp,
+            ("down", "128th"): SmuflLabels.flag128thDown,
+            ("up", "256th"): SmuflLabels.flag256thUp,
+            ("down", "256th"): SmuflLabels.flag256thDown,
+            ("up", "512th"): SmuflLabels.flag512thUp,
+            ("down", "512th"): SmuflLabels.flag512thDown,
+            ("up", "1024th"): SmuflLabels.flag1024thUp,
+            ("down", "1024th"): SmuflLabels.flag1024thDown,
         }
         key = (stem_value.value, type_duration.value)
         flag = _LOOKUP.get(key)
@@ -264,12 +262,12 @@ class SmuflGlyphClass(str, Enum):
     @staticmethod
     def accidental_from_accidental_value(
         accidental_value: AccidentalValue
-    ) -> "SmuflGlyphClass":
+    ) -> "SmuflLabels":
         _LOOKUP = {
-            AccidentalValue.natural: SmuflGlyphClass.accidentalNatural,
-            AccidentalValue.flat: SmuflGlyphClass.accidentalFlat,
-            AccidentalValue.sharp: SmuflGlyphClass.accidentalSharp,
-            AccidentalValue.doubleSharp: SmuflGlyphClass.accidentalDoubleSharp,
+            AccidentalValue.natural: SmuflLabels.accidentalNatural,
+            AccidentalValue.flat: SmuflLabels.accidentalFlat,
+            AccidentalValue.sharp: SmuflLabels.accidentalSharp,
+            AccidentalValue.doubleSharp: SmuflLabels.accidentalDoubleSharp,
         }
         glyph_class = _LOOKUP.get(accidental_value)
         if glyph_class is None:

@@ -7,7 +7,7 @@ from smashcima.scene.visual.Stafflines import Stafflines
 from smashcima.scene.visual.Accidental import Accidental
 from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.visual.RestGlyph import RestGlyph
-from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
+from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
 from smashcima.geometry.Point import Point
 from smashcima.random_between import random_between
@@ -108,7 +108,7 @@ def synthesize_accidentals_column(
 
             # create accidental
             accidental = glyph_synthesizer.synthesize_glyph(
-                glyph_class=SmuflGlyphClass.accidental_from_accidental_value(
+                glyph_class=SmuflLabels.accidental_from_accidental_value(
                     note.accidental_value
                 ).value,
                 expected_glyph_type=Accidental

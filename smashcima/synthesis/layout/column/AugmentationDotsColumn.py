@@ -7,7 +7,7 @@ from smashcima.scene.visual.Stafflines import Stafflines
 from smashcima.scene.visual.AugmentationDot import AugmentationDot
 from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.visual.RestGlyph import RestGlyph
-from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
+from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
 from smashcima.geometry.Point import Point
 from smashcima.random_between import random_between
@@ -172,7 +172,7 @@ def synthesize_augmentation_dots_column(
 
                 # create new dot
                 dot = glyph_synthesizer.synthesize_glyph(
-                    glyph_class=SmuflGlyphClass.augmentationDot.value,
+                    glyph_class=SmuflLabels.augmentationDot.value,
                     expected_glyph_type=AugmentationDot
                 )
                 dot.augmentation_dot_index = dot_index

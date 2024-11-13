@@ -10,7 +10,7 @@ from smashcima.scene.semantic.Chord import Chord
 from smashcima.scene.semantic.Note import Note
 from smashcima.scene.semantic.TypeDuration import TypeDuration
 from smashcima.geometry.Transform import Transform
-from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
+from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
 from ..BeamStemSynthesizer import BeamStemSynthesizer
 from ...glyph.LineSynthesizer import LineSynthesizer
@@ -371,7 +371,7 @@ class ColumnLayoutSynthesizer:
                 continue
 
             # get the glyph class
-            glyph_class = SmuflGlyphClass.flag_from_type_duration_and_stem_value(
+            glyph_class = SmuflLabels.flag_from_type_duration_and_stem_value(
                 type_duration=type_duration,
                 stem_value=chord.stem_value
             ).value

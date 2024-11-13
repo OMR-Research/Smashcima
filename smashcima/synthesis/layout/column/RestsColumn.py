@@ -1,3 +1,4 @@
+from smashcima.scene import SmashcimaLabels
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.Event import Event
 from smashcima.scene.semantic.Staff import Staff
@@ -6,8 +7,7 @@ from smashcima.scene.semantic.Rest import Rest
 from smashcima.scene.visual.Stafflines import Stafflines
 from smashcima.scene.visual.RestGlyph import RestGlyph
 from smashcima.scene.visual.LedgerLine import LedgerLine
-from smashcima.synthesis.glyph.SmashcimaGlyphClass import SmashcimaGlyphClass
-from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
+from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
 from smashcima.synthesis.glyph.LineSynthesizer import LineSynthesizer
 from smashcima.geometry.Point import Point
@@ -78,7 +78,7 @@ def synthesize_rests_column(
             )
 
             # create the rest
-            glyph_class = SmuflGlyphClass.rest_from_type_duration(
+            glyph_class = SmuflLabels.rest_from_type_duration(
                 durable.type_duration
             )
             rest_glyph = glyph_synthesizer.synthesize_glyph(
@@ -104,12 +104,12 @@ def synthesize_rests_column(
 
 def _synthesize_ledger_line_if_necessary(
     rest_glyph: RestGlyph,
-    glyph_class: SmuflGlyphClass,
+    glyph_class: SmuflLabels,
     line_synthesizer: LineSynthesizer,
     rng: random.Random
 ):
     # the rest is not whole nor half, no ledger line needed
-    if glyph_class not in [SmuflGlyphClass.restWhole, SmuflGlyphClass.restHalf]:
+    if glyph_class not in [SmuflLabels.restWhole, SmuflLabels.restHalf]:
         return
 
     # the rest is still within the staff, no ledgerline needed
@@ -121,7 +121,7 @@ def _synthesize_ledger_line_if_necessary(
     
     line = line_synthesizer.synthesize_line(
         glyph_type=LedgerLine,
-        glyph_class=SmashcimaGlyphClass.ledgerLine.value,
+        glyph_class=SmashcimaLabels.ledgerLine.value,
         start_point=Point(-width / 2, 0),
         end_point=Point(width / 2, 0)
     )

@@ -1,10 +1,10 @@
+from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from .NaiveLineSynthesizer import NaiveLineSynthesizer, T
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.assets.AssetRepository import AssetRepository
 from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
 from smashcima.assets.glyphs.muscima_pp.LineList import LineList
-from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
-from smashcima.synthesis.glyph.SmashcimaGlyphClass import SmashcimaGlyphClass
+from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
 from typing import Type, Dict
 import random
@@ -12,10 +12,10 @@ import copy
 
 
 _QUERY_TO_MPP_LOOKUP: Dict[str, str] = {
-    SmashcimaGlyphClass.ledgerLine.value: SmashcimaGlyphClass.ledgerLine.value,
-    SmuflGlyphClass.stem.value: SmuflGlyphClass.stem.value,
-    SmashcimaGlyphClass.beam.value: SmashcimaGlyphClass.beam.value,
-    SmashcimaGlyphClass.beamHook.value: SmashcimaGlyphClass.beamHook.value,
+    SmashcimaLabels.ledgerLine.value: SmashcimaLabels.ledgerLine.value,
+    SmuflLabels.stem.value: SmuflLabels.stem.value,
+    SmashcimaLabels.beam.value: SmashcimaLabels.beam.value,
+    SmashcimaLabels.beamHook.value: SmashcimaLabels.beamHook.value,
 }
 
 

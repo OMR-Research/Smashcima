@@ -2,7 +2,7 @@ from smashcima.scene.semantic.Clef import Clef
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.visual.Stafflines import Stafflines
 from smashcima.scene.visual.Glyph import Glyph
-from smashcima.synthesis.glyph.SmuflGlyphClass import SmuflGlyphClass
+from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
 from .ColumnBase import ColumnBase
 from typing import List, Set
@@ -59,7 +59,7 @@ def synthesize_header_clefs(
             stafflines = staves[stafflines_index]
 
             # determine the glyph class
-            glyph_class: str = SmuflGlyphClass.clef_from_clef_sign(
+            glyph_class: str = SmuflLabels.clef_from_clef_sign(
                 clef_sign=clef.sign,
                 small=False
             ).value

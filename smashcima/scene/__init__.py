@@ -6,6 +6,8 @@ from .Region import Region
 from .Scene import Scene
 from .SceneObject import SceneObject
 from .ScenePoint import ScenePoint
+from .SmashcimaLabels import SmashcimaLabels
+from .SmuflLabels import SmuflLabels
 from .Sprite import Sprite
 from .ViewBox import ViewBox
 
