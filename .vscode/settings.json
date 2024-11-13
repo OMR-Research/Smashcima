@@ -1,4 +1,5 @@
 {
     "python.pythonPath": ".venv/bin/python",
+    "python.analysis.autoImportCompletions": true,
     "editor.rulers": [80]
 }

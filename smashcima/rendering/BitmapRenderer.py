@@ -82,7 +82,7 @@ class BitmapRenderer:
 
         # go through all the sprites in the scene
         for (sprite, sprite_transform) in traverse_sprites(
-            scene.space,
+            scene.root_space,
             include_pixels_transform=True,
             include_sprite_transform=True,
             include_root_space_transform=False

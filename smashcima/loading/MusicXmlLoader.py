@@ -17,9 +17,10 @@ from ..scene.semantic.StemValue import StemValue
 from ..scene.semantic.BeamedGroup import BeamedGroup
 from ..scene.semantic.BeamValue import BeamValue
 from ..scene.semantic.AccidentalValue import AccidentalValue
-from typing import List, TextIO, Optional, Dict
+from typing import List, TextIO, Optional, Dict, Union
 from fractions import Fraction
 from dataclasses import dataclass, field
+from pathlib import Path
 import io
 
 
@@ -121,13 +122,15 @@ class MusicXmlLoader:
             header = f"[ERROR]:"
         print(header, *values, file=self._errout)
 
-    def load_file(self, path: str) -> Score:
+    def load_file(self, path: Union[Path, str]) -> Score:
         """Loads a score from a MusicXML file"""
         # TODO: handle .mxl files as well
-        # TODO: accept Path instance as well
-        with open(path, "r") as file:
-            tree = ET.parse(file)
-        return self.load(tree)
+        with open(str(path), "r") as file:
+            return self.load(ET.parse(file))
+
+    def load_xml(self, xml: str) -> Score:
+        fake_file = io.StringIO(xml)
+        return self.load(ET.parse(fake_file))
 
     def load(self, tree: ET.ElementTree) -> Score:
         """Loads a score from a MusicXML XML tree"""

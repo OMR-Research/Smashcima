@@ -1,54 +1,94 @@
-from .Model import Model
+import copy
+from pathlib import Path
+from typing import List, Optional, Union
+
+import numpy as np
+
+from smashcima.loading.load_score import load_score
+from smashcima.scene.AffineSpace import AffineSpace
+from smashcima.scene.Scene import Scene
+from smashcima.scene.semantic.Score import Score
+from smashcima.scene.visual.Page import Page
+from smashcima.synthesis.glyph.LineSynthesizer import LineSynthesizer
+from smashcima.synthesis.glyph.MuscimaPPLineSynthesizer import \
+    MuscimaPPLineSynthesizer
+from smashcima.synthesis.glyph.NaiveLineSynthesizer import NaiveLineSynthesizer
+from smashcima.synthesis.layout.BeamStemSynthesizer import BeamStemSynthesizer
+from smashcima.synthesis.page.MzkQuiltingPaperSynthesizer import \
+    MzkQuiltingPaperSynthesizer
+from smashcima.synthesis.page.PaperSynthesizer import PaperSynthesizer
+from smashcima.synthesis.page.SimplePageSynthesizer import \
+    SimplePageSynthesizer
+from smashcima.synthesis.page.SolidColorPaperSynthesizer import \
+    SolidColorPaperSynthesizer
+from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
+from smashcima.synthesis.style.MzkPaperStyleDomain import (MzkPaperStyleDomain,
+                                                           Patch)
+
 from ..geometry.Vector2 import Vector2
-from ..loading.MusicXmlLoader import MusicXmlLoader
-from ..synthesis.page.NaiveStafflinesSynthesizer \
-    import NaiveStafflinesSynthesizer
-from ..synthesis.page.StafflinesSynthesizer import StafflinesSynthesizer
-from ..synthesis.layout.column.ColumnLayoutSynthesizer \
-    import ColumnLayoutSynthesizer
 from ..rendering.BitmapRenderer import BitmapRenderer
 from ..synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
-from ..synthesis.glyph.MuscimaPPGlyphSynthesizer import MuscimaPPGlyphSynthesizer
-from smashcima.synthesis.page.SimplePageSynthesizer import SimplePageSynthesizer
-from smashcima.synthesis.glyph.LineSynthesizer import LineSynthesizer
-from smashcima.synthesis.glyph.NaiveLineSynthesizer \
-    import NaiveLineSynthesizer
-from smashcima.synthesis.glyph.MuscimaPPLineSynthesizer \
-    import MuscimaPPLineSynthesizer
-from smashcima.synthesis.layout.BeamStemSynthesizer import BeamStemSynthesizer
-from smashcima.scene.visual.Page import Page
-from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
-from smashcima.synthesis.page.PaperSynthesizer import PaperSynthesizer
-from smashcima.synthesis.page.SolidColorPaperSynthesizer \
-    import SolidColorPaperSynthesizer
-from smashcima.synthesis.page.MzkQuiltingPaperSynthesizer \
-    import MzkQuiltingPaperSynthesizer
-from smashcima.synthesis.style.MzkPaperStyleDomain \
-    import MzkPaperStyleDomain
-import numpy as np
-from typing import List
+from ..synthesis.glyph.MuscimaPPGlyphSynthesizer import \
+    MuscimaPPGlyphSynthesizer
+from ..synthesis.layout.column.ColumnLayoutSynthesizer import \
+    ColumnLayoutSynthesizer
+from ..synthesis.page.NaiveStafflinesSynthesizer import \
+    NaiveStafflinesSynthesizer
+from ..synthesis.page.StafflinesSynthesizer import StafflinesSynthesizer
+from .Model import Model
 
 
-class BaseHandwrittenModel(Model):
-    """
-    Model that serves as the basic handwritten music synthesizer.
-    The whole framework is being developed around this model currently
-    and its name might change in the future. It aims to be like Mashcima1
-    with the additions of using MXL input, polyphony and postprocessing.
-    """
-    def __init__(self):
-        super().__init__()
+class BaseHandwrittenScene(Scene):
+    """Scene synthesized by the `BaseHandwrittenModel`"""
+    def __init__(
+        self,
+        root_space: AffineSpace,
+        score: Score,
+        mpp_writer: int,
+        mzk_background_patch: Patch,
+        pages: List[Page]
+    ):
+        super().__init__(root_space)
+        
+        self.score = score
+        """The semantic score based on which the scene was synthesized"""
 
-        self.pages: List[Page] = []
-        "Pages that will be synthesized during model invocation"
+        self.mpp_writer = mpp_writer
+        """The MUSCIMA++ writer number that was used for this scene"""
+
+        self.mzk_background_patch = mzk_background_patch
+        """The MZK texture patch used for the background paper"""
+
+        self.pages = pages
+        """All the pages of music that were synthesized"""
+
+        # add to the list of scene objects
+        self.add_many([score, *pages])
+
+    def render(self, page: Page, dpi=300) -> np.ndarray:
+        """Renders the bitmap BGRA image of a page"""
+        assert page in self.pages, "Given page is not in this scene"
+        renderer = BitmapRenderer(dpi=dpi)
+        bitmap = renderer.render(self, page.view_box)
+        return bitmap
+
+
+class BaseHandwrittenModel(Model[BaseHandwrittenScene]):
+    """Synthesizes handwritten pages of music notation.
+
+    This model provides similar functionality as MuseScore when it comes
+    to rendering music content. You put in a musical content file
+    (say MusicXML) and you get out a scene with a number of pages
+    (depending on the music length and system and page breaks)
+    and the scene can then be turn into an image and other annotations.
     
+    This model acts as a flagship demonstrator for the Smashcima library.
+    It serves as an example of what a well-designed Model looks like.
+    """
+
     def register_services(self):
         super().register_services()
         c = self.container
-
-        # TODO: there is some issue and the style domains are not being
-        # resolved as singletons but as transients. Add unit tests,
-        # maybe it has to do with a specific version of punq
         
         c.type(ColumnLayoutSynthesizer)
         c.type(BeamStemSynthesizer)
@@ -67,6 +107,9 @@ class BaseHandwrittenModel(Model):
 
         self.layout_synthesizer = c.resolve(ColumnLayoutSynthesizer)
         self.page_synthesizer = c.resolve(SimplePageSynthesizer)
+
+        self.mpp_style_domain = c.resolve(MuscimaPPStyleDomain)
+        self.mzk_paper_style_domain = c.resolve(MzkPaperStyleDomain)
     
     def configure_services(self):
         super().configure_services()
@@ -80,27 +123,89 @@ class BaseHandwrittenModel(Model):
             self.container.resolve(MzkPaperStyleDomain)
         )
 
-    def __call__(self, annotation_file_path: str) -> np.ndarray:
-        return super().__call__(annotation_file_path)
+    def __call__(
+        self,
+        file: Union[Path, str, None] = None,
+        data: Union[bytes, str, None] = None,
+        format: Optional[str] = None,
+        score: Optional[Score] = None,
+        clone_score: bool = False
+    ) -> BaseHandwrittenScene:
+        """Synthesizes handwritten pages given a musical content.
+        
+        The musical content can be provided as a file path, string data,
+        or an already parsed Smashcima Score object. The content will
+        be placed onto a page until it overflows and then another page is
+        added - just like using MuseScore for MXL rendering.
 
-    def call(self, annotation_file_path: str):
-        # load the symbolic part
-        score = MusicXmlLoader().load_file(annotation_file_path)
-        self.scene.add(score)
+        :param file: Path to a file with musical content
+            (e.g. './my_file.musicxml')
+        :param data: Musical contents as a bytes or string
+            (e.g. MusicXML file contents)
+        :param format: In what format is the musical content
+            (file suffix, including the period, i.e. '.musicxml')
+        :param score: Musical content in the form of an already parsed
+            Smashcima Score
+        :param clone_score: Should the score be cloned before being embedded
+            in the resulting scene
+        :returns: The synthesized scene with all the pages
+        """
+
+        # NOTE: This method is where input pre-processing should happen
+        # and where the state of the model should be prepared for the
+        # next synthesis invocation. For example, the Model base class
+        # lets the styler pick specific styles here. Similarly, after the
+        # synthesis core (the call() method) is invoked, this method is where
+        # you can do any post-processing and updates to the model state.
+        # For example, the Model base class sets the self.scene property here.
+
+        if score is None:
+            score = self.load_score(
+                file=file,
+                data=data,
+                format=format
+            )
+        elif clone_score:
+            score = copy.deepcopy(score)
+
+        return super().__call__(score)
+
+    def load_score(
+        self,
+        file: Union[Path, str, None] = None,
+        data: Union[bytes, str, None] = None,
+        format: Optional[str] = None,
+    ) -> Score:
+        """This method is responsible for loading input annotation files.
+        
+        Override this method to modify the loading behaviour.
+        """
+        return load_score(
+            file=file,
+            data=data,
+            format=format
+        )
+
+    def call(self, score: Score) -> BaseHandwrittenScene:
+        # NOTE: This method is where the synthesis itself happens and
+        # the resulting scene is constructed. This method should not modify
+        # the state of the model instance, these modifications should happen
+        # in the __call__() method instead.
+
+        root_space = AffineSpace()
 
         # until you run out of music
         # 1. synthesize a page of stafflines
         # 2. fill the page with music
-        self.pages = []
+        pages = []
         next_measure_index = 0
         next_page_origin = Vector2(0, 0)
         _PAGE_SPACING = 10 # 1cm
         while next_measure_index < score.measure_count:
             # prepare the next page of music
             page = self.page_synthesizer.synthesize_page(next_page_origin)
-            page.space.parent_space = self.scene.space
-            self.scene.add(page)
-            self.pages.append(page)
+            page.space.parent_space = root_space
+            pages.append(page)
 
             next_page_origin += Vector2(
                 page.view_box.rectangle.width + _PAGE_SPACING,
@@ -115,13 +220,11 @@ class BaseHandwrittenModel(Model):
             )
             next_measure_index = systems[-1].last_measure_index + 1
 
-        # add objects to scene that are transitively linked from objects
-        # already in scene
-        self.scene.add_closure()
-
-        return self.render(page_index=0)
-    
-    def render(self, page_index: int) -> np.ndarray:
-        renderer = BitmapRenderer()
-        bitmap = renderer.render(self.scene, self.pages[page_index].view_box)
-        return bitmap
+        # construct the complete scene and return
+        return BaseHandwrittenScene(
+            root_space=root_space,
+            score=score,
+            mpp_writer=self.mpp_style_domain.current_writer,
+            mzk_background_patch=self.mzk_paper_style_domain.current_patch,
+            pages=pages
+        )

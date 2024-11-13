@@ -15,10 +15,10 @@ class DebugGlyphRenderer:
         glyph.place_debug_overlay()
 
         scene = Scene()
-        glyph.space.parent_space = scene.space
+        glyph.space.parent_space = scene.root_space
         scene.add_closure()
 
-        view_box = ViewBox(glyph.get_bbox_in_space(scene.space))
+        view_box = ViewBox(glyph.get_bbox_in_space(scene.root_space))
         dpi = max(s.dpi for s in glyph.sprites)
 
         renderer = BitmapRenderer(dpi=dpi)
