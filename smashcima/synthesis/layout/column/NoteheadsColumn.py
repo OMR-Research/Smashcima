@@ -4,12 +4,12 @@ from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from smashcima.scene.semantic.Clef import Clef
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.Event import Event
-from smashcima.scene.semantic.Staff import Staff
+from smashcima.scene.semantic.StaffSemantic import StaffSemantic
 from smashcima.scene.semantic.Chord import Chord
 from smashcima.scene.semantic.StemValue import StemValue
 from smashcima.scene.semantic.ScoreEvent import ScoreEvent
 from smashcima.scene.semantic.Note import Note
-from smashcima.scene.visual.Stafflines import Stafflines
+from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.visual.NoteheadSide import NoteheadSide
 from smashcima.scene.visual.LedgerLine import LedgerLine
@@ -82,19 +82,19 @@ class NoteheadsColumn(ColumnBase):
     
     def _position_glyphs(self):
         # noteheads
-        for stafflines in self.staves:
-            self.kick_off_noteheads_on_stafflines(stafflines)
+        for staff in self.staves:
+            self.kick_off_noteheads_on_staff(staff)
         self.position_noteheads()
         
         # ledger lines
         self.delete_current_ledger_lines()
-        for stafflines in self.staves:
-            self.place_ledger_lines(stafflines)
+        for staff in self.staves:
+            self.place_ledger_lines(staff)
 
-    def kick_off_noteheads_on_stafflines(self, stafflines: Stafflines):
+    def kick_off_noteheads_on_staff(self, staff: StaffVisual):
         contexts = [
             c for c in self.notehead_contexts
-            if c.notehead.stafflines is stafflines
+            if c.notehead.staff is staff
         ]
         contexts.sort(key=lambda c: c.note.pitch.get_linear_pitch())
         
@@ -143,7 +143,7 @@ class NoteheadsColumn(ColumnBase):
             return
         
         center_notehead_stack_width = sum(
-            ctx.notehead.glyph.get_bbox_in_space(ctx.notehead.stafflines.space).width
+            ctx.notehead.glyph.get_bbox_in_space(ctx.notehead.staff.space).width
             for ctx in self.notehead_contexts
         ) / len(self.notehead_contexts) # average
         kick_off_distance = center_notehead_stack_width \
@@ -151,7 +151,7 @@ class NoteheadsColumn(ColumnBase):
 
         for ctx in self.notehead_contexts:
             notehead = ctx.notehead
-            sl = ctx.notehead.stafflines
+            sl = ctx.notehead.staff
 
             notehead.glyph.space.transform = sl.staff_coordinate_system.get_transform(
                 pitch_position=ctx.notehead.pitch_position,
@@ -159,10 +159,10 @@ class NoteheadsColumn(ColumnBase):
                     + (ctx.kick_off * kick_off_distance)
             )
     
-    def place_ledger_lines(self, stafflines: Stafflines):
+    def place_ledger_lines(self, staff: StaffVisual):
         contexts = [
             c for c in self.notehead_contexts
-            if c.notehead.stafflines is stafflines
+            if c.notehead.staff is staff
         ]
 
         if len(contexts) == 0:
@@ -173,8 +173,8 @@ class NoteheadsColumn(ColumnBase):
         ) -> Tuple[float, float]:
             """Gets the time position of the two start and end of a basic
             ledger line for a given (already placed) notehead"""
-            bbox = ctx.notehead.glyph.get_bbox_in_space(ctx.notehead.stafflines.space)
-            pos_x = ctx.notehead.stafflines.staff_coordinate_system.get_transform(
+            bbox = ctx.notehead.glyph.get_bbox_in_space(ctx.notehead.staff.space)
+            pos_x = ctx.notehead.staff.staff_coordinate_system.get_transform(
                 pitch_position=0, time_position=self.time_position
             ).apply_to(Point(0, 0)).x
             center = self.time_position + (bbox.center.x - pos_x)
@@ -217,7 +217,7 @@ class NoteheadsColumn(ColumnBase):
                 # (if on even position and if we have some affected noteheads)
                 if pitch_position % 2 == 0 and len(affected_noteheads) > 0:
                     line = self.synthesize_ledger_line(
-                        stafflines,
+                        staff,
                         pitch_position=pitch_position,
                         time_position_start=time_position_start,
                         time_position_end=time_position_end
@@ -232,17 +232,17 @@ class NoteheadsColumn(ColumnBase):
     
     def synthesize_ledger_line(
         self,
-        stafflines: Stafflines,
+        staff: StaffVisual,
         pitch_position: int,
         time_position_start: float,
         time_position_end: float
     ) -> LedgerLine:
-        start_point = stafflines.staff_coordinate_system.get_transform(
+        start_point = staff.staff_coordinate_system.get_transform(
             pitch_position=pitch_position,
             time_position=time_position_start
         ).apply_to(Point(0, 0))
 
-        end_point = stafflines.staff_coordinate_system.get_transform(
+        end_point = staff.staff_coordinate_system.get_transform(
             pitch_position=pitch_position,
             time_position=time_position_end
         ).apply_to(Point(0, 0))
@@ -253,7 +253,7 @@ class NoteheadsColumn(ColumnBase):
             start_point=start_point,
             end_point=end_point
         )
-        glyph.space.parent_space = stafflines.space
+        glyph.space.parent_space = staff.space
         line = LedgerLine(
             glyph=glyph,
             affected_noteheads=[], # populated later
@@ -268,7 +268,7 @@ class NoteheadsColumn(ColumnBase):
 
 def synthesize_noteheads_column(
     column: NoteheadsColumn,
-    staves: List[Stafflines],
+    staves: List[StaffVisual],
     glyph_synthesizer: GlyphSynthesizer,
     line_synthesizer: LineSynthesizer,
     score: Score,
@@ -280,23 +280,23 @@ def synthesize_noteheads_column(
     # (when two voices share a notehead)
     _all_noteheads: Dict[Tuple[int, int], Notehead] = dict()
     
-    def _get_notehead(note: Note, stafflines_index: int) -> Optional[Notehead]:
+    def _get_notehead(note: Note, staff_index: int) -> Optional[Notehead]:
         nonlocal _all_noteheads
         linear_pitch = note.pitch.get_linear_pitch()
-        return _all_noteheads.get((stafflines_index, linear_pitch))
+        return _all_noteheads.get((staff_index, linear_pitch))
 
-    def _store_notehead(note: Note, stafflines_index: int, notehead: Notehead):
+    def _store_notehead(note: Note, staff_index: int, notehead: Notehead):
         nonlocal _all_noteheads
         linear_pitch = note.pitch.get_linear_pitch()
-        _all_noteheads[(stafflines_index, linear_pitch)] = notehead
+        _all_noteheads[(staff_index, linear_pitch)] = notehead
 
     # go through all the notes and create notehead glyphs
     for event in score_event.events:
         for durable in event.durables:
             if isinstance(durable, Note):
                 note: Note = durable
-                stafflines_index = score.staff_index_of_durable(note)
-                notehead = _get_notehead(note, stafflines_index)
+                staff_index = score.staff_index_of_durable(note)
+                notehead = _get_notehead(note, staff_index)
 
                 # another note for an existing notehead
                 if notehead is not None:
@@ -305,9 +305,9 @@ def synthesize_noteheads_column(
 
                 # resolve context
                 event = Event.of_durable(note, fail_if_none=True)
-                staff = Staff.of_durable(note, fail_if_none=True)
-                clef = event.attributes.clefs[staff.staff_number]
-                stafflines = staves[stafflines_index]
+                staff_sem = StaffSemantic.of_durable(note, fail_if_none=True)
+                clef = event.attributes.clefs[staff_sem.staff_number]
+                staff = staves[staff_index]
                 
                 # new notehead for a note
                 glyph = glyph_synthesizer.synthesize_glyph(
@@ -316,15 +316,15 @@ def synthesize_noteheads_column(
                     ).value,
                     expected_glyph_type=Glyph
                 )
-                glyph.space.parent_space = stafflines.space
+                glyph.space.parent_space = staff.space
                 notehead = Notehead(
                     glyph=glyph,
                     notes = [note],
                     clef=clef,
-                    stafflines=stafflines,
+                    staff=staff,
                     pitch_position=clef.pitch_to_pitch_position(note.pitch),
                 )
-                _store_notehead(note, stafflines_index, notehead)
+                _store_notehead(note, staff_index, notehead)
     
     # add noteheads to the column
     for notehead in _all_noteheads.values():

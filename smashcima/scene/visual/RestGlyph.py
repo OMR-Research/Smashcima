@@ -6,7 +6,7 @@ from smashcima.nameof_via_dummy import nameof_via_dummy
 from ..Glyph import Glyph
 from ..SceneObject import SceneObject
 from ..semantic import Clef, MeasureRest, Pitch, Rest, TypeDuration
-from .Stafflines import Stafflines
+from .StaffVisual import StaffVisual
 
 # Display Pitch
 # -------------
@@ -53,7 +53,7 @@ class RestGlyph(SceneObject):
     clef: Clef
     "What clef applies to the rest"
 
-    stafflines: Stafflines
+    staff: StaffVisual
     "What stafflines is the rest placed onto"
 
     pitch_position: int
@@ -64,7 +64,7 @@ class RestGlyph(SceneObject):
         self.glyph.detach()
         self.rest = None
         self.clef = None
-        self.stafflines = None
+        self.staff = None
 
     @staticmethod
     def of_rest(

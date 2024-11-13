@@ -1,4 +1,4 @@
-from smashcima.scene.visual.Stafflines import Stafflines
+from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.Glyph import Glyph
 from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
@@ -19,7 +19,7 @@ class BarlinesColumn(ColumnBase):
 
     def _position_glyphs(self):
         for barline in self.glyphs:
-            sl = self.get_stafflines_of_glyph(barline)
+            sl = self.get_staff_of_glyph(barline)
 
             barline.space.transform = sl.staff_coordinate_system.get_transform(
                 pitch_position=0, # centered on the staff
@@ -28,17 +28,17 @@ class BarlinesColumn(ColumnBase):
 
 
 def synthesize_barlines_column(
-    staves: List[Stafflines],
+    staves: List[StaffVisual],
     rng: random.Random,
     glyph_synthesizer: GlyphSynthesizer
 ) -> BarlinesColumn:
     column = BarlinesColumn(staves, rng.random())
 
-    for stafflines in staves:
+    for staff in staves:
         barline = glyph_synthesizer.synthesize_glyph(
             SmuflLabels.barlineSingle.value
         )
-        barline.space.parent_space = stafflines.space
+        barline.space.parent_space = staff.space
         column.add_barline(barline)
 
     return column

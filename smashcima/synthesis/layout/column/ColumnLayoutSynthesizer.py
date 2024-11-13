@@ -1,6 +1,6 @@
 from smashcima.scene.Glyph import Glyph
 from smashcima.scene.visual.Flag import Flag
-from smashcima.scene.visual.Stafflines import Stafflines
+from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.visual.System import System
 from smashcima.scene.visual.Page import Page
@@ -206,7 +206,7 @@ class ColumnLayoutSynthesizer:
     
     def synthesize_system(
         self,
-        staves: List[Stafflines],
+        staves: List[StaffVisual],
         score: Score,
         start_on_measure: int
     ) -> System:

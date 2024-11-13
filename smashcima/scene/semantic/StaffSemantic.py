@@ -6,7 +6,7 @@ from smashcima.nameof_via_dummy import nameof_via_dummy
 
 
 @dataclass
-class Staff(SceneObject):
+class StaffSemantic(SceneObject):
     """
     Represents a staff within a measure (e.g. piano measures have 2 staves),
     as a collection of durables
@@ -27,10 +27,10 @@ class Staff(SceneObject):
     def of_durable(
         durable: Durable,
         fail_if_none=False
-    ) -> Optional["Staff"] | "Staff":
+    ) -> Optional["StaffSemantic"] | "StaffSemantic":
         return durable.get_inlinked(
-            Staff,
-            nameof_via_dummy(Staff, lambda s: s.durables),
+            StaffSemantic,
+            nameof_via_dummy(StaffSemantic, lambda s: s.durables),
             at_most_one=True,
             fail_if_none=fail_if_none
         )

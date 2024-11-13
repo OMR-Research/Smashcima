@@ -4,7 +4,7 @@ from fractions import Fraction
 from ..SceneObject import SceneObject
 from .Durable import Durable
 from .Event import Event
-from .Staff import Staff
+from .StaffSemantic import StaffSemantic
 from .AttributesChange import AttributesChange
 from typing import List
 from smashcima.nameof_via_dummy import nameof_via_dummy
@@ -17,7 +17,7 @@ class Measure(SceneObject):
     events: List[Event] = field(default_factory=list)
     "Links to all events within this measure"
 
-    staves: List[Staff] = field(default_factory=list)
+    staves: List[StaffSemantic] = field(default_factory=list)
     """Links to all staves within this measure"""
 
     @property
@@ -50,7 +50,7 @@ class Measure(SceneObject):
 
     @staticmethod
     def of_staff(
-        staff: Staff,
+        staff: StaffSemantic,
         fail_if_none=False
     ) -> Optional["Measure"] | "Measure":
         return staff.get_inlinked(
@@ -99,7 +99,7 @@ class Measure(SceneObject):
         """Sorts events by onset, ascending"""
         self.events.sort(key=lambda e: e.fractional_measure_onset)
     
-    def get_or_create_staff(self, staff_number: int) -> Staff:
+    def get_or_create_staff(self, staff_number: int) -> StaffSemantic:
         """Returns staff with the given staff number"""
         matches = [s for s in self.staves if s.staff_number == staff_number]
         if len(matches) > 1:
@@ -107,7 +107,7 @@ class Measure(SceneObject):
         elif len(matches) == 1:
             return matches[0]
         else:
-            staff = Staff(staff_number=staff_number)
+            staff = StaffSemantic(staff_number=staff_number)
             self.staves = [*self.staves, staff]
             self.sort_staves_by_number()
             return staff

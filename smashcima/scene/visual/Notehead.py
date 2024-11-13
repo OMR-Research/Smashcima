@@ -7,7 +7,7 @@ from ..Glyph import Glyph
 from ..SceneObject import SceneObject
 from ..semantic import Clef, Note
 from .NoteheadSide import NoteheadSide
-from .Stafflines import Stafflines
+from .StaffVisual import StaffVisual
 
 
 @dataclass
@@ -23,7 +23,7 @@ class Notehead(SceneObject):
     clef: Clef
     "What clef applies to the note (notehead)"
 
-    stafflines: Stafflines
+    staff: StaffVisual
     "What stafflines is the notehead placed onto"
 
     pitch_position: int

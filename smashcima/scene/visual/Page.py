@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from ..SceneObject import SceneObject
 from ..ViewBox import ViewBox
 from ..AffineSpace import AffineSpace
-from .Stafflines import Stafflines
+from .StaffVisual import StaffVisual
 from typing import List
 
 
@@ -17,5 +17,5 @@ class Page(SceneObject):
     view_box: ViewBox
     "The view box that renders the page, in the global space"
 
-    staves: List[Stafflines] = field(default_factory=list)
+    staves: List[StaffVisual] = field(default_factory=list)
     "Stafflines on the page, sorted top to bottom"

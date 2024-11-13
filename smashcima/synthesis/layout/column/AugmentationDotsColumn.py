@@ -4,7 +4,7 @@ from smashcima.scene.semantic.ScoreEvent import ScoreEvent
 from smashcima.scene.semantic.Note import Note
 from smashcima.scene.semantic.Rest import Rest
 from smashcima.scene.semantic.Durable import Durable
-from smashcima.scene.visual.Stafflines import Stafflines
+from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.visual.AugmentationDot import AugmentationDot
 from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.visual.RestGlyph import RestGlyph
@@ -29,17 +29,17 @@ class AugmentationDotsColumn(ColumnBase):
         self.place_augmentation_dots()
 
     def place_augmentation_dots(self):
-        for stafflines in self.staves:
-            self.place_augmentation_dots_for_stafflines(stafflines)
+        for staff in self.staves:
+            self.place_augmentation_dots_for_staff(staff)
 
-    def place_augmentation_dots_for_stafflines(self, stafflines: Stafflines):
+    def place_augmentation_dots_for_staff(self, staff: StaffVisual):
         noteheads: List[Notehead] = []
         notehead_dots: List[AugmentationDot] = []
         rests: List[RestGlyph] = []
         rest_dots: List[AugmentationDot] = []
         for dot in self.augmentation_dots:
             for owner in dot.owners:
-                if self.get_stafflines_of_glyph(owner.glyph) is not stafflines:
+                if self.get_staff_of_glyph(owner.glyph) is not staff:
                     continue # skip glyphs in other staves
                 if isinstance(owner, Notehead):
                     noteheads.append(owner)
@@ -49,14 +49,14 @@ class AugmentationDotsColumn(ColumnBase):
                     rest_dots.append(dot)
         
         # where is the column in the staff space coords
-        origin_x = stafflines.staff_coordinate_system.get_transform(
+        origin_x = staff.staff_coordinate_system.get_transform(
             0, self.time_position
         ).apply_to(Point(0, 0)).x
 
         # get right edge of all noteheads
         noteheads_right_edge = origin_x
         for notehead in noteheads:
-            r = notehead.glyph.get_bbox_in_space(stafflines.space).right
+            r = notehead.glyph.get_bbox_in_space(staff.space).right
             noteheads_right_edge = max(noteheads_right_edge, r)
         
         # constants
@@ -69,7 +69,7 @@ class AugmentationDotsColumn(ColumnBase):
             time_position = self.time_position + (
                 noteheads_right_edge - origin_x
             ) + position_x
-            dot.glyph.space.transform = stafflines.staff_coordinate_system.get_transform(
+            dot.glyph.space.transform = staff.staff_coordinate_system.get_transform(
                 pitch_position=dot.pitch_position,
                 time_position=time_position
             )
@@ -77,20 +77,20 @@ class AugmentationDotsColumn(ColumnBase):
         # place rest dots
         for dot in rest_dots:
             rest_right_edge = dot.owners[0].glyph.get_bbox_in_space(
-                stafflines.space
+                staff.space
             ).right
             position_x = SPACING * dot.augmentation_dot_index
             time_position = self.time_position + (
                 rest_right_edge - origin_x
             ) + position_x
-            dot.glyph.space.transform = stafflines.staff_coordinate_system.get_transform(
+            dot.glyph.space.transform = staff.staff_coordinate_system.get_transform(
                 pitch_position=dot.pitch_position,
                 time_position=time_position
             )
 
 def synthesize_augmentation_dots_column(
     column: AugmentationDotsColumn,
-    staves: List[Stafflines],
+    staves: List[StaffVisual],
     glyph_synthesizer: GlyphSynthesizer,
     score: Score,
     score_event: ScoreEvent
@@ -99,12 +99,12 @@ def synthesize_augmentation_dots_column(
     durables: Dict[int, List[Durable]] = {}
     for event in score_event.events:
         for durable in event.durables:
-            stafflines_index = score.staff_index_of_durable(durable)
-            durables.setdefault(stafflines_index, [])
-            durables[stafflines_index].append(durable)
+            staff_index = score.staff_index_of_durable(durable)
+            durables.setdefault(staff_index, [])
+            durables[staff_index].append(durable)
 
     # for each staff durables
-    for stafflines_index, staffline_durables in durables.items():
+    for staff_index, staffline_durables in durables.items():
         created_dots: Dict[int, List[AugmentationDot]] = dict() # by pitch pos
         handled_noteheads: List[Notehead] = []
 
@@ -176,7 +176,7 @@ def synthesize_augmentation_dots_column(
                     glyph_class=SmuflLabels.augmentationDot.value,
                     expected_glyph_type=Glyph
                 )
-                glyph.space.parent_space = staves[stafflines_index].space
+                glyph.space.parent_space = staves[staff_index].space
                 dot = AugmentationDot(
                     glyph=glyph,
                     owners=[owner],

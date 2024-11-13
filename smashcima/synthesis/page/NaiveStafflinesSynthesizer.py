@@ -1,5 +1,5 @@
-from smashcima.scene.visual.Stafflines \
-    import Stafflines, StaffCoordinateSystem
+from smashcima.scene.visual.StaffVisual import StaffVisual
+from smashcima.scene.visual.StaffCoordinateSystem import StaffCoordinateSystem
 from smashcima.scene.AffineSpace import AffineSpace
 from smashcima.scene.Sprite import Sprite
 from smashcima.geometry.Vector2 import Vector2
@@ -32,12 +32,12 @@ class NaiveStaffCoordinateSystem(StaffCoordinateSystem):
 
 class NaiveStafflinesSynthesizer(StafflinesSynthesizer):
     """Simple stafflines synthesizer that just creates straight stafflines"""
-    def __init__(self):
+    def __init__(self) -> None:
         self.staff_space: float = MUSCIMA_STAFF_SPACE
         self.line_width: float = MUSCIMA_LINE_WIDTH
 
     @property
-    def stafflines_height(self) -> float:
+    def staff_height(self) -> float:
         return self.staff_space * 4
     
     def synthesize_stafflines(
@@ -45,7 +45,7 @@ class NaiveStafflinesSynthesizer(StafflinesSynthesizer):
         parent_space: AffineSpace,
         position: Vector2,
         width: float
-    ) -> Stafflines:
+    ) -> StaffVisual:
         local_space = AffineSpace(
             parent_space=parent_space,
             transform=Transform.translate(position)
@@ -64,7 +64,7 @@ class NaiveStafflinesSynthesizer(StafflinesSynthesizer):
             )
             for i in range(-2, 3)
         ]
-        return Stafflines(
+        return StaffVisual(
             width=width,
             space=local_space,
             sprites=sprites,

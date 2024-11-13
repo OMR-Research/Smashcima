@@ -2,10 +2,10 @@ from smashcima.scene import LineGlyph, SmashcimaLabels
 from smashcima.scene.Glyph import Glyph
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.Event import Event
-from smashcima.scene.semantic.Staff import Staff
+from smashcima.scene.semantic.StaffSemantic import StaffSemantic
 from smashcima.scene.semantic.ScoreEvent import ScoreEvent
 from smashcima.scene.semantic.Rest import Rest
-from smashcima.scene.visual.Stafflines import Stafflines
+from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.visual.RestGlyph import RestGlyph
 from smashcima.scene.visual.LedgerLine import LedgerLine
 from smashcima.scene.SmuflLabels import SmuflLabels
@@ -40,7 +40,7 @@ class RestsColumn(ColumnBase):
                 rest_glyph.clef, display_pitch, rest_glyph.rest.type_duration
             )
 
-            rest_glyph.glyph.space.transform = rest_glyph.stafflines.staff_coordinate_system \
+            rest_glyph.glyph.space.transform = rest_glyph.staff.staff_coordinate_system \
                 .get_transform(
                     pitch_position=pitch_position,
                     time_position=self.time_position
@@ -49,7 +49,7 @@ class RestsColumn(ColumnBase):
 
 def synthesize_rests_column(
     column: RestsColumn,
-    staves: List[Stafflines],
+    staves: List[StaffVisual],
     glyph_synthesizer: GlyphSynthesizer,
     line_synthesizer: LineSynthesizer,
     score: Score,
@@ -64,10 +64,10 @@ def synthesize_rests_column(
             
             # resolve context
             event = Event.of_durable(durable, fail_if_none=True)
-            staff = Staff.of_durable(durable, fail_if_none=True)
-            clef = event.attributes.clefs[staff.staff_number]
-            stafflines_index = score.staff_index_of_durable(durable)
-            stafflines = staves[stafflines_index]
+            staff_sem = StaffSemantic.of_durable(durable, fail_if_none=True)
+            clef = event.attributes.clefs[staff_sem.staff_number]
+            staff_index = score.staff_index_of_durable(durable)
+            staff = staves[staff_index]
 
             # resolve pitch position
             display_pitch = durable.display_pitch \
@@ -86,12 +86,12 @@ def synthesize_rests_column(
                 glyph_class.value,
                 expected_glyph_type=Glyph
             )
-            glyph.space.parent_space = stafflines.space
+            glyph.space.parent_space = staff.space
             rest_glyph = RestGlyph(
                 glyph=glyph,
                 rest = durable,
                 clef = clef,
-                stafflines = stafflines,
+                staff = staff,
                 pitch_position = pitch_position,
             )
             column.add_rest(rest_glyph)

@@ -3,8 +3,7 @@ from ..SceneObject import SceneObject
 from typing import List, Set
 from .Part import Part
 from .ScoreMeasure import ScoreMeasure
-from .Event import Event
-from .Staff import Staff
+from .StaffSemantic import StaffSemantic
 from .Measure import Measure
 from .Durable import Durable
 
@@ -50,7 +49,7 @@ class Score(SceneObject):
     def staff_index_of_durable(self, durable: Durable) -> int:
         """Returns the staff index (zero-based) of the given durable
         with respect to the whole score (all the instruments) (to the system)"""
-        staff = Staff.of_durable(durable, fail_if_none=True)
+        staff = StaffSemantic.of_durable(durable, fail_if_none=True)
         measure = Measure.of_staff(staff, fail_if_none=True)
         part = Part.of_measure(measure, fail_if_none=True)
 

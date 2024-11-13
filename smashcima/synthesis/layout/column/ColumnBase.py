@@ -1,7 +1,7 @@
 import abc
 from typing import List
 from .Column import Column
-from smashcima.scene.visual.Stafflines import Stafflines
+from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.Glyph import Glyph
 from smashcima.scene.Sprite import Sprite
 from smashcima.geometry.Vector2 import Vector2
@@ -13,7 +13,7 @@ import random
 class ColumnBase(Column, metaclass=abc.ABCMeta):
     """Base class for layout columns that implements common logic,
     such as dimension calculation from glyph list"""
-    def __init__(self, staves: List[Stafflines], rng_seed: float):
+    def __init__(self, staves: List[StaffVisual], rng_seed: float):
         super().__init__()
 
         self.staves = staves
@@ -37,15 +37,15 @@ class ColumnBase(Column, metaclass=abc.ABCMeta):
     def add_glyph(self, glyph: Glyph):
         """Adds a glyph into the column, the glyph must be in some staff space"""
         # check that the glyph is properly attached to stafflines
-        self.get_stafflines_of_glyph(glyph)
+        self.get_staff_of_glyph(glyph)
         if glyph not in self.glyphs:
             self.glyphs.append(glyph)
     
-    def get_stafflines_of_glyph(self, glyph: Glyph) -> Stafflines:
+    def get_staff_of_glyph(self, glyph: Glyph) -> StaffVisual:
         """Resolves the stafflines object for a given glyph"""
-        for stafflines in self.staves:
-            if stafflines.space is glyph.space.parent_space:
-                return stafflines
+        for staff in self.staves:
+            if staff.space is glyph.space.parent_space:
+                return staff
         raise Exception(
             "Given glyph is not attached to any of the stafflines objects"
         )
@@ -73,15 +73,15 @@ class ColumnBase(Column, metaclass=abc.ABCMeta):
         points: List[Vector2] = []
 
         # for all staves
-        for stafflines in self.staves:
-            column_origin = stafflines.staff_coordinate_system.get_transform(
+        for staff in self.staves:
+            column_origin = staff.staff_coordinate_system.get_transform(
                 0,
                 self.time_position
             ).apply_to(Vector2(0, 0))
 
             # for all glyphs in that staff
             for glyph in self.glyphs:
-                if glyph.space.parent_space is not stafflines.space:
+                if glyph.space.parent_space is not staff.space:
                     continue
 
                 # get all sprites in that glyph and transform their corners
@@ -115,17 +115,17 @@ class ColumnBase(Column, metaclass=abc.ABCMeta):
 
     def place_debug_boxes(self):
         """For debugging purposes - places sprites that visualize the column"""
-        for stafflines in self.staves:
-            topleft = stafflines.staff_coordinate_system.get_transform(
+        for staff in self.staves:
+            topleft = staff.staff_coordinate_system.get_transform(
                 pitch_position=4,
                 time_position=self.time_position - self.left_width
             ).apply_to(Vector2(0, 0))
-            bottomright = stafflines.staff_coordinate_system.get_transform(
+            bottomright = staff.staff_coordinate_system.get_transform(
                 pitch_position=-4,
                 time_position=self.time_position + self.right_width
             ).apply_to(Vector2(0, 0))
             Sprite.debug_box(
-                space=stafflines.space,
+                space=staff.space,
                 rectangle=Rectangle(
                     x=topleft.x,
                     y=topleft.y,

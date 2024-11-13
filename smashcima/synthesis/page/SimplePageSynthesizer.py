@@ -1,5 +1,5 @@
 from smashcima.scene.visual.Page import Page
-from smashcima.scene.visual.Stafflines import Stafflines
+from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.geometry.Rectangle import Rectangle
 from smashcima.geometry.Transform import Transform
@@ -88,7 +88,7 @@ class SimplePageSynthesizer:
             staves=staves
         )
     
-    def _synthesize_stafflines(self, page_space: AffineSpace) -> List[Stafflines]:
+    def _synthesize_stafflines(self, page_space: AffineSpace) -> List[StaffVisual]:
         content_box = Rectangle(
             self.page_setup.padding_left,
             self.page_setup.padding_top,
@@ -99,13 +99,13 @@ class SimplePageSynthesizer:
         )
 
         starting_point = content_box.y \
-            + self.stafflines_synthesizer.stafflines_height / 2
+            + self.stafflines_synthesizer.staff_height / 2
 
         vertical_step = (content_box.height \
-            - self.stafflines_synthesizer.stafflines_height) \
+            - self.stafflines_synthesizer.staff_height) \
             / self.page_setup.staff_count
 
-        staves: List[Stafflines] = []
+        staves: List[StaffVisual] = []
         for i in range(self.page_setup.staff_count):
             stafflines = self.stafflines_synthesizer.synthesize_stafflines(
                 parent_space=page_space,

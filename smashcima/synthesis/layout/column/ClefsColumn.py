@@ -1,6 +1,6 @@
 from smashcima.scene.semantic.Clef import Clef
 from smashcima.scene.semantic.Score import Score
-from smashcima.scene.visual.Stafflines import Stafflines
+from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.Glyph import Glyph
 from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
@@ -22,7 +22,7 @@ class ClefsColumn(ColumnBase):
 
     def _position_glyphs(self):
         for clef, clef_glyph in zip(self.clefs, self.glyphs):
-            sl = self.get_stafflines_of_glyph(clef_glyph)
+            sl = self.get_staff_of_glyph(clef_glyph)
 
             pitch_position = Clef.clef_line_to_pitch_position(clef.line)
 
@@ -33,7 +33,7 @@ class ClefsColumn(ColumnBase):
 
 
 def synthesize_header_clefs(
-    staves: List[Stafflines],
+    staves: List[StaffVisual],
     rng: random.Random,
     glyph_synthesizer: GlyphSynthesizer,
     score: Score,
@@ -54,9 +54,9 @@ def synthesize_header_clefs(
         for staff_number, clef in event.attributes.clefs.items():
 
             # get the proper stafflines instance
-            stafflines_index = score.first_staff_index_of_part(part) \
+            staff_index = score.first_staff_index_of_part(part) \
                 + (staff_number - 1)
-            stafflines = staves[stafflines_index]
+            staff = staves[staff_index]
 
             # determine the glyph class
             glyph_class: str = SmuflLabels.clef_from_clef_sign(
@@ -66,15 +66,15 @@ def synthesize_header_clefs(
 
             # synthesize the glyph
             glyph = glyph_synthesizer.synthesize_glyph(glyph_class)
-            glyph.space.parent_space = stafflines.space
+            glyph.space.parent_space = staff.space
             column.add_clef(clef, glyph)
 
             # verification logic
-            if stafflines_index in handled_staves:
+            if staff_index in handled_staves:
                 raise Exception(
-                    f"The staff {stafflines_index} had a clef be created twice!"
+                    f"The staff {staff_index} had a clef be created twice!"
                 )
-            handled_staves.add(stafflines_index)
+            handled_staves.add(staff_index)
     
     # verify there is one clef for each staff
     assert len(handled_staves) == len(staves), \

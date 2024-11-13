@@ -3,19 +3,16 @@ from smashcima.scene.Glyph import Glyph
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.ScoreEvent import ScoreEvent
 from smashcima.scene.semantic.Note import Note
-from smashcima.scene.semantic.Rest import Rest
-from smashcima.scene.semantic.Durable import Durable
-from smashcima.scene.visual.Stafflines import Stafflines
+from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.visual.Accidental import Accidental
 from smashcima.scene.visual.Notehead import Notehead
-from smashcima.scene.visual.RestGlyph import RestGlyph
 from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
 from smashcima.geometry.Point import Point
 from smashcima.random_between import random_between
 from .ColumnBase import ColumnBase
 from .Skyline import Skyline
-from typing import List, Dict, Optional, Union, Optional
+from typing import List
 
 
 class AccidentalsColumn(ColumnBase):
@@ -31,14 +28,14 @@ class AccidentalsColumn(ColumnBase):
         self.place_accidentals()
 
     def place_accidentals(self):
-        for stafflines in self.staves:
-            self.place_accidentals_for_stafflines(stafflines)
+        for staff in self.staves:
+            self.place_accidentals_for_staff(staff)
 
-    def place_accidentals_for_stafflines(self, stafflines: Stafflines):
+    def place_accidentals_for_staff(self, staff: StaffVisual):
         # extract all accidentals in this staff
         accidentals: List[Accidental] = []
         for accidental in self.accidentals:
-            if self.get_stafflines_of_glyph(accidental.notehead.glyph) is not stafflines:
+            if self.get_staff_of_glyph(accidental.notehead.glyph) is not staff:
                 continue
             accidentals.append(accidental)
         
@@ -54,7 +51,7 @@ class AccidentalsColumn(ColumnBase):
             )
             if notehead is None:
                 continue
-            if self.get_stafflines_of_glyph(glyph) is not stafflines:
+            if self.get_staff_of_glyph(glyph) is not staff:
                 continue
             noteheads.append(notehead)
 
@@ -62,7 +59,7 @@ class AccidentalsColumn(ColumnBase):
         SPACING = random_between(0.2, 1.0, self.rng) # between accidentals
         
         # where is the column in the staff space coords
-        origin_x = stafflines.staff_coordinate_system.get_transform(
+        origin_x = staff.staff_coordinate_system.get_transform(
             0, self.time_position
         ).apply_to(Point(0, 0)).x
 
@@ -70,7 +67,7 @@ class AccidentalsColumn(ColumnBase):
         # (in the column-local space increasing to the right)
         skyline = Skyline(ground_level=0)
         for notehead in noteheads:
-            bbox_global = notehead.glyph.get_bbox_in_space(stafflines.space)
+            bbox_global = notehead.glyph.get_bbox_in_space(staff.space)
             skyline.overlay_box(
                 minimum=bbox_global.top,
                 maximum=bbox_global.bottom,
@@ -82,7 +79,7 @@ class AccidentalsColumn(ColumnBase):
             assert accidental.notehead in noteheads, \
                 "Not all noteheads have been extracted to build the skyline base"
 
-            bbox_global = accidental.glyph.get_bbox_in_space(stafflines.space)
+            bbox_global = accidental.glyph.get_bbox_in_space(staff.space)
             bbox_local = accidental.glyph.get_bbox_in_space(accidental.glyph.space)
 
             skyline_left = skyline.drop_box(
@@ -90,7 +87,7 @@ class AccidentalsColumn(ColumnBase):
                 maximum=bbox_global.bottom,
                 thickness=bbox_global.width + SPACING
             )
-            accidental.glyph.space.transform = stafflines.staff_coordinate_system \
+            accidental.glyph.space.transform = staff.staff_coordinate_system \
                 .get_transform(
                     pitch_position=accidental.notehead.pitch_position,
                     time_position=(
@@ -100,7 +97,7 @@ class AccidentalsColumn(ColumnBase):
 
 def synthesize_accidentals_column(
     column: AccidentalsColumn,
-    staves: List[Stafflines],
+    staves: List[StaffVisual],
     glyph_synthesizer: GlyphSynthesizer,
     score: Score,
     score_event: ScoreEvent
@@ -122,8 +119,8 @@ def synthesize_accidentals_column(
                 ).value,
                 expected_glyph_type=Glyph
             )
-            stafflines_index = score.staff_index_of_durable(note)
-            glyph.space.parent_space = staves[stafflines_index].space
+            staff_index = score.staff_index_of_durable(note)
+            glyph.space.parent_space = staves[staff_index].space
             accidental = Accidental(
                 glyph=glyph,
                 notehead=Notehead.of_note(note, fail_if_none=True)

@@ -18,7 +18,7 @@ from .Rest import Rest
 from .ScoreEvent import ScoreEvent
 from .ScoreMeasure import ScoreMeasure
 from .Score import Score
-from .Staff import Staff
+from .StaffSemantic import StaffSemantic
 from .StemValue import StemValue
 from .TimeSignature import TimeSignature
 from .TypeDuration import TypeDuration

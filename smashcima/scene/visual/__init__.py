@@ -9,6 +9,7 @@ from .Notehead import Notehead
 from .NoteheadSide import NoteheadSide
 from .Page import Page
 from .RestGlyph import RestGlyph
-from .Stafflines import Stafflines
+from .StaffCoordinateSystem import StaffCoordinateSystem
+from .StaffVisual import StaffVisual
 from .Stem import Stem
 from .System import System
