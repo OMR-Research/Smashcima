@@ -10,6 +10,7 @@ from .NoteheadSide import NoteheadSide
 from .Page import Page
 from .RestVisual import RestVisual
 from .StaffCoordinateSystem import StaffCoordinateSystem
+from .StaffMeasure import StaffMeasure
 from .StaffVisual import StaffVisual
 from .Stem import Stem
 from .System import System
