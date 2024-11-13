@@ -36,6 +36,9 @@ import cv2
 from typing import Optional
 
 
+# Re-install asset bunle during development by running:
+# .venv/bin/python3 -m smashcima.assets.glyphs.muscima_pp --debug
+
 class MuscimaPPGlyphs(AssetBundle):
     def __post_init__(self):
         self._symbol_repository_cache: Optional[SymbolRepository] = None
@@ -132,22 +135,3 @@ class MuscimaPPGlyphs(AssetBundle):
                     str(glyphs_folder / (meta.mpp_crop_object_uid + ".png")),
                     glyph_renderer.render(glyph)
                 )
-
-
-# Run by:
-# .venv/bin/python3 -m smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs --debug
-if __name__ == "__main__":
-    from ...AssetRepository import AssetRepository
-    from pathlib import Path
-    import sys
-    
-    assets = AssetRepository(Path("smashcima_assets"))
-
-    print("Re-installing MUSCIMA++ glyphs...")
-    bundle = assets.resolve_bundle(MuscimaPPGlyphs, force_install=True)
-    
-    if len(sys.argv) >= 2 and sys.argv[1] == "--debug":
-        print("Building the debug folder...")
-        bundle.build_debug_folder()
-
-    print("Done.")
