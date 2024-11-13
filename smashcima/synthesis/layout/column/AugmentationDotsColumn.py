@@ -1,3 +1,4 @@
+from smashcima.scene.Glyph import Glyph
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.ScoreEvent import ScoreEvent
 from smashcima.scene.semantic.Note import Note
@@ -12,16 +13,16 @@ from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
 from smashcima.geometry.Point import Point
 from smashcima.random_between import random_between
 from .ColumnBase import ColumnBase
-from typing import List, Dict, Optional, Union, Optional
+from typing import List, Dict, Optional, Union
 
 
 class AugmentationDotsColumn(ColumnBase):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.augmentation_dots: List[AugmentationDot] = []
     
     def add_augmentation_dot(self, augmentation_dot: AugmentationDot):
         assert len(augmentation_dot.owners) > 0
-        self.glyphs.append(augmentation_dot)
+        self.glyphs.append(augmentation_dot.glyph)
         self.augmentation_dots.append(augmentation_dot)
 
     def _position_glyphs(self):
@@ -38,7 +39,7 @@ class AugmentationDotsColumn(ColumnBase):
         rest_dots: List[AugmentationDot] = []
         for dot in self.augmentation_dots:
             for owner in dot.owners:
-                if self.get_stafflines_of_glyph(owner) is not stafflines:
+                if self.get_stafflines_of_glyph(owner.glyph) is not stafflines:
                     continue # skip glyphs in other staves
                 if isinstance(owner, Notehead):
                     noteheads.append(owner)
@@ -55,7 +56,7 @@ class AugmentationDotsColumn(ColumnBase):
         # get right edge of all noteheads
         noteheads_right_edge = origin_x
         for notehead in noteheads:
-            r = notehead.get_bbox_in_space(stafflines.space).right
+            r = notehead.glyph.get_bbox_in_space(stafflines.space).right
             noteheads_right_edge = max(noteheads_right_edge, r)
         
         # constants
@@ -68,21 +69,21 @@ class AugmentationDotsColumn(ColumnBase):
             time_position = self.time_position + (
                 noteheads_right_edge - origin_x
             ) + position_x
-            dot.space.transform = stafflines.staff_coordinate_system.get_transform(
+            dot.glyph.space.transform = stafflines.staff_coordinate_system.get_transform(
                 pitch_position=dot.pitch_position,
                 time_position=time_position
             )
         
         # place rest dots
         for dot in rest_dots:
-            rest_right_edge = dot.owners[0].get_bbox_in_space(
+            rest_right_edge = dot.owners[0].glyph.get_bbox_in_space(
                 stafflines.space
             ).right
             position_x = SPACING * dot.augmentation_dot_index
             time_position = self.time_position + (
                 rest_right_edge - origin_x
             ) + position_x
-            dot.space.transform = stafflines.staff_coordinate_system.get_transform(
+            dot.glyph.space.transform = stafflines.staff_coordinate_system.get_transform(
                 pitch_position=dot.pitch_position,
                 time_position=time_position
             )
@@ -103,13 +104,13 @@ def synthesize_augmentation_dots_column(
             durables[stafflines_index].append(durable)
 
     # for each staff durables
-    for stafflines_index in durables.keys():
+    for stafflines_index, staffline_durables in durables.items():
         created_dots: Dict[int, List[AugmentationDot]] = dict() # by pitch pos
         handled_noteheads: List[Notehead] = []
 
         # sort by pitch from high-to-low
         # (in order for noteheads to properly distribute dots)
-        sorted_durables = list(durables[stafflines_index])
+        sorted_durables = list(staffline_durables)
         sorted_durables.sort(key=lambda d:
             d.pitch.get_linear_pitch() if isinstance(d, Note) else 0,
             reverse=True
@@ -126,18 +127,18 @@ def synthesize_augmentation_dots_column(
                 if notehead in handled_noteheads:
                     continue
                 handled_noteheads.append(notehead)
-                
+
                 owner = notehead
                 pitch_position = notehead.pitch_position
                 augmentation_dot_count = durable.augmentation_dots
-            
+
             # handle rests
             elif isinstance(durable, Rest):
                 rest_glyph = RestGlyph.of_rest(durable, fail_if_none=True)
                 owner = rest_glyph
                 pitch_position = rest_glyph.pitch_position
                 augmentation_dot_count = durable.augmentation_dots
-            
+
             # skip other durables (there should be none)
             else:
                 continue
@@ -162,7 +163,7 @@ def synthesize_augmentation_dots_column(
             created_dots.setdefault(pitch_position, [])
             dots: List[AugmentationDot] = created_dots[pitch_position]
             for dot_index in range(1, augmentation_dot_count + 1):
-                
+
                 # reuse existing dot
                 if dot_index <= len(dots):
                     dot = dots[dot_index - 1]
@@ -171,14 +172,17 @@ def synthesize_augmentation_dots_column(
                     dot.owners = [*dot.owners, owner]
 
                 # create new dot
-                dot = glyph_synthesizer.synthesize_glyph(
+                glyph = glyph_synthesizer.synthesize_glyph(
                     glyph_class=SmuflLabels.augmentationDot.value,
-                    expected_glyph_type=AugmentationDot
+                    expected_glyph_type=Glyph
                 )
-                dot.augmentation_dot_index = dot_index
-                dot.pitch_position = pitch_position
-                dot.owners = [owner]
-                dot.space.parent_space = staves[stafflines_index].space
+                glyph.space.parent_space = staves[stafflines_index].space
+                dot = AugmentationDot(
+                    glyph=glyph,
+                    owners=[owner],
+                    augmentation_dot_index=dot_index,
+                    pitch_position=pitch_position,
+                )
                 dots.append(dot)
 
                 column.add_augmentation_dot(dot)

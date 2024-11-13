@@ -1,4 +1,5 @@
 from ..LineGlyph import LineGlyph
+from ..SceneObject import SceneObject
 from ..semantic.Chord import Chord
 from dataclasses import dataclass
 from typing import Optional
@@ -7,26 +8,29 @@ from ..ScenePoint import ScenePoint
 
 
 @dataclass
-class Stem(LineGlyph):
+class Stem(SceneObject):
     """Stem (visual line) belonging to a chord"""
     
-    chord: Chord = None
+    glyph: LineGlyph
+    "The glyph of the line"
+
+    chord: Chord
     """The chord containing the notes that this stem is for. Can be None
     only during construction, otherwise must be set."""
 
     @property
     def base(self) -> ScenePoint:
         """Base of the stem, in glyph space coordinates"""
-        return self.start_point
+        return self.glyph.start_point
 
     @property
     def tip(self) -> ScenePoint:
         """Tip of the stem, in glyph space coordinates"""
-        return self.end_point
+        return self.glyph.end_point
     
     def detach(self):
         """Unlink the glyph from the scene"""
-        super().detach()
+        self.glyph.detach()
         self.chord = None
 
     @staticmethod
@@ -40,7 +44,3 @@ class Stem(LineGlyph):
             at_most_one=True,
             fail_if_none=fail_if_none
         )
-    
-    def detach(self):
-        self.space.parent_space = None
-        self.chord = None

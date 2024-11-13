@@ -1,14 +1,12 @@
 from dataclasses import dataclass
-from ..semantic.Rest import Rest
-from ..semantic.MeasureRest import MeasureRest
-from ..semantic.TypeDuration import TypeDuration
-from ..semantic.Pitch import Pitch
-from ..semantic.Clef import Clef
-from .Stafflines import Stafflines
-from ..Glyph import Glyph
-from typing import Optional
+from typing import Optional, Union
+
 from smashcima.nameof_via_dummy import nameof_via_dummy
 
+from ..Glyph import Glyph
+from ..SceneObject import SceneObject
+from ..semantic import Clef, MeasureRest, Pitch, Rest, TypeDuration
+from .Stafflines import Stafflines
 
 # Display Pitch
 # -------------
@@ -43,24 +41,27 @@ from smashcima.nameof_via_dummy import nameof_via_dummy
 
 
 @dataclass
-class RestGlyph(Glyph):
+class RestGlyph(SceneObject):
     """Glyph of a rest symbol"""
 
-    rest: Rest | MeasureRest | None = None
+    glyph: Glyph
+    "The glyph of the rest object"
+
+    rest: Union[Rest, MeasureRest, None]
     "The semantic rest that this glyph represents"
 
-    clef: Clef = None
+    clef: Clef
     "What clef applies to the rest"
 
-    stafflines: Stafflines = None
+    stafflines: Stafflines
     "What stafflines is the rest placed onto"
 
-    pitch_position: int = None
+    pitch_position: int
     "Display pitch position of the rest on the stafflines"
 
     def detach(self):
         """Unlink the glyph from the scene"""
-        super().detach()
+        self.glyph.detach()
         self.rest = None
         self.clef = None
         self.stafflines = None

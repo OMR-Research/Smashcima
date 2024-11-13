@@ -1,3 +1,4 @@
+from ..SceneObject import SceneObject
 from ..LineGlyph import LineGlyph
 from .Notehead import Notehead
 from .RestGlyph import RestGlyph
@@ -6,9 +7,11 @@ from typing import List, Optional
 
 
 @dataclass
-class LedgerLine(LineGlyph):
+class LedgerLine(SceneObject):
     """Ledger line (visual), extending the stafflines outside their range"""
     
+    glyph: LineGlyph
+
     affected_noteheads: List[Notehead] = field(default_factory=list)
     """List of noteheads that are affected by this ledger line (so if we are
     at the top of the staff, all notes that are on or above this ledger line
@@ -23,6 +26,6 @@ class LedgerLine(LineGlyph):
 
     def detach(self):
         """Unlink the glyph from the scene"""
-        super().detach()
+        self.glyph.detach()
         self.affected_noteheads = None
         self.affected_rest = None

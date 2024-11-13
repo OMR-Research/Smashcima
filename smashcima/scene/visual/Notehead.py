@@ -1,27 +1,32 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional
-from ..semantic.Note import Note
-from ..semantic.Clef import Clef
-from .Stafflines import Stafflines
-from ..Glyph import Glyph
-from .NoteheadSide import NoteheadSide
+
 from smashcima.nameof_via_dummy import nameof_via_dummy
+
+from ..Glyph import Glyph
+from ..SceneObject import SceneObject
+from ..semantic import Clef, Note
+from .NoteheadSide import NoteheadSide
+from .Stafflines import Stafflines
 
 
 @dataclass
-class Notehead(Glyph):
-    """Glyph of a notehead, contains links specific to a notehead glyph"""
+class Notehead(SceneObject):
+    """A notehead in a music score"""
 
-    notes: List[Note] = field(default_factory=list)
+    glyph: Glyph
+    "The visual glyph of the notehead"
+
+    notes: List[Note]
     "List of notes being represented by this notehead (typically just one)"
 
-    clef: Clef = None
+    clef: Clef
     "What clef applies to the note (notehead)"
 
-    stafflines: Stafflines = None
+    stafflines: Stafflines
     "What stafflines is the notehead placed onto"
 
-    pitch_position: int = None
+    pitch_position: int
     "Pitch position of the notehead on the stafflines"
 
     up_stem_attachment_side: Optional[NoteheadSide] = NoteheadSide.right
@@ -37,8 +42,8 @@ class Notehead(Glyph):
     None means there should not ever be such a stem attached."""
 
     def detach(self):
-        """Unlink the glyph from the scene"""
-        super().detach()
+        """Unlink the notehead from the scene"""
+        self.glyph.detach()
         self.notes = []
 
     @staticmethod

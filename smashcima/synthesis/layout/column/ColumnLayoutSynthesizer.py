@@ -1,3 +1,5 @@
+from smashcima.scene.Glyph import Glyph
+from smashcima.scene.visual.Flag import Flag
 from smashcima.scene.visual.Stafflines import Stafflines
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.visual.System import System
@@ -378,8 +380,13 @@ class ColumnLayoutSynthesizer:
 
             # create the glyph
             glyph = self.glyph_synthesizer.synthesize_glyph(
-                glyph_class=glyph_class
+                glyph_class=glyph_class,
+                expected_glyph_type=Glyph
             )
             glyph.space.parent_space = paper_space
             attachment_point = stem.tip.transform_to(paper_space)
             glyph.space.transform = Transform.translate(attachment_point.vector)
+            Flag(
+                glyph=glyph,
+                stem=stem
+            )

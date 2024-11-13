@@ -1,3 +1,5 @@
+from smashcima.scene import LineGlyph
+from smashcima.scene.Glyph import Glyph
 from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from smashcima.scene.semantic.Clef import Clef
 from smashcima.scene.semantic.Score import Score
@@ -47,7 +49,7 @@ class _NoteheadContext:
 
 
 class NoteheadsColumn(ColumnBase):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.notehead_contexts: List[_NoteheadContext] = []
         self.ledger_lines: List[LedgerLine] = []
     
@@ -57,7 +59,7 @@ class NoteheadsColumn(ColumnBase):
     def add_notehead(self, notehead: Notehead):
         assert len(notehead.notes) > 0
 
-        self.glyphs.append(notehead)
+        self.glyphs.append(notehead.glyph)
         
         note = notehead.notes[0]
         chord = Chord.of_note(note, fail_if_none=True)
@@ -141,7 +143,7 @@ class NoteheadsColumn(ColumnBase):
             return
         
         center_notehead_stack_width = sum(
-            ctx.notehead.get_bbox_in_space(ctx.notehead.stafflines.space).width
+            ctx.notehead.glyph.get_bbox_in_space(ctx.notehead.stafflines.space).width
             for ctx in self.notehead_contexts
         ) / len(self.notehead_contexts) # average
         kick_off_distance = center_notehead_stack_width \
@@ -151,7 +153,7 @@ class NoteheadsColumn(ColumnBase):
             notehead = ctx.notehead
             sl = ctx.notehead.stafflines
 
-            notehead.space.transform = sl.staff_coordinate_system.get_transform(
+            notehead.glyph.space.transform = sl.staff_coordinate_system.get_transform(
                 pitch_position=ctx.notehead.pitch_position,
                 time_position=self.time_position \
                     + (ctx.kick_off * kick_off_distance)
@@ -166,10 +168,12 @@ class NoteheadsColumn(ColumnBase):
         if len(contexts) == 0:
             return
         
-        def _ledger_line_temporal_bounds(ctx: _NoteheadContext) -> float:
+        def _ledger_line_temporal_bounds(
+            ctx: _NoteheadContext
+        ) -> Tuple[float, float]:
             """Gets the time position of the two start and end of a basic
             ledger line for a given (already placed) notehead"""
-            bbox = ctx.notehead.get_bbox_in_space(ctx.notehead.stafflines.space)
+            bbox = ctx.notehead.glyph.get_bbox_in_space(ctx.notehead.stafflines.space)
             pos_x = ctx.notehead.stafflines.staff_coordinate_system.get_transform(
                 pitch_position=0, time_position=self.time_position
             ).apply_to(Point(0, 0)).x
@@ -222,7 +226,7 @@ class NoteheadsColumn(ColumnBase):
     
     def delete_current_ledger_lines(self):
         for line in self.ledger_lines:
-            self.glyphs.remove(line)
+            self.glyphs.remove(line.glyph)
             line.detach()
         self.ledger_lines = []
     
@@ -243,15 +247,20 @@ class NoteheadsColumn(ColumnBase):
             time_position=time_position_end
         ).apply_to(Point(0, 0))
 
-        line = self.line_synthesizer.synthesize_line(
-            glyph_type=LedgerLine,
+        glyph = self.line_synthesizer.synthesize_line(
+            glyph_type=LineGlyph,
             glyph_class=SmashcimaLabels.ledgerLine.value,
             start_point=start_point,
             end_point=end_point
         )
-        line.space.parent_space = stafflines.space
+        glyph.space.parent_space = stafflines.space
+        line = LedgerLine(
+            glyph=glyph,
+            affected_noteheads=[], # populated later
+            affected_rest=None
+        )
 
-        self.glyphs.append(line)
+        self.glyphs.append(glyph)
         self.ledger_lines.append(line)
 
         return line
@@ -301,17 +310,20 @@ def synthesize_noteheads_column(
                 stafflines = staves[stafflines_index]
                 
                 # new notehead for a note
-                notehead = glyph_synthesizer.synthesize_glyph(
+                glyph = glyph_synthesizer.synthesize_glyph(
                     SmuflLabels.notehead_from_type_duration(
                         note.type_duration
                     ).value,
-                    expected_glyph_type=Notehead
+                    expected_glyph_type=Glyph
                 )
-                notehead.notes = [*notehead.notes, note]
-                notehead.clef=clef
-                notehead.stafflines=stafflines
-                notehead.pitch_position=clef.pitch_to_pitch_position(note.pitch)
-                notehead.space.parent_space = stafflines.space
+                glyph.space.parent_space = stafflines.space
+                notehead = Notehead(
+                    glyph=glyph,
+                    notes = [note],
+                    clef=clef,
+                    stafflines=stafflines,
+                    pitch_position=clef.pitch_to_pitch_position(note.pitch),
+                )
                 _store_notehead(note, stafflines_index, notehead)
     
     # add noteheads to the column

@@ -1,4 +1,5 @@
-from smashcima.scene import SmashcimaLabels
+from smashcima.scene import LineGlyph, SmashcimaLabels
+from smashcima.scene.Glyph import Glyph
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.Event import Event
 from smashcima.scene.semantic.Staff import Staff
@@ -18,28 +19,28 @@ import random
 
 
 class RestsColumn(ColumnBase):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.rest_glyphs: List[RestGlyph] = []
 
-    def add_rest(self, glyph: RestGlyph):
-        assert glyph.rest is not None
-        self.glyphs.append(glyph)
-        self.rest_glyphs.append(glyph)
+    def add_rest(self, rest_glyph: RestGlyph):
+        assert rest_glyph.rest is not None
+        self.glyphs.append(rest_glyph.glyph)
+        self.rest_glyphs.append(rest_glyph)
     
     def _position_glyphs(self):
         self.position_rests()
     
     def position_rests(self):
-        for glyph in self.rest_glyphs:
-            display_pitch = glyph.rest.display_pitch \
+        for rest_glyph in self.rest_glyphs:
+            display_pitch = rest_glyph.rest.display_pitch \
                 or RestGlyph.default_display_pitch(
-                    glyph.clef, glyph.rest.type_duration
+                    rest_glyph.clef, rest_glyph.rest.type_duration
                 )
             pitch_position = RestGlyph.display_pitch_to_glyph_pitch_position(
-                glyph.clef, display_pitch, glyph.rest.type_duration
+                rest_glyph.clef, display_pitch, rest_glyph.rest.type_duration
             )
 
-            glyph.space.transform = glyph.stafflines.staff_coordinate_system \
+            rest_glyph.glyph.space.transform = rest_glyph.stafflines.staff_coordinate_system \
                 .get_transform(
                     pitch_position=pitch_position,
                     time_position=self.time_position
@@ -81,15 +82,18 @@ def synthesize_rests_column(
             glyph_class = SmuflLabels.rest_from_type_duration(
                 durable.type_duration
             )
-            rest_glyph = glyph_synthesizer.synthesize_glyph(
+            glyph = glyph_synthesizer.synthesize_glyph(
                 glyph_class.value,
-                expected_glyph_type=RestGlyph
+                expected_glyph_type=Glyph
             )
-            rest_glyph.clef = clef
-            rest_glyph.stafflines = stafflines
-            rest_glyph.pitch_position = pitch_position
-            rest_glyph.space.parent_space = stafflines.space
-            rest_glyph.rest = durable
+            glyph.space.parent_space = stafflines.space
+            rest_glyph = RestGlyph(
+                glyph=glyph,
+                rest = durable,
+                clef = clef,
+                stafflines = stafflines,
+                pitch_position = pitch_position,
+            )
             column.add_rest(rest_glyph)
 
             # create ledger line for whole/half rests
@@ -115,15 +119,19 @@ def _synthesize_ledger_line_if_necessary(
     # the rest is still within the staff, no ledgerline needed
     if abs(rest_glyph.pitch_position) < 4:
         return
-        
-    width = rest_glyph.get_bbox_in_space(rest_glyph.space).width \
+
+    width = rest_glyph.glyph.get_bbox_in_space(rest_glyph.glyph.space).width \
         * random_between(1.2, 2.5, rng)
     
-    line = line_synthesizer.synthesize_line(
-        glyph_type=LedgerLine,
+    glyph = line_synthesizer.synthesize_line(
+        glyph_type=LineGlyph,
         glyph_class=SmashcimaLabels.ledgerLine.value,
         start_point=Point(-width / 2, 0),
         end_point=Point(width / 2, 0)
     )
-    line.space.parent_space = rest_glyph.space
-    line.affected_rest = rest_glyph
+    glyph.space.parent_space = rest_glyph.glyph.space
+    LedgerLine(
+        glyph=glyph,
+        affected_noteheads=[], # none
+        affected_rest = rest_glyph
+    )

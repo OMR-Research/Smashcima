@@ -1,3 +1,5 @@
+from smashcima.nameof_via_dummy import nameof_via_dummy
+from smashcima.scene.Glyph import Glyph
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.ScoreEvent import ScoreEvent
 from smashcima.scene.semantic.Note import Note
@@ -17,12 +19,12 @@ from typing import List, Dict, Optional, Union, Optional
 
 
 class AccidentalsColumn(ColumnBase):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.accidentals: List[Accidental] = []
     
     def add_accidental(self, accidental: Accidental):
         assert accidental.notehead is not None
-        self.glyphs.append(accidental)
+        self.glyphs.append(accidental.glyph)
         self.accidentals.append(accidental)
 
     def _position_glyphs(self):
@@ -36,18 +38,25 @@ class AccidentalsColumn(ColumnBase):
         # extract all accidentals in this staff
         accidentals: List[Accidental] = []
         for accidental in self.accidentals:
-            if self.get_stafflines_of_glyph(accidental.notehead) is not stafflines:
+            if self.get_stafflines_of_glyph(accidental.notehead.glyph) is not stafflines:
                 continue
             accidentals.append(accidental)
         
         # extract all noteheads in this staff
+        # TODO: this is ugly, it's crawling the graph in ways it should not
         noteheads: List[Notehead] = []
         for glyph in self.glyphs:
-            if not isinstance(glyph, Notehead):
+            notehead = glyph.get_inlinked(
+                Notehead,
+                nameof_via_dummy(Notehead, lambda n: n.glyph),
+                at_most_one=True,
+                fail_if_none=False
+            )
+            if notehead is None:
                 continue
             if self.get_stafflines_of_glyph(glyph) is not stafflines:
                 continue
-            noteheads.append(glyph)
+            noteheads.append(notehead)
 
         # constants
         SPACING = random_between(0.2, 1.0, self.rng) # between accidentals
@@ -61,7 +70,7 @@ class AccidentalsColumn(ColumnBase):
         # (in the column-local space increasing to the right)
         skyline = Skyline(ground_level=0)
         for notehead in noteheads:
-            bbox_global = notehead.get_bbox_in_space(stafflines.space)
+            bbox_global = notehead.glyph.get_bbox_in_space(stafflines.space)
             skyline.overlay_box(
                 minimum=bbox_global.top,
                 maximum=bbox_global.bottom,
@@ -73,15 +82,15 @@ class AccidentalsColumn(ColumnBase):
             assert accidental.notehead in noteheads, \
                 "Not all noteheads have been extracted to build the skyline base"
 
-            bbox_global = accidental.get_bbox_in_space(stafflines.space)
-            bbox_local = accidental.get_bbox_in_space(accidental.space)
+            bbox_global = accidental.glyph.get_bbox_in_space(stafflines.space)
+            bbox_local = accidental.glyph.get_bbox_in_space(accidental.glyph.space)
 
             skyline_left = skyline.drop_box(
                 minimum=bbox_global.top,
                 maximum=bbox_global.bottom,
                 thickness=bbox_global.width + SPACING
             )
-            accidental.space.transform = stafflines.staff_coordinate_system \
+            accidental.glyph.space.transform = stafflines.staff_coordinate_system \
                 .get_transform(
                     pitch_position=accidental.notehead.pitch_position,
                     time_position=(
@@ -107,14 +116,16 @@ def synthesize_accidentals_column(
                 continue
 
             # create accidental
-            accidental = glyph_synthesizer.synthesize_glyph(
+            glyph = glyph_synthesizer.synthesize_glyph(
                 glyph_class=SmuflLabels.accidental_from_accidental_value(
                     note.accidental_value
                 ).value,
-                expected_glyph_type=Accidental
+                expected_glyph_type=Glyph
             )
-            accidental.notehead = Notehead.of_note(note, fail_if_none=True)
             stafflines_index = score.staff_index_of_durable(note)
-            accidental.space.parent_space = staves[stafflines_index].space
-
+            glyph.space.parent_space = staves[stafflines_index].space
+            accidental = Accidental(
+                glyph=glyph,
+                notehead=Notehead.of_note(note, fail_if_none=True)
+            )
             column.add_accidental(accidental)

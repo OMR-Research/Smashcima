@@ -3,7 +3,6 @@ from .AugmentationDot import AugmentationDot
 from .BeamCoordinateSystem import BeamCoordinateSystem
 from .BeamHook import BeamHook
 from .Beam import Beam
-from .ComposedFlag import ComposedFlag
 from .Flag import Flag
 from .LedgerLine import LedgerLine
 from .Notehead import Notehead

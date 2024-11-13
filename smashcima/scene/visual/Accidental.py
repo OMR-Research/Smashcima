@@ -1,17 +1,20 @@
 from ..Glyph import Glyph
+from ..SceneObject import SceneObject
 from .Notehead import Notehead
 from dataclasses import dataclass
-from typing import List, Union, Optional
 
 
 @dataclass
-class Accidental(Glyph):
+class Accidental(SceneObject):
     """Glyph of an accidental"""
 
-    notehead: Notehead = None
+    glyph: Glyph
+    """The glyph of the accidental"""
+
+    notehead: Notehead
     """The notehead that the accidental belongs to."""
 
     def detach(self):
         """Unlink the glyph from the scene"""
-        super().detach()
+        self.glyph.detach()
         self.notehead = None

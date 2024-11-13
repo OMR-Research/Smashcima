@@ -1,3 +1,4 @@
+from smashcima.scene.LineGlyph import LineGlyph
 from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from smashcima.scene.semantic.Note import Note
 from smashcima.scene.semantic.BeamedGroup import BeamedGroup
@@ -102,23 +103,26 @@ class BeamStemSynthesizer:
             return
 
         # get both stem points
-        stem_base = paper_space.transform_from(base_notehead.space).apply_to(
+        stem_base = paper_space.transform_from(base_notehead.glyph.space).apply_to(
             self.get_stem_base_point(base_notehead, stem_value)
         )
-        stem_center = paper_space.transform_from(center_notehead.space).apply_to(
+        stem_center = paper_space.transform_from(center_notehead.glyph.space).apply_to(
             self.get_stem_base_point(center_notehead, stem_value)
         )
         stem_tip = self.get_stem_tip_point(stem_center, stem_value)
 
         # synthesize the stem glyph
-        stem = self.line_synthesizer.synthesize_line(
-            glyph_type=Stem,
+        glyph = self.line_synthesizer.synthesize_line(
+            glyph_type=LineGlyph,
             glyph_class=SmuflLabels.stem.value,
             start_point=stem_base,
             end_point=stem_tip
         )
-        stem.space.parent_space = paper_space
-        stem.chord = chord
+        glyph.space.parent_space = paper_space
+        Stem(
+            glyph=glyph,
+            chord=chord
+        )
     
     def infer_stem_orientation(self, chord: Chord) -> StemValue:
         # whole notes have no stem
@@ -165,12 +169,12 @@ class BeamStemSynthesizer:
         # TODO: pull from some distribution
         if side == NoteheadSide.left:
             return Point(
-                x=-notehead.get_bbox_in_space(notehead.space).width / 2,
+                x=-notehead.glyph.get_bbox_in_space(notehead.glyph.space).width / 2,
                 y=0
             )
         elif side == NoteheadSide.right:
             return Point(
-                x=notehead.get_bbox_in_space(notehead.space).width / 2,
+                x=notehead.glyph.get_bbox_in_space(notehead.glyph.space).width / 2,
                 y=0
             )
         
@@ -302,15 +306,19 @@ class BeamStemSynthesizer:
             start_tip = tips[group.chords.index(chords[0])]
             end_tip = tips[group.chords.index(chords[-1])]
             stem_value = _determine_beam_orientation(chords)
-            beam = self.line_synthesizer.synthesize_line(
-                glyph_type=Beam,
+            glyph = self.line_synthesizer.synthesize_line(
+                glyph_type=LineGlyph,
                 glyph_class=SmashcimaLabels.beam.value,
                 start_point=f.point(start_tip.x, beam_number, stem_value),
                 end_point=f.point(end_tip.x, beam_number, stem_value)
             )
-            beam.space.parent_space = paper_space
-            beam.chords = chords
-            beam.beam_number = beam_number
+            glyph.space.parent_space = paper_space
+            Beam(
+                glyph=glyph,
+                beamed_group=group,
+                chords=chords,
+                beam_number=beam_number
+            )
         
         # hooks
         for beam_number, chord, hook_type in group.iterate_hooks():
@@ -320,17 +328,20 @@ class BeamStemSynthesizer:
                 if hook_type == BeamValue.forward_hook else
                 -HOOK_LENGTH
             )
-            hook = self.line_synthesizer.synthesize_line(
-                glyph_type=BeamHook,
+            glyph = self.line_synthesizer.synthesize_line(
+                glyph_type=LineGlyph,
                 glyph_class=SmashcimaLabels.beamHook.value,
                 start_point=f.point(start_x, beam_number, stem_value),
                 end_point=f.point(end_x, beam_number, stem_value)
             )
-            hook.space.parent_space = paper_space
-            hook.beamed_group = group
-            hook.chord = chord
-            hook.beam_number = beam_number
-            hook.hook_type = hook_type
+            glyph.space.parent_space = paper_space
+            BeamHook(
+                glyph=glyph,
+                beamed_group=group,
+                chord=chord,
+                beam_number=beam_number,
+                hook_type=hook_type
+            )
 
     def adjust_stems_for_beam_group(
         self,
@@ -347,14 +358,17 @@ class BeamStemSynthesizer:
             end_point = f.point(old_stem.tip.transform_to(paper_space).x)
 
             # synthesize new sprites and points
-            new_stem = self.line_synthesizer.synthesize_line(
-                glyph_type=Stem,
-                glyph_class=old_stem.glyph_class,
+            glyph = self.line_synthesizer.synthesize_line(
+                glyph_type=LineGlyph,
+                glyph_class=old_stem.glyph.glyph_class,
                 start_point=start_point,
                 end_point=end_point
             )
-            new_stem.space.parent_space = paper_space
-            new_stem.chord = old_stem.chord
+            glyph.space.parent_space = paper_space
+            new_stem = Stem(
+                glyph=glyph,
+                chord=old_stem.chord
+            )
 
             # remove the old stem from scene
             old_stem.detach()

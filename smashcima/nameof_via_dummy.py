@@ -12,14 +12,14 @@ class _Dummy:
         return name
 
 
-def nameof_via_dummy(examined_type: Type[T], probe: Callable[[T], str]) -> str:
+def nameof_via_dummy(examined_type: Type[T], probe: Callable[[T], Any]) -> str:
     """Get the name of an object property via a lambda function by substituting
     a dummy instance instead of the real examined type.
     
     Can be used like this:
     nameof_via_dummy(MyType, lambda my_type: my_type.my_property)
     """
-    return probe(_Dummy())
+    return str(probe(_Dummy())) # type: ignore
 
 
 if __name__ == "__main__":
