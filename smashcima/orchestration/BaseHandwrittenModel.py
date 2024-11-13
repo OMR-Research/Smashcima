@@ -4,37 +4,23 @@ from typing import List, Optional, Union
 
 import numpy as np
 
-from smashcima.loading.load_score import load_score
-from smashcima.scene.AffineSpace import AffineSpace
-from smashcima.scene.Scene import Scene
-from smashcima.scene.semantic.Score import Score
-from smashcima.scene.visual.Page import Page
-from smashcima.synthesis.glyph.LineSynthesizer import LineSynthesizer
-from smashcima.synthesis.glyph.MuscimaPPLineSynthesizer import \
-    MuscimaPPLineSynthesizer
-from smashcima.synthesis.glyph.NaiveLineSynthesizer import NaiveLineSynthesizer
-from smashcima.synthesis.layout.BeamStemSynthesizer import BeamStemSynthesizer
-from smashcima.synthesis.page.MzkQuiltingPaperSynthesizer import \
-    MzkQuiltingPaperSynthesizer
-from smashcima.synthesis.page.PaperSynthesizer import PaperSynthesizer
-from smashcima.synthesis.page.SimplePageSynthesizer import \
-    SimplePageSynthesizer
-from smashcima.synthesis.page.SolidColorPaperSynthesizer import \
-    SolidColorPaperSynthesizer
-from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
-from smashcima.synthesis.style.MzkPaperStyleDomain import (MzkPaperStyleDomain,
-                                                           Patch)
+from smashcima.geometry import Vector2
+from smashcima.loading import load_score
+from smashcima.rendering import BitmapRenderer
+from smashcima.scene import AffineSpace, Page, Scene, Score
+from smashcima.synthesis import (BeamStemSynthesizer, ColumnLayoutSynthesizer,
+                                 LineSynthesizer, MuscimaPPGlyphSynthesizer,
+                                 MuscimaPPLineSynthesizer,
+                                 MuscimaPPStyleDomain, MzkPaperStyleDomain,
+                                 MzkQuiltingPaperSynthesizer,
+                                 NaiveLineSynthesizer,
+                                 NaiveStafflinesSynthesizer, PaperSynthesizer,
+                                 SimplePageSynthesizer,
+                                 SolidColorPaperSynthesizer,
+                                 StafflinesSynthesizer,
+                                 GlyphSynthesizer)
+from smashcima.synthesis.style.MzkPaperStyleDomain import Patch
 
-from ..geometry.Vector2 import Vector2
-from ..rendering.BitmapRenderer import BitmapRenderer
-from ..synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
-from ..synthesis.glyph.MuscimaPPGlyphSynthesizer import \
-    MuscimaPPGlyphSynthesizer
-from ..synthesis.layout.column.ColumnLayoutSynthesizer import \
-    ColumnLayoutSynthesizer
-from ..synthesis.page.NaiveStafflinesSynthesizer import \
-    NaiveStafflinesSynthesizer
-from ..synthesis.page.StafflinesSynthesizer import StafflinesSynthesizer
 from .Model import Model
 
 
