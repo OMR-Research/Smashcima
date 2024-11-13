@@ -1,6 +1,8 @@
 # -----------------------------------------------------------------------------
 # import local types
 from .AffineSpace import AffineSpace
+from .LabeledRegion import LabeledRegion
+from .Region import Region
 from .Scene import Scene
 from .SceneObject import SceneObject
 from .ScenePoint import ScenePoint

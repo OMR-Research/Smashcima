@@ -1,0 +1,51 @@
+from dataclasses import dataclass
+from typing import List
+
+from smashcima.geometry import Polygon, Rectangle
+
+from .AffineSpace import AffineSpace
+from .SceneObject import SceneObject
+
+
+@dataclass
+class Region(SceneObject):
+    """A region with an area inside the scene.
+
+    A region can be transformed through the affine space hierarchy
+    and can be used for various area-describing tasks (object localization,
+    masking, etc.).
+
+    It is defined by a set of polygons, because a polygon can undergo affine
+    transformations and remain a polygon (unlike a bounding box).
+    Other lower-detail regions can be derived from the set of polygons easily
+    (e.g. convex hull, tight rectangle, bounding box).
+    """
+
+    space: AffineSpace
+    """Space in which the region is situated. Not owned by the region."""
+
+    contours: List[Polygon]
+    """Polygon areas that define the region (in parent space coordinates)"""
+
+    def detach(self):
+        """Unlink the region from the scene"""
+        self.space = None
+    
+    def get_contours_in_space(self, target_space: AffineSpace) -> List[Polygon]:
+        """Returns the contours polygons transformed to the target space
+        
+        :param target_space: The space to which coordinates of the contours
+            should be transformed. Must be an ancestor of this region's space.
+        """
+        transform = target_space.transform_from(self.space)
+        return [transform.apply_to(p) for p in self.contours]
+    
+    def get_bbox_in_space(self, target_space: AffineSpace) -> Rectangle:
+        """Returns the bounding box rectangle in the target space coordinates
+        
+        :param target_space: The space to which coordinates of the contours
+            should be transformed. Must be an ancestor of this region's space.
+        """
+        contours = self.get_contours_in_space(target_space)
+        point_cloud = Polygon([p for c in contours for p in c.points])
+        return point_cloud.bbox()
