@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from smashcima.nameof_via_dummy import nameof_via_dummy
-
 from ..Glyph import Glyph
 from ..SceneObject import SceneObject
 from ..semantic import Clef, Note
@@ -46,14 +44,6 @@ class Notehead(SceneObject):
         self.glyph.detach()
         self.notes = []
 
-    @staticmethod
-    def of_note(
-        note: Note,
-        fail_if_none=False
-    ) -> Optional["Notehead"] | "Notehead":
-        return note.get_inlinked(
-            Notehead,
-            nameof_via_dummy(Notehead, lambda n: n.notes),
-            at_most_one=True,
-            fail_if_none=fail_if_none
-        )
+    @classmethod
+    def of_note(cls, note: Note):
+        return cls.of(note, lambda n: n.notes)

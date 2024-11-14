@@ -14,6 +14,7 @@ class ScoreMeasure:
     events: List[ScoreEvent]
     "Temporally-ordered musical events (sets of durables with the same onset)"
 
+    @staticmethod
     def from_part_measures(measures: List[Measure]) -> "ScoreMeasure":
         return ScoreMeasure(
             measures=measures,

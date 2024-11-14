@@ -3,7 +3,6 @@ from ..SceneObject import SceneObject
 from typing import List, Optional
 from .Measure import Measure
 from .Attributes import Attributes
-from smashcima.nameof_via_dummy import nameof_via_dummy
 
 
 @dataclass
@@ -16,22 +15,14 @@ class Part(SceneObject):
     staff_count: int = 1
     "Number of staves for this part (each measure should have all of them)"
 
-    @staticmethod
-    def of_measure(
-        measure: Measure,
-        fail_if_none=False
-    ) -> Optional["Part"] | "Part":
-        return measure.get_inlinked(
-            Part,
-            nameof_via_dummy(Part, lambda p: p.measures),
-            at_most_one=True,
-            fail_if_none=fail_if_none
-        )
+    @classmethod
+    def of_measure(cls, measure: Measure):
+        return cls.of(measure, lambda p: p.measures)
 
     def append_measure(self, measure: Measure):
         self.measures = [*self.measures, measure]
     
-    def compute_event_attributes(self):
+    def compute_event_attributes(self) -> None:
         """Sets attributes for all events based on present attributes changes"""
         attributes: Optional[Attributes] = None
 

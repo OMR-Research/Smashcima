@@ -20,13 +20,3 @@ def nameof_via_dummy(examined_type: Type[T], probe: Callable[[T], Any]) -> str:
     nameof_via_dummy(MyType, lambda my_type: my_type.my_property)
     """
     return str(probe(_Dummy())) # type: ignore
-
-
-if __name__ == "__main__":
-    class Foo:
-        def __init__(self):
-            self.bar = "BAR!"
-    
-    assert nameof_via_dummy(Foo, lambda f: f.bar) == "bar"
-
-    print("OK!")

@@ -1,4 +1,3 @@
-from smashcima.nameof_via_dummy import nameof_via_dummy
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.ScoreEvent import ScoreEvent
 from smashcima.scene.semantic.Note import Note
@@ -42,12 +41,7 @@ class AccidentalsColumn(ColumnBase):
         # TODO: this is ugly, it's crawling the graph in ways it should not
         noteheads: List[Notehead] = []
         for glyph in self.glyphs:
-            notehead = glyph.get_inlinked(
-                Notehead,
-                nameof_via_dummy(Notehead, lambda n: n.glyph),
-                at_most_one=True,
-                fail_if_none=False
-            )
+            notehead = Notehead.of_or_none(glyph, lambda n: n.glyph)
             if notehead is None:
                 continue
             if self.get_staff_of_glyph(glyph) is not staff:
@@ -122,6 +116,6 @@ def synthesize_accidentals_column(
             )
             accidental = Accidental(
                 glyph=glyph,
-                notehead=Notehead.of_note(note, fail_if_none=True)
+                notehead=Notehead.of_note(note)
             )
             column.add_accidental(accidental)

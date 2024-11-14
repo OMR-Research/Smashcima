@@ -66,6 +66,10 @@ class Sprite(SceneObject):
         space - that is (0, 0, px_width, px_height)"""
         return Rectangle(0, 0, self.pixel_width, self.pixel_height)
     
+    @classmethod
+    def many_of_space(cls, space: AffineSpace):
+        return cls.many_of(space, lambda s: s.space)
+    
     def get_pixels_to_scene_transform(self) -> Transform:
         """Returns a transform that converts from local pixel space
         to local scene space (excluding the sprite transform property)"""

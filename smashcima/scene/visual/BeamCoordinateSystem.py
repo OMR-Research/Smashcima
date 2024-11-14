@@ -3,8 +3,6 @@ from ..semantic.BeamedGroup import BeamedGroup
 from ..AffineSpace import AffineSpace
 from smashcima.geometry.Point import Point
 from ..SceneObject import SceneObject
-from smashcima.nameof_via_dummy import nameof_via_dummy
-from typing import Optional
 
 
 class BeamCoordinateSystem(SceneObject):
@@ -36,17 +34,9 @@ class BeamCoordinateSystem(SceneObject):
         self.q = q
         self.beam_spacing = beam_spacing
     
-    @staticmethod
-    def of_beamed_group(
-        beamed_group: BeamedGroup,
-        fail_if_none=False
-    ) -> Optional["BeamCoordinateSystem"] | "BeamCoordinateSystem":
-        return beamed_group.get_inlinked(
-            BeamCoordinateSystem,
-            nameof_via_dummy(BeamCoordinateSystem, lambda c: c.beamed_group),
-            at_most_one=True,
-            fail_if_none=fail_if_none
-        )
+    @classmethod
+    def of_beamed_group(cls, beamed_group: BeamedGroup):
+        return cls.of(beamed_group, lambda bcs: bcs.beamed_group)
     
     def __call__(
         self,

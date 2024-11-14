@@ -5,7 +5,6 @@ from .Note import Note
 from .Event import Event
 from .StemValue import StemValue
 from .TypeDuration import TypeDuration
-from smashcima.nameof_via_dummy import nameof_via_dummy
 
 
 @dataclass
@@ -25,23 +24,15 @@ class Chord(SceneObject):
     If None, the stem orientation is unknown
     and must be inferred during rendering."""
 
-    @staticmethod
-    def of_note(
-        note: Note,
-        fail_if_none=False
-    ) -> Optional["Chord"] | "Chord":
-        return note.get_inlinked(
-            Chord,
-            nameof_via_dummy(Chord, lambda c: c.notes),
-            at_most_one=True,
-            fail_if_none=fail_if_none
-        )
+    @classmethod
+    def of_note(cls, note: Note):
+        return cls.of(note, lambda c: c.notes)
     
     def get_event(self) -> Event:
         """Returns the event that contains notes in this chord"""
         if len(self.notes) == 0:
             raise Exception("The chord is empty, there are no notes.")
-        return Event.of_durable(self.notes[0], fail_if_none=True)
+        return Event.of_durable(self.notes[0])
     
     def get_type_duration(self) -> TypeDuration:
         """Returns the type duration of all notes in this chord"""
@@ -62,8 +53,8 @@ class Chord(SceneObject):
         
         # validate that all the notes share the same event (have the same onset)
         if len(self.notes) > 0:
-            event = Event.of_durable(self.notes[0], fail_if_none=True)
-            inserted_event = Event.of_durable(note, fail_if_none=True)
+            event = Event.of_durable(self.notes[0])
+            inserted_event = Event.of_durable(note)
             assert event is inserted_event, \
                 "All notes in a chord must be in the same event (same onset)"
         

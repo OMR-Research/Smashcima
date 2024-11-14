@@ -130,7 +130,7 @@ class MuscimaPPGlyphs(AssetBundle):
 
             print(label, "...")
             for glyph in tqdm(glyphs):
-                meta = MppGlyphMetadata.of_glyph(glyph, fail_if_none=True)
+                meta = MppGlyphMetadata.of_glyph(glyph)
                 cv2.imwrite(
                     str(glyphs_folder / (meta.mpp_crop_object_uid + ".png")),
                     glyph_renderer.render(glyph)

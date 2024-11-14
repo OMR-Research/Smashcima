@@ -122,7 +122,7 @@ def synthesize_augmentation_dots_column(
 
             # handle noteheads
             if isinstance(durable, Note):
-                notehead = Notehead.of_note(durable, fail_if_none=True)
+                notehead = Notehead.of_note(durable)
                 if notehead in handled_noteheads:
                     continue
                 handled_noteheads.append(notehead)
@@ -133,7 +133,7 @@ def synthesize_augmentation_dots_column(
 
             # handle rests
             elif isinstance(durable, RestSemantic):
-                rest_glyph = RestVisual.of_rest(durable, fail_if_none=True)
+                rest_glyph = RestVisual.of_rest(durable)
                 owner = rest_glyph
                 pitch_position = rest_glyph.pitch_position
                 augmentation_dot_count = durable.augmentation_dots

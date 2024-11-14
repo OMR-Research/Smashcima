@@ -1,8 +1,15 @@
-from typing import Any, Type, TypeVar, List, Optional
+from typing import Any, Callable, Tuple, Type, TypeVar, List, Optional
 from dataclasses import dataclass, field
 
+from smashcima.scene.nameof_via_dummy import nameof_via_dummy
 
-T = TypeVar("T")
+
+T = TypeVar("T", bound="SceneObject")
+
+
+class SceneRelationshipResolutionException(Exception):
+    """Thrown by the `.of`, `.many_of`, and `.of_or_none` query methods"""
+    pass
 
 
 class Link:
@@ -70,48 +77,83 @@ class SceneObject:
         for link in list(self.outlinks):
             if link.name == name:
                 link.detach()
-    
-    def get_inlinked(
-        self,
-        obj_type: Type[T],
-        name: Optional[str] = None,
-        at_most_one=False,
-        fail_if_none=False
-    ) -> List[T] | Optional[T] | T:
-        """Returns scene objects that link to this object (called sources)
+
+    ########################
+    # Relationship queries #
+    ########################
+
+    @classmethod
+    def _of_impl(
+        cls: Type[T],
+        subject: "SceneObject",
+        name_probe: Callable[[T], Any]
+    ) -> Tuple[List[T], str]:
+        name = nameof_via_dummy(cls, name_probe)
+        return (
+            [
+                link.source for link in subject.inlinks
+                if isinstance(link.source, cls)
+                    and (name is None or link.name == name)
+            ],
+            name
+        )
+
+    @classmethod
+    def of(
+        cls: Type[T], 
+        subject: "SceneObject",
+        name_probe: Callable[[T], Any]
+    ) -> T:
+        if subject is None:
+            raise ValueError("Passed in subject cannot be None")
         
-        obj_type: What source types are we interested in
-        name: Through which field on the source is the link facilitated
-        at_most_one: Returns the first found source, fails if there are more.
-        """
-
-        # TODO: this is absolutely dismal with mypy, instead provide:
-        # Foo.of_bar() -> Foo
-        # Foo.of_bar_or_none() -> Optional[Foo]
-        # Foo.many_of_bar() -> List[Foo]
-
-        sources = [
-            link.source for link in self.inlinks
-            if isinstance(link.source, obj_type)
-                and (name is None or link.name == name)
-        ]
-
-        if fail_if_none:
-            if len(sources) == 0:
-                raise Exception(
-                    f"There are no {obj_type} linking to " + \
-                    f"{type(self)} via name {name}."
-                )
-
-        if at_most_one:
-            if len(sources) > 1:
-                raise Exception(
-                    f"There are more than one {obj_type} linking to " + \
-                    f"{type(self)} via name {name}."
-                )
-            if len(sources) == 0:
-                return None
-            else:
-                return sources[0]
+        candidates, name = cls._of_impl(subject, name_probe)
         
-        return sources
+        if len(candidates) > 1:
+            raise SceneRelationshipResolutionException(
+                f"There are more than one {cls} linking to " + \
+                f"{subject} via name {name}."
+            )
+        
+        if len(candidates) == 0:
+            raise SceneRelationshipResolutionException(
+                f"There are no {cls} linking to " + \
+                f"{subject} via name {name}."
+            )
+        
+        return candidates[0]
+
+    @classmethod
+    def of_or_none(
+        cls: Type[T],
+        subject: Optional["SceneObject"],
+        name_probe: Callable[[T], Any]
+    ) -> Optional[T]:
+        if subject is None:
+            return None
+        
+        candidates, name = cls._of_impl(subject, name_probe)
+        
+        if len(candidates) > 1:
+            raise SceneRelationshipResolutionException(
+                f"There are more than one {cls} linking to " + \
+                f"{subject} via name {name}."
+            )
+        
+        if len(candidates) == 0:
+            return None
+        
+        return candidates[0]
+
+    @classmethod
+    def many_of(
+        cls: Type[T],
+        subject: "SceneObject",
+        name_probe: Callable[[T], Any]
+    ) -> List[T]:
+        if subject is None:
+            raise ValueError("Passed in subject cannot be None")
+        
+        candidates, _ = cls._of_impl(subject, name_probe)
+        
+        return candidates

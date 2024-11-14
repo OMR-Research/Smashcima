@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Optional
 from fractions import Fraction
 from ..SceneObject import SceneObject
 from .Durable import Durable
@@ -7,7 +6,6 @@ from .Event import Event
 from .StaffSemantic import StaffSemantic
 from .AttributesChange import AttributesChange
 from typing import List
-from smashcima.nameof_via_dummy import nameof_via_dummy
 
 
 @dataclass
@@ -27,38 +25,17 @@ class Measure(SceneObject):
         return self.events[0]
 
     @staticmethod
-    def of_durable(
-        durable: Durable,
-        fail_if_none=False
-    ) -> Optional["Measure"] | "Measure":
-        event = Event.of_durable(durable, fail_if_none=fail_if_none)
-        if event is None:
-            return None
-        return Measure.of_event(event, fail_if_none=fail_if_none)
+    def of_durable(durable: Durable):
+        event = Event.of_durable(durable)
+        return Measure.of_event(event)
 
-    @staticmethod
-    def of_event(
-        event: Event,
-        fail_if_none=False
-    ) -> Optional["Measure"] | "Measure":
-        return event.get_inlinked(
-            Measure,
-            nameof_via_dummy(Measure, lambda m: m.events),
-            at_most_one=True,
-            fail_if_none=fail_if_none
-        )
-
-    @staticmethod
-    def of_staff(
-        staff: StaffSemantic,
-        fail_if_none=False
-    ) -> Optional["Measure"] | "Measure":
-        return staff.get_inlinked(
-            Measure,
-            nameof_via_dummy(Measure, lambda m: m.staves),
-            at_most_one=True,
-            fail_if_none=fail_if_none
-        )
+    @classmethod
+    def of_event(cls, event: Event):
+        return cls.of(event, lambda m: m.events)
+    
+    @classmethod
+    def of_staff(cls, staff: StaffSemantic):
+        return cls.of(staff, lambda m: m.staves)
     
     def add_attributes_change(
         self,

@@ -49,9 +49,9 @@ class Score(SceneObject):
     def staff_index_of_durable(self, durable: Durable) -> int:
         """Returns the staff index (zero-based) of the given durable
         with respect to the whole score (all the instruments) (to the system)"""
-        staff = StaffSemantic.of_durable(durable, fail_if_none=True)
-        measure = Measure.of_staff(staff, fail_if_none=True)
-        part = Part.of_measure(measure, fail_if_none=True)
+        staff = StaffSemantic.of_durable(durable)
+        measure = Measure.of_staff(staff)
+        part = Part.of_measure(measure)
 
         assert part in self.parts, "Given part must be in this score"
         

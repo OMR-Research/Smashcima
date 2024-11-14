@@ -30,6 +30,10 @@ class Region(SceneObject):
     def detach(self):
         """Unlink the region from the scene"""
         self.space = None
+
+    @classmethod
+    def many_of_space(cls, space: AffineSpace):
+        return cls.many_of(space, lambda r: r.space)
     
     def get_contours_in_space(self, target_space: AffineSpace) -> List[Polygon]:
         """Returns the contours polygons transformed to the target space

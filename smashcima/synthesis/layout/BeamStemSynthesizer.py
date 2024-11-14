@@ -61,10 +61,10 @@ class BeamStemSynthesizer:
                         continue
 
                     chord = Chord.of_note(durable)
-                    if chord is not None and chord not in chords:
+                    if chord not in chords:
                         chords.append(chord)
                     
-                    group = BeamedGroup.of_chord(chord)
+                    group = BeamedGroup.of_chord_or_none(chord)
                     if group is not None and group not in groups:
                         groups.append(group)
         
@@ -83,14 +83,12 @@ class BeamStemSynthesizer:
     def synthesize_stem(self, paper_space: AffineSpace, chord: Chord):
         # notehead in the middle of the stem (the "top" notehead)
         center_notehead = Notehead.of_note(
-            chord.notes[-1 if chord.stem_value == StemValue.up else 0],
-            fail_if_none=True
+            chord.notes[-1 if chord.stem_value == StemValue.up else 0]
         )
 
         # notehead at the base of the stem (the "bottom" notehead)
         base_notehead = Notehead.of_note(
-            chord.notes[0 if chord.stem_value == StemValue.up else -1],
-            fail_if_none=True
+            chord.notes[0 if chord.stem_value == StemValue.up else -1]
         )
 
         # get stem orientation
@@ -138,8 +136,8 @@ class BeamStemSynthesizer:
         # or can be subclassed and overriden by the user
         event = chord.get_event()
         onset = event.fractional_measure_onset
-        measure = Measure.of_event(event, fail_if_none=True)
-        part = Part.of_measure(measure, fail_if_none=True)
+        measure = Measure.of_event(event)
+        part = Part.of_measure(measure)
         measure_index = part.measures.index(measure)
         raise NotImplementedError(
             "Stem orientation inference is not supported. " + \
@@ -198,7 +196,7 @@ class BeamStemSynthesizer:
         assert len(group.chords) >= 2, \
             "There must be at least 2 chords in a beamed group"
 
-        stems = [Stem.of_chord(ch, fail_if_none=True) for ch in group.chords]
+        stems = [Stem.of_chord(ch) for ch in group.chords]
         tips = [s.tip.transform_to(paper_space) for s in stems]
         up_stem_count = len(
             [s for s in stems if s.chord.stem_value == StemValue.up]
@@ -212,7 +210,7 @@ class BeamStemSynthesizer:
         # === 1) compute the slope of the beam ===
 
         # get the slope of the beam by fitting a line through the points
-        slope = 0
+        slope = 0.0
         line = cv2.fitLine(
             np.array([list(tip) for tip in tips]),
             cv2.DIST_L2, 0, 0, 0
@@ -241,7 +239,7 @@ class BeamStemSynthesizer:
             
             # define the reference line
             origin = tips[0]
-            offset = 0
+            offset = 0.0
             def _f(x: float) -> float:
                 "The function of the beam line"
                 return origin.y + (x - origin.x) * slope + offset
@@ -298,6 +296,7 @@ class BeamStemSynthesizer:
             key, count = Counter(
                 [ch.stem_value for ch in chords]
             ).most_common(1)[0]
+            assert key is not None, "There must be at least one stem"
             return key
 
         # beams
@@ -345,9 +344,9 @@ class BeamStemSynthesizer:
         paper_space: AffineSpace,
         group: BeamedGroup
     ):
-        stems = [Stem.of_chord(ch, fail_if_none=True) for ch in group.chords]
+        stems = [Stem.of_chord(ch) for ch in group.chords]
         
-        f = BeamCoordinateSystem.of_beamed_group(group, fail_if_none=True)
+        f = BeamCoordinateSystem.of_beamed_group(group)
         
         for old_stem in stems:
             # get the new placement of the stem

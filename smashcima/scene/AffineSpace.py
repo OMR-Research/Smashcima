@@ -1,6 +1,6 @@
 from .SceneObject import SceneObject
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 from ..geometry.Transform import Transform
 
 
@@ -21,15 +21,23 @@ class AffineSpace(SceneObject):
     to the parent's space coordinates, effectively defining the placement of
     this space within the parent space."""
 
+    def get_children(self) -> List["AffineSpace"]:
+        """Returns child affine spaces as a list"""
+        return AffineSpace.many_of(self, lambda s: s.parent_space)
+
     def transform_from(self, sub_space: "AffineSpace") -> Transform:
         """Returns the transform from the given space to the current space"""
-        t = Transform.identity()
+        if sub_space is None:
+            raise ValueError("The given space should not be None")
         
-        while sub_space is not None:
-            if sub_space is self:
+        t = Transform.identity()
+        s: Optional[AffineSpace] = sub_space
+        
+        while s is not None:
+            if s is self:
                 return t
             
-            t = t.then(sub_space.transform)
-            sub_space = sub_space.parent_space
+            t = t.then(s.transform)
+            s = s.parent_space
 
         raise Exception("The given sub space is not attached under this space")

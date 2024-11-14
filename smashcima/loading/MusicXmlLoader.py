@@ -174,11 +174,11 @@ class MusicXmlLoader:
         score = Score(
             parts=parts,
             new_system_measure_indices=set(
-                Part.of_measure(m, fail_if_none=True).measures.index(m)
+                Part.of_measure(m).measures.index(m)
                 for m in self._score_state.new_system_measures
             ),
             new_page_measure_indices=set(
-                Part.of_measure(m, fail_if_none=True).measures.index(m)
+                Part.of_measure(m).measures.index(m)
                 for m in self._score_state.new_page_measures
             )
         )

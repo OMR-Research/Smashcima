@@ -1,8 +1,7 @@
 from dataclasses import dataclass, field
 from ..SceneObject import SceneObject
-from typing import List, Optional
+from typing import List
 from .Durable import Durable
-from smashcima.nameof_via_dummy import nameof_via_dummy
 
 
 @dataclass
@@ -23,14 +22,6 @@ class StaffSemantic(SceneObject):
         """Zero-based index of the staff in measure stafflines"""
         return self.staff_number - 1
 
-    @staticmethod
-    def of_durable(
-        durable: Durable,
-        fail_if_none=False
-    ) -> Optional["StaffSemantic"] | "StaffSemantic":
-        return durable.get_inlinked(
-            StaffSemantic,
-            nameof_via_dummy(StaffSemantic, lambda s: s.durables),
-            at_most_one=True,
-            fail_if_none=fail_if_none
-        )
+    @classmethod
+    def of_durable(cls, durable: Durable):
+        return cls.of(durable, lambda s: s.durables)

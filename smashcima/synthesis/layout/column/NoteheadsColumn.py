@@ -59,7 +59,7 @@ class NoteheadsColumn(ColumnBase):
         self.glyphs.append(notehead.glyph)
         
         note = notehead.notes[0]
-        chord = Chord.of_note(note, fail_if_none=True)
+        chord = Chord.of_note(note)
 
         if chord.stem_value == StemValue.up:
             kick_asif_stem_up = True
@@ -300,8 +300,8 @@ def synthesize_noteheads_column(
                     continue
 
                 # resolve context
-                event = Event.of_durable(note, fail_if_none=True)
-                staff_sem = StaffSemantic.of_durable(note, fail_if_none=True)
+                event = Event.of_durable(note)
+                staff_sem = StaffSemantic.of_durable(note)
                 clef = event.attributes.clefs[staff_sem.staff_number]
                 staff = staves[staff_index]
                 

@@ -3,7 +3,6 @@ from ..SceneObject import SceneObject
 from ..semantic.Chord import Chord
 from dataclasses import dataclass
 from typing import Optional
-from smashcima.nameof_via_dummy import nameof_via_dummy
 from ..ScenePoint import ScenePoint
 
 
@@ -33,14 +32,10 @@ class Stem(SceneObject):
         self.glyph.detach()
         self.chord = None
 
-    @staticmethod
-    def of_chord(
-        chord: Chord,
-        fail_if_none=False
-    ) -> Optional["Stem"] | "Stem":
-        return chord.get_inlinked(
-            Stem,
-            nameof_via_dummy(Stem, lambda s: s.chord),
-            at_most_one=True,
-            fail_if_none=fail_if_none
-        )
+    @classmethod
+    def of_chord(cls, chord: Chord):
+        return cls.of(chord, lambda s: s.chord)
+
+    @classmethod
+    def of_chord_or_none(cls, chord: Optional[Chord]):
+        return cls.of_or_none(chord, lambda s: s.chord)

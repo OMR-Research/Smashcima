@@ -9,7 +9,7 @@ class SymbolRepository:
     Extracted glyphs from MUSCIMA++ so that they can be sampled
     by the synthesizer
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.all_glyphs: List[Glyph] = []
         "Contains all glyphs in the repository in one big list"
 
@@ -34,13 +34,13 @@ class SymbolRepository:
 
         self.all_writers.add(metadata.mpp_writer)
 
-        key = glyph.label
-        self.glyphs_by_class.setdefault(key, [])
-        self.glyphs_by_class[key].append(glyph)
+        key1 = glyph.label
+        self.glyphs_by_class.setdefault(key1, [])
+        self.glyphs_by_class[key1].append(glyph)
 
-        key = (glyph.label, metadata.mpp_writer)
-        self.glyphs_by_class_and_writer.setdefault(key, [])
-        self.glyphs_by_class_and_writer[key].append(glyph)
+        key2 = (glyph.label, metadata.mpp_writer)
+        self.glyphs_by_class_and_writer.setdefault(key2, [])
+        self.glyphs_by_class_and_writer[key2].append(glyph)
     
     def remove_writer(self, writer: int):
         """Removes a given writer from the repository completely.
@@ -50,15 +50,15 @@ class SymbolRepository:
             self.all_glyphs
         ))
         self.all_writers.remove(writer)
-        for key in self.glyphs_by_class.keys():
-            self.glyphs_by_class[key] = list(filter(
+        for key1 in self.glyphs_by_class.keys():
+            self.glyphs_by_class[key1] = list(filter(
                 lambda g: MppGlyphMetadata.of_glyph(g).mpp_writer == writer,
-                self.glyphs_by_class[key]
+                self.glyphs_by_class[key1]
             ))
-        for key in self.glyphs_by_class_and_writer.keys():
-            self.glyphs_by_class_and_writer[key] = list(filter(
+        for key2 in self.glyphs_by_class_and_writer.keys():
+            self.glyphs_by_class_and_writer[key2] = list(filter(
                 lambda g: MppGlyphMetadata.of_glyph(g).mpp_writer == writer,
-                self.glyphs_by_class_and_writer[key]
+                self.glyphs_by_class_and_writer[key2]
             ))
 
     def index_lines(self, labels: List[str]):

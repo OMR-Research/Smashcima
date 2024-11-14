@@ -1,7 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Union
-
-from smashcima.nameof_via_dummy import nameof_via_dummy
+from typing import Union
 
 from ..Glyph import Glyph
 from ..SceneObject import SceneObject
@@ -66,17 +64,9 @@ class RestVisual(SceneObject):
         self.clef = None
         self.staff = None
 
-    @staticmethod
-    def of_rest(
-        rest: RestSemantic,
-        fail_if_none=False
-    ) -> Optional["RestVisual"] | "RestVisual":
-        return rest.get_inlinked(
-            RestVisual,
-            nameof_via_dummy(RestVisual, lambda g: g.rest_semantic),
-            at_most_one=True,
-            fail_if_none=fail_if_none
-        )
+    @classmethod
+    def of_rest(cls, rest: RestSemantic):
+        return cls.of(rest, lambda r: r.rest_semantic)
 
     @staticmethod
     def default_display_pitch(clef: Clef, type_duration: TypeDuration) -> Pitch:

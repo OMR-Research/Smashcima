@@ -20,7 +20,7 @@ def traverse_sprites(
     """
 
     # yield all sprites in the root space
-    for sprite in space.get_inlinked(Sprite):
+    for sprite in Sprite.many_of_space(space):
         transform = Transform.identity()
         
         if include_pixels_transform:
@@ -37,7 +37,7 @@ def traverse_sprites(
             yield (sprite, transform)
     
     # recusion into all sub-spaces
-    for subspace in space.get_inlinked(AffineSpace):
+    for subspace in space.get_children():
         for (sprite, sprite_transform) in traverse_sprites(
             subspace,
             include_pixels_transform=include_pixels_transform,

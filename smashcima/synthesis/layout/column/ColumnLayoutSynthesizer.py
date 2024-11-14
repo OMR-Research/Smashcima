@@ -35,7 +35,7 @@ class _SystemState:
         self.columns: List[Column] = []
         "List of columns in this system"
 
-        self.total_width = 0
+        self.total_width = 0.0
         "Total width of all the columns, if stacked most tightly"
 
         self.current_measure_index: Optional[int] = None
@@ -356,14 +356,14 @@ class ColumnLayoutSynthesizer:
         
         # go through the chords and add flags
         for chord in chords:
-            stem = Stem.of_chord(chord)
+            stem = Stem.of_chord_or_none(chord)
             if stem is None:
                 continue
 
             if len(chord.notes) == 0:
                 continue
             
-            if BeamedGroup.of_chord(chord) is not None:
+            if BeamedGroup.of_chord_or_none(chord) is not None:
                 continue
 
             type_duration=chord.notes[0].type_duration

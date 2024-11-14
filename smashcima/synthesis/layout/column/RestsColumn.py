@@ -62,8 +62,8 @@ def synthesize_rests_column(
                 continue
             
             # resolve context
-            event = Event.of_durable(durable, fail_if_none=True)
-            staff_sem = StaffSemantic.of_durable(durable, fail_if_none=True)
+            event = Event.of_durable(durable)
+            staff_sem = StaffSemantic.of_durable(durable)
             clef = event.attributes.clefs[staff_sem.staff_number]
             staff_index = score.staff_index_of_durable(durable)
             staff = staves[staff_index]

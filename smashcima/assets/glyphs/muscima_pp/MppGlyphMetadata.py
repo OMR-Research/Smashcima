@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from smashcima.nameof_via_dummy import nameof_via_dummy
 from smashcima.scene import Glyph, SceneObject
 
 from .MppPage import MppPage
@@ -50,14 +49,10 @@ class MppGlyphMetadata(SceneObject):
             mpp_numeric_objid=numeric_objid
         )
     
-    @staticmethod
-    def of_glyph(
-        glyph: Glyph,
-        fail_if_none=False
-    ) -> Optional["MppGlyphMetadata"] | "MppGlyphMetadata":
-        return glyph.get_inlinked(
-            MppGlyphMetadata,
-            nameof_via_dummy(MppGlyphMetadata, lambda m: m.glyph),
-            at_most_one=True,
-            fail_if_none=fail_if_none
-        )
+    @classmethod
+    def of_glyph(cls, glyph: Glyph):
+        return cls.of(glyph, lambda m: m.glyph)
+
+    @classmethod
+    def of_glyph_or_none(cls, glyph: Optional[Glyph]):
+        return cls.of_or_none(glyph, lambda m: m.glyph)

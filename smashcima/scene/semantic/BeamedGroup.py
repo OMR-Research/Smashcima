@@ -1,10 +1,8 @@
 from dataclasses import dataclass, field
 from ..SceneObject import SceneObject
 from typing import List, Optional, Dict, Tuple, Generator, Any
-from .Note import Note
 from .Chord import Chord
 from .BeamValue import BeamValue
-from smashcima.nameof_via_dummy import nameof_via_dummy
 
 
 @dataclass
@@ -20,18 +18,10 @@ class BeamedGroup(SceneObject):
 
     beam_values: List[Dict[int, BeamValue]] = field(default_factory=list)
     """For each chord there is a dictionary, mapping beam numbers to beam values"""
-
-    @staticmethod
-    def of_chord(
-        chord: Chord,
-        fail_if_none=False
-    ) -> Optional["BeamedGroup"] | "BeamedGroup":
-        return chord.get_inlinked(
-            BeamedGroup,
-            nameof_via_dummy(BeamedGroup, lambda g: g.chords),
-            at_most_one=True,
-            fail_if_none=fail_if_none
-        )
+    
+    @classmethod
+    def of_chord_or_none(cls, chord: Optional[Chord]):
+        return cls.of_or_none(chord, lambda g: g.chords)
 
     def add_chord(self, chord: Chord, beam_values: Dict[int, BeamValue]):
         """Adds a new chord into the beamed group"""
