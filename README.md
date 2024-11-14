@@ -1,30 +1,57 @@
-# Smashcima
+[![License Apache 2.0](https://badgen.net/badge/license/apache2.0/blue)](https://github.com/OMR-Research/Smashcima/blob/main/LICENSE)
+[![PyPI version](https://badge.fury.io/py/smashcima.svg)](https://pypi.org/project/smashcima/)
+[![Downloads](https://static.pepy.tech/badge/smashcima)](https://pepy.tech/project/smashcima)
+![Python Version](https://badgen.net/badge/python/3.8+/cyan)
 
-A library and a framework for synthesizing images containing music, intended for the creation of training data for OMR models.
+<div align="center">
+    <br/>
+    <img src="docs/assets/smashcima-logo.svg" width="400px">
+    <br/>
+    <br/>
+    <br/>
+</div>
 
-**Try out the demo on [🤗 Huggingface Spaces](https://huggingface.co/spaces/Jirka-Mayer/Smashcima) right now!**
+A library and a framework for synthesizing images containing handwritten music, intended for the creation of training data for OMR models.
 
-Install with:
+**Try out the demo on [🤗 Huggingface Spaces](https://huggingface.co/spaces/Jirka-Mayer/Smashcima) right now!**<br/>
+Example output with MUSCIMA++ writer no. 28 style:
+
+<img src="docs/assets/readme-example.jpg"><br/>
+
+**Install from [pypi](https://pypi.org/project/smashcima/) with:**
 
 ```bash
-pip3 install smashcima
+pip install smashcima
 ```
 
 
-## A tutorial
+## Getting started
 
-> **Note:** The tool is under development and does not yet have a fixed public API. The tutorial is being developed and from it the whole tool is being built top-down.
+To quickly learn how to start using Smashcima for your project, start with the tutorials:
 
-To quickly learn how to start using Smashcima for your project, start with the tutorial.
-
-[Smashcima Tutorial](docs/tutorial.md)
+1. [Producing music notation images](docs/tutorials/1-producing-music-notation-images.md)
+2. Changing image background
+3. Using custom glyphs
 
 
 ## How it works
 
-Smashcima is not really a single tool, but more like a framework. To fully learn how to leverage its abilities, start by reading its documentation:
+Smashcima is primarily a framework and a set of crafted interfaces for building custom visual-data related synthesizers.
 
-[Smashcima Documentation - Introduction](docs/introduction.md)
+
+- [Introduction](docs/introduction.md)
+- Models and service orchestration
+- Scene
+    - Scene objects
+    - Affine spaces and rendering
+    - Semantic music scene objects
+    - Visual music scene objects
+- Synthesis
+    - Synthesizer interfaces
+    - Glyphs
+    - Style control
+- Asset bundles
+- ...
 
 
 ## After cloning

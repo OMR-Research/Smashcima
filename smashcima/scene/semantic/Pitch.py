@@ -1,5 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass, field
+from typing import Optional, Union
 
 
 STEP_ORDER = ["C", "D", "E", "F", "G", "A", "B"]
@@ -49,14 +50,14 @@ class Pitch:
     alter: Alter = field(default=Alter.none)
 
     @staticmethod
-    def parse(octave: str, step: str, alter: str | None = None) -> "Pitch":
+    def parse(octave: str, step: str, alter: Optional[str] = None) -> "Pitch":
         return Pitch(
             octave=Octave(int(octave)),
             step=Step(step),
             alter=Alter.none if alter is None else Alter(int(alter))
         )
     
-    def get_linear_pitch(self, with_alters=False) -> int | float:
+    def get_linear_pitch(self, with_alters=False) -> Union[int, float]:
         """Converts the pitch object into a number where 0 is A0 note
         and then it increases by one for each tone. If you include alters,
         the returned value is a float with +-0.5 based on the alter."""

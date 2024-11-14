@@ -1,5 +1,7 @@
 # Scene
 
+> **WARNING:** This documentation page is outdated. Ignore it. Will be rewritten.
+
 The scene is the data model for the Smashcima synthesizer. It describes the music page constructed during synthesis.
 
 The designing principles are:

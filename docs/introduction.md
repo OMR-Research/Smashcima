@@ -1,5 +1,7 @@
 # Introduction
 
+> **WARNING:** This documentation page is outdated. Ignore it. Will be rewritten.
+
 Mashcima 2 is a python package aimed at synthesizing training data for Optical Musci Recognition (OMR). Therefore the ultimate goal is to create synthetic images of music notation, together with the corresponding annotations (textual, visual, or both). The structure of the system follows from this goal and is described in this file.
 
 

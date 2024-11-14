@@ -1,3 +1,4 @@
+from typing import Optional
 import unittest
 from smashcima.orchestration.Container import Container
 import punq
@@ -119,7 +120,7 @@ class ContainerTest(unittest.TestCase):
 
     def test_it_can_register_interface_via_factory(self):
         c = Container()
-        core: _MyCoreService | None = None
+        core: Optional[_MyCoreService] = None
 
         def _factory():
             nonlocal core
