@@ -1,19 +1,22 @@
-from dataclasses import dataclass, field
-from .SceneObject import SceneObject
-from .Sprite import Sprite
-from .AffineSpace import AffineSpace
-from .ScenePoint import ScenePoint
-from smashcima.geometry.Polygon import Polygon
-from smashcima.geometry.Rectangle import Rectangle
-from smashcima.geometry.Point import Point
+from dataclasses import dataclass
 from typing import List
-import numpy as np
+
 import cv2
+import numpy as np
+
+from smashcima.geometry import Point, Polygon, Rectangle
+
+from .AffineSpace import AffineSpace
+from .LabeledRegion import LabeledRegion
+from .SceneObject import SceneObject
+from .ScenePoint import ScenePoint
+from .Sprite import Sprite
 
 
 @dataclass
 class Glyph(SceneObject):
-    """
+    """Set of sprites together with their label and segmentation region.
+
     A glyph is a visual unit of the notation. It can be detected, segmented,
     classified.
 
@@ -29,46 +32,68 @@ class Glyph(SceneObject):
     https://en.wikipedia.org/wiki/Glyph
     """
 
-    glyph_class: str
-    "Class name used for classification"
+    space: AffineSpace
+    """Space in which glyph components live. The origin is usually well
+    defined for each glyph label. The space instance is owned by this
+    Glyph instance - should be created, moved, and deleted together."""
 
-    space: AffineSpace = field(default_factory=AffineSpace)
-    """The local space of the glyph, where the origin point is some important
-    point of the glyph (depends on the glyph class, e.g. center of a notehead
-    or the base of a stem)"""
+    region: LabeledRegion
+    """The segmentation mask region, defines the label and bounding box"""
 
-    sprites: List[Sprite] = field(default_factory=list)
-    "Images that should be rendered for the glyph."
+    sprites: List[Sprite]
+    """Sprites that make up the visual appearance of the glyph"""
 
-    def __post_init__(self):
-        assert type(self.glyph_class) is str, "Glyph class must be string"
+    @property
+    def label(self) -> str:
+        """Label used for object classification, identifies the type of glyph"""
+        return self.region.label
+    
+    @label.setter
+    def label(self, value: str) -> None:
+        self.region.label = value
     
     def detach(self):
         """Unlink the glyph from the scene"""
-        self.space.parent_space = None
+        self.space.parent_space = None # the important bit
+        self.region = None
+        self.sprites = []
     
-    def get_segmentation_mask_of_sprite(self, sprite: Sprite) -> np.ndarray:
-        """Given a sprite in this glyph, returns its segmentation mask
-        (a 2D array of booleans for the sprite bitmap). Override this
-        method to control the semantic segmentation output for the glyph."""
-        assert sprite in self.sprites, "Given sprite must belong to this glyph"
+    @staticmethod
+    def build_region_from_sprites_alpha_channel(
+        label: str,
+        sprites: List[Sprite],
+        threshold: float = 0.5
+    ) -> LabeledRegion:
+        """Constructs a labeled region from a set of sprites by their alpha.
 
-        # default behaviour: 0.5-thresholded alfa channel
-        return sprite.bitmap[:, :, 3] >= 0.5
-    
-    def get_contours(self) -> List[Polygon]:
-        """Returns the list of countours of the glyph, using the segmentation
-        mask. The polygon lives in the glyph affine space. Override this method
-        to control the countours for the glyph."""
+        All the sprites must already be attached to the same affine space
+        and this space will be used as the space of the constructed region.
+
+        This method does not assume overlap in sprites. If resulting contours
+        overlap, they will stay overlapping in the resulting region and no
+        morphological union will be performed.
+
+        :param label: The classification label that will be assigned to
+            the region
+        :param sprites: Sprites to use to region construction
+        :param threshold: Threshold to use for alpha channel binarization,
+            float in 0.0 - 1.0 range.
+        """
+        assert len(sprites) > 0, "You must provide at least one sprite"
+
+        # get the affine space
+        space = sprites[0].space
+        assert space is not None, "All provided sprites must have space set"
+        assert all(s.space is space for s in sprites), \
+            "All provided sprites must be in the same affine space"
+        
         out_contours: List[Polygon] = []
 
-        # NOTE: this algorithm assumes no overlap between individual sprites
-        
         # for each sprite
-        for sprite in self.sprites:
+        for sprite in sprites:
 
             # run contour extraction
-            mask = self.get_segmentation_mask_of_sprite(sprite)
+            mask = sprite.bitmap[:, :, 3] >= int(threshold * 255)
             img = np.zeros(shape=mask.shape, dtype=np.uint8)
             img[mask] = 255
             cv_contours, _ = cv2.findContours(
@@ -83,16 +108,21 @@ class Glyph(SceneObject):
                     Polygon.from_cv2_contour(cv_contour)
                 )
                 out_contours.append(out_contour)
-
-        return out_contours
+        
+        # build the final region instance
+        return LabeledRegion(
+            space=space,
+            contours=out_contours,
+            label=label
+        )
     
-    def get_bbox_in_space(self, space: AffineSpace) -> Rectangle:
-        """Returns the bounding box of this glyph in the given affine space"""
-        transform = space.transform_from(self.space)
-        contours = self.get_contours()
-        point_cloud = Polygon([p for c in contours for p in c.points])
-        point_cloud_transformed = transform.apply_to(point_cloud)
-        return point_cloud_transformed.bbox()
+    def get_bbox_in_space(self, target_space: AffineSpace) -> Rectangle:
+        """Returns the bounding box rectangle in the target space coordinates
+        
+        :param target_space: The space to which coordinates of the contours
+            should be transformed. Must be an ancestor of this glyph's space.
+        """
+        return self.region.get_bbox_in_space(target_space)
 
     def place_debug_overlay(self) -> List[Sprite]:
         """Places sprites that act as debugging overlay for the glyph.

@@ -84,6 +84,12 @@ class SceneObject:
         name: Through which field on the source is the link facilitated
         at_most_one: Returns the first found source, fails if there are more.
         """
+
+        # TODO: this is absolutely dismal with mypy, instead provide:
+        # Foo.of_bar() -> Foo
+        # Foo.of_bar_or_none() -> Optional[Foo]
+        # Foo.many_of_bar() -> List[Foo]
+
         sources = [
             link.source for link in self.inlinks
             if isinstance(link.source, obj_type)

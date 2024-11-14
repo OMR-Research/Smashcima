@@ -6,6 +6,7 @@ from muscima.io import CropObject
 
 from smashcima.geometry import Point, Vector2
 from smashcima.scene import ComposedGlyph, Glyph, LineGlyph, ScenePoint, Sprite
+from smashcima.scene.AffineSpace import AffineSpace
 from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from smashcima.scene.SmuflLabels import SmuflLabels
 
@@ -34,26 +35,30 @@ def _mpp_mask_to_sprite_bitmap(mask: np.ndarray):
 def _crop_objects_to_single_sprite_glyphs(
     crop_objects: List[CropObject],
     page: MppPage,
-    glyph_class: str,
+    label: str,
     sprite_origin: Optional[Callable[[CropObject], Point]] = None
 ) -> List[Glyph]:
     glyphs: List[Glyph] = []
 
     for o in crop_objects:
+        space = AffineSpace()
+        sprite = Sprite(
+            space=space,
+            bitmap=_mpp_mask_to_sprite_bitmap(o.mask),
+            bitmap_origin=(
+                sprite_origin(o) if sprite_origin else Point(0.5, 0.5)
+            ),
+            dpi=MUSCIMA_PP_DPI
+        )
         glyph = Glyph(
-            glyph_class=glyph_class
+            space=space,
+            region=Glyph.build_region_from_sprites_alpha_channel(
+                label=label,
+                sprites=[sprite]
+            ),
+            sprites=[sprite]
         )
         MppGlyphMetadata.stamp_glyph(glyph, page, int(o.objid))
-        glyph.sprites = [
-            Sprite(
-                space=glyph.space,
-                bitmap=_mpp_mask_to_sprite_bitmap(o.mask),
-                bitmap_origin=(
-                    sprite_origin(o) if sprite_origin else Point(0.5, 0.5)
-                ),
-                dpi=MUSCIMA_PP_DPI
-            )
-        ]
         glyphs.append(glyph)
 
     return glyphs
@@ -84,7 +89,7 @@ def _get_y_position_of_staff_line(
 def _get_symbols_centered_on_line(
     page: MppPage,
     clsname: str,
-    glyph_class: str,
+    label: str,
     line_from_top: int,
     when_center_outside_recenter: bool = False
 ) -> List[Glyph]:
@@ -108,7 +113,7 @@ def _get_symbols_centered_on_line(
             if o.clsname == clsname
         ],
         page=page,
-        glyph_class=glyph_class,
+        label=label,
         sprite_origin=_sprite_origin
     )
 
@@ -116,26 +121,13 @@ def _get_symbols_centered_on_line(
 def _crop_objects_to_line_glyphs(
     crop_objects: List[CropObject],
     page: MppPage,
-    glyph_class: str,
+    label: str,
     horizontal_line: bool,
     in_increasing_direction: bool,
 ) -> List[LineGlyph]:
     glyphs: List[LineGlyph] = []
 
     for o in crop_objects:
-        # prepare the glyph
-        glyph = LineGlyph(
-            glyph_class=glyph_class
-        )
-        MppGlyphMetadata.stamp_glyph(glyph, page, int(o.objid))
-        sprite = Sprite(
-            space=glyph.space,
-            bitmap=_mpp_mask_to_sprite_bitmap(o.mask),
-            bitmap_origin=Point(0.5, 0.5),
-            dpi=MUSCIMA_PP_DPI
-        )
-        glyph.sprites = [sprite]
-
         # extract endpoints
         blurred_mask = cv2.medianBlur(o.mask, 5) # smooth out (5x5 window)
         points = get_line_endpoints(blurred_mask)
@@ -150,17 +142,37 @@ def _crop_objects_to_line_glyphs(
             #     "Is:", o.clsname
             # )
             continue
-        glyph.start_point = ScenePoint(
-            point=sprite.get_pixels_to_scene_transform().apply_to(points[0]),
-            space=glyph.space
-        )
-        glyph.end_point = ScenePoint(
-            point=sprite.get_pixels_to_scene_transform().apply_to(points[-1]),
-            space=glyph.space
-        )
 
         # store the points in the point cloud
         page.point_cloud.set_points(o, [points[0], points[-1]])
+
+        # construct the glyph
+        space = AffineSpace()
+        sprite = Sprite(
+            space=space,
+            bitmap=_mpp_mask_to_sprite_bitmap(o.mask),
+            bitmap_origin=Point(0.5, 0.5),
+            dpi=MUSCIMA_PP_DPI
+        )
+        start_point = ScenePoint(
+            point=sprite.get_pixels_to_scene_transform().apply_to(points[0]),
+            space=space
+        )
+        end_point = ScenePoint(
+            point=sprite.get_pixels_to_scene_transform().apply_to(points[-1]),
+            space=space
+        )
+        glyph = LineGlyph(
+            space=space,
+            region=Glyph.build_region_from_sprites_alpha_channel(
+                label=label,
+                sprites=[sprite]
+            ),
+            sprites=[sprite],
+            start_point=start_point,
+            end_point=end_point
+        )
+        MppGlyphMetadata.stamp_glyph(glyph, page, int(o.objid))
 
         # return the glyph
         glyphs.append(glyph)
@@ -239,7 +251,7 @@ def get_full_noteheads(page: MppPage) -> List[Glyph]:
             and not page.has_outlink_to(o, "ledger_line")
         ],
         page=page,
-        glyph_class=SmuflLabels.noteheadBlack.value
+        label=SmuflLabels.noteheadBlack.value
     )
 
 
@@ -251,7 +263,7 @@ def get_empty_noteheads(page: MppPage) -> List[Glyph]:
             and not page.has_outlink_to(o, "ledger_line")
         ],
         page=page,
-        glyph_class=SmuflLabels.noteheadWhole.value
+        label=SmuflLabels.noteheadWhole.value
     )
 
 
@@ -259,7 +271,7 @@ def get_whole_rests(page: MppPage) -> List[Glyph]:
     glyphs = _get_symbols_centered_on_line(
         page,
         clsname="whole_rest",
-        glyph_class=SmuflLabels.restWhole.value,
+        label=SmuflLabels.restWhole.value,
         line_from_top=1
     )
     # NOTE: these checks were in the old version, but they make situation
@@ -276,7 +288,7 @@ def get_half_rests(page: MppPage) -> List[Glyph]:
     glyphs = _get_symbols_centered_on_line(
         page,
         clsname="half_rest",
-        glyph_class=SmuflLabels.restHalf.value,
+        label=SmuflLabels.restHalf.value,
         line_from_top=2
     )
     # NOTE: these checks were in the old version, but they make situation
@@ -293,7 +305,7 @@ def get_quarter_rests(page: MppPage) -> List[Glyph]:
     return _get_symbols_centered_on_line(
         page,
         clsname="quarter_rest",
-        glyph_class=SmuflLabels.restQuarter.value,
+        label=SmuflLabels.restQuarter.value,
         line_from_top=2,
         when_center_outside_recenter=True
     )
@@ -303,7 +315,7 @@ def get_eighth_rests(page: MppPage) -> List[Glyph]:
     return _get_symbols_centered_on_line(
         page,
         clsname="8th_rest",
-        glyph_class=SmuflLabels.rest8th.value,
+        label=SmuflLabels.rest8th.value,
         line_from_top=2,
         when_center_outside_recenter=True
     )
@@ -313,7 +325,7 @@ def get_sixteenth_rests(page: MppPage) -> List[Glyph]:
     return _get_symbols_centered_on_line(
         page,
         clsname="16th_rest",
-        glyph_class=SmuflLabels.rest16th.value,
+        label=SmuflLabels.rest16th.value,
         line_from_top=2,
         when_center_outside_recenter=True
     )
@@ -332,7 +344,7 @@ def get_normal_barlines(page: MppPage) -> List[Glyph]:
             and o.uid not in _EXCLUDE
         ],
         page=page,
-        glyph_class=SmuflLabels.barlineSingle.value
+        label=SmuflLabels.barlineSingle.value
     )
 
 
@@ -340,7 +352,7 @@ def get_g_clefs(page: MppPage) -> List[Glyph]:
     return _get_symbols_centered_on_line(
         page,
         clsname="g-clef",
-        glyph_class=SmuflLabels.gClef.value,
+        label=SmuflLabels.gClef.value,
         line_from_top=3
     )
 
@@ -349,7 +361,7 @@ def get_f_clefs(page: MppPage) -> List[Glyph]:
     return _get_symbols_centered_on_line(
         page,
         clsname="f-clef",
-        glyph_class=SmuflLabels.fClef.value,
+        label=SmuflLabels.fClef.value,
         line_from_top=1
     )
 
@@ -361,7 +373,7 @@ def get_c_clefs(page: MppPage) -> List[Glyph]:
             if o.clsname == "c-clef"
         ],
         page=page,
-        glyph_class=SmuflLabels.cClef.value
+        label=SmuflLabels.cClef.value
     )
 
 
@@ -372,7 +384,7 @@ def get_stems(page: MppPage) -> List[LineGlyph]:
             if o.clsname in ["stem"]
         ],
         page=page,
-        glyph_class=SmuflLabels.stem.value,
+        label=SmuflLabels.stem.value,
         horizontal_line=False, # vertical line
         in_increasing_direction=False # pointing upwards
     )
@@ -386,7 +398,7 @@ def get_beams(page: MppPage) -> List[LineGlyph]:
             and o.width > BEAM_HOOK_MAX_WIDTH_PX
         ],
         page=page,
-        glyph_class=SmashcimaLabels.beam.value,
+        label=SmashcimaLabels.beam.value,
         horizontal_line=True, # horizontal line
         in_increasing_direction=True # pointing to the right
     )
@@ -400,7 +412,7 @@ def get_beam_hooks(page: MppPage) -> List[LineGlyph]:
             and o.width <= BEAM_HOOK_MAX_WIDTH_PX
         ],
         page=page,
-        glyph_class=SmashcimaLabels.beamHook.value,
+        label=SmashcimaLabels.beamHook.value,
         horizontal_line=True, # horizontal line
         in_increasing_direction=True # pointing to the right
     )
@@ -413,7 +425,7 @@ def get_ledger_lines(page: MppPage) -> List[LineGlyph]:
             if o.clsname in ["ledger_line"]
         ],
         page=page,
-        glyph_class=SmashcimaLabels.ledgerLine.value,
+        label=SmashcimaLabels.ledgerLine.value,
         horizontal_line=True, # horizontal line
         in_increasing_direction=True # pointing to the right
     )
@@ -467,14 +479,14 @@ def get_flags(page: MppPage) -> Tuple[List[Glyph], List[Glyph]]:
         if flag8th is None:
             continue # due to some error, 8th flag was not present 
 
-        _GLYPH_CLASS_LOOKUP: Dict[Tuple[bool, bool], str] = {
+        _LABEL_LOOKUP: Dict[Tuple[bool, bool], str] = {
             # (16th?, upward?) -> smufl class
             (False, False): SmuflLabels.flag8thDown.value,
             (False, True): SmuflLabels.flag8thUp.value,
             (True, False): SmuflLabels.flag16thDown.value,
             (True, True): SmuflLabels.flag16thUp.value,
         }
-        _ISOLATED_GLYPH_CLASS_LOOKUP: Dict[Tuple[bool, bool], str] = {
+        _ISOLATED_LABEL_LOOKUP: Dict[Tuple[bool, bool], str] = {
             # (16th?, upward?) -> smufl class
             (False, False): SmashcimaLabels.isolatedFlag8thDown.value,
             (False, True): SmashcimaLabels.isolatedFlag8thUp.value,
@@ -500,44 +512,50 @@ def get_flags(page: MppPage) -> Tuple[List[Glyph], List[Glyph]]:
             Vector2(stem.left, stem.top)
 
         # create the composed glyph
-        flag_glyph = ComposedGlyph(
-            glyph_class=_GLYPH_CLASS_LOOKUP[is_16th_flag, is_upward_pointing]
-        )
+        flag_subglyphs: List[Glyph] = []
 
-        def _add_isolated_flag_glyph(flag: CropObject, glyph_class: str):
+        def _build_sub_glyph(flag: CropObject, label: str):
             local_flag_origin = (
                 global_flag_origin - Vector2(flag.left, flag.top)
             )
-            relative_flag_origin = Vector2(
+            relative_flag_origin = Point(
                 local_flag_origin.x / flag.width,
                 local_flag_origin.y / flag.height
             )
-            g = Glyph(glyph_class=glyph_class)
-            g.sprites = [
-                Sprite(
-                    space=g.space,
-                    bitmap=_mpp_mask_to_sprite_bitmap(flag.mask),
-                    bitmap_origin=relative_flag_origin,
-                    dpi=MUSCIMA_PP_DPI
-                )
-            ]
-            g.space.parent_space = flag_glyph.space
-            MppGlyphMetadata.stamp_glyph(g, page, int(flag.objid))
-            flag_glyph.sub_glyphs = [*flag_glyph.sub_glyphs, g]
+            space = AffineSpace()
+            sprite = Sprite(
+                space=space,
+                bitmap=_mpp_mask_to_sprite_bitmap(flag.mask),
+                bitmap_origin=relative_flag_origin,
+                dpi=MUSCIMA_PP_DPI
+            )
+            sub_glyph = Glyph(
+                space=space,
+                region=Glyph.build_region_from_sprites_alpha_channel(
+                    label=label,
+                    sprites=[sprite]
+                ),
+                sprites=[sprite]
+            )
+            MppGlyphMetadata.stamp_glyph(sub_glyph, page, int(flag.objid))
+            flag_subglyphs.append(sub_glyph)
         
         # add sub-glyphs
-        _add_isolated_flag_glyph(
+        _build_sub_glyph(
             flag8th,
-            _ISOLATED_GLYPH_CLASS_LOOKUP[False, is_upward_pointing]
+            _ISOLATED_LABEL_LOOKUP[False, is_upward_pointing]
         )
         if is_16th_flag:
-            _add_isolated_flag_glyph(
+            _build_sub_glyph(
                 flag16th,
-                _ISOLATED_GLYPH_CLASS_LOOKUP[True, is_upward_pointing]
+                _ISOLATED_LABEL_LOOKUP[True, is_upward_pointing]
             )
 
         # finalize the composed glyph
-        flag_glyph.aggregate_sprites()
+        flag_glyph = ComposedGlyph.build(
+            label=_LABEL_LOOKUP[is_16th_flag, is_upward_pointing],
+            sub_glyphs=flag_subglyphs
+        )
         MppGlyphMetadata.stamp_glyph(
             flag_glyph,
             page,
@@ -560,7 +578,7 @@ def get_duration_dots(page: MppPage) -> List[Glyph]:
             if o.clsname == "duration-dot"
         ],
         page=page,
-        glyph_class=SmuflLabels.augmentationDot.value
+        label=SmuflLabels.augmentationDot.value
     )
 
 
@@ -571,12 +589,12 @@ def get_staccato_dots(page: MppPage) -> List[Glyph]:
             if o.clsname == "staccato-dot"
         ],
         page=page,
-        glyph_class=SmuflLabels.articStaccatoBelow.value
+        label=SmuflLabels.articStaccatoBelow.value
     )
 
 
 def get_accidentals(page: MppPage) -> List[Glyph]:
-    _GLYPH_CLASS_LOOKUP: Dict[str, str] = {
+    _LABEL_LOOKUP: Dict[str, str] = {
         "sharp": SmuflLabels.accidentalSharp.value,
         "flat": SmuflLabels.accidentalFlat.value,
         "natural": SmuflLabels.accidentalNatural.value,
@@ -588,7 +606,7 @@ def get_accidentals(page: MppPage) -> List[Glyph]:
 
     crop_objects = [
         o for o in page.crop_objects
-        if o.clsname in list(_GLYPH_CLASS_LOOKUP.keys())
+        if o.clsname in list(_LABEL_LOOKUP.keys())
     ]
 
     glyphs: List[Glyph] = []
@@ -599,7 +617,7 @@ def get_accidentals(page: MppPage) -> List[Glyph]:
         # (dilate vertically twice as much)
         object_center_x, object_center_y = get_center_of_component(o.mask)
         mask = (o.mask * 255).astype(dtype=np.uint8)
-        glyph = Glyph(glyph_class=_GLYPH_CLASS_LOOKUP[o.clsname])
+        space = AffineSpace()
         sprite: Optional[Sprite] = None
         for i in range(5):
             components = get_connected_components_not_touching_image_border(
@@ -620,7 +638,7 @@ def get_accidentals(page: MppPage) -> List[Glyph]:
                 components[0]
             )
             sprite = Sprite(
-                space=glyph.space,
+                space=space,
                 bitmap=_mpp_mask_to_sprite_bitmap(o.mask),
                 bitmap_origin=Point(
                     component_center_x / o.width,
@@ -635,7 +653,7 @@ def get_accidentals(page: MppPage) -> List[Glyph]:
             link = page.get(o.inlinks[0])
             if "notehead" in link.clsname:
                 sprite = Sprite(
-                    space=glyph.space,
+                    space=space,
                     bitmap=_mpp_mask_to_sprite_bitmap(o.mask),
                     bitmap_origin=Point(
                         0.5,
@@ -648,20 +666,27 @@ def get_accidentals(page: MppPage) -> List[Glyph]:
         if sprite is None:
             if o.clsname in ["flat", "double_flat"]:
                 sprite = Sprite(
-                    space=glyph.space,
+                    space=space,
                     bitmap=_mpp_mask_to_sprite_bitmap(o.mask),
                     bitmap_origin=Point(0.5, 0.75),
                     dpi=MUSCIMA_PP_DPI
                 )
             else:
                 sprite = Sprite(
-                    space=glyph.space,
+                    space=space,
                     bitmap=_mpp_mask_to_sprite_bitmap(o.mask),
                     bitmap_origin=Point(0.5, 0.5),
                     dpi=MUSCIMA_PP_DPI
                 )
         
-        glyph.sprites = [sprite]
+        glyph = Glyph(
+            space=space,
+            region=Glyph.build_region_from_sprites_alpha_channel(
+                label=_LABEL_LOOKUP[o.clsname],
+                sprites=[sprite]
+            ),
+            sprites=[sprite]
+        )
         MppGlyphMetadata.stamp_glyph(glyph, page, o.objid)
         glyphs.append(glyph)
 
@@ -675,7 +700,7 @@ def get_brackets_and_braces(page: MppPage) -> List[LineGlyph]:
             if o.clsname == "multi-staff_bracket"
         ],
         page=page,
-        glyph_class=SmuflLabels.bracket.value,
+        label=SmuflLabels.bracket.value,
         horizontal_line=False, # vertical line
         in_increasing_direction=True # drawn top-to-bottom
     )
@@ -685,7 +710,7 @@ def get_brackets_and_braces(page: MppPage) -> List[LineGlyph]:
             if o.clsname == "multi-staff_brace"
         ],
         page=page,
-        glyph_class=SmuflLabels.brace.value,
+        label=SmuflLabels.brace.value,
         horizontal_line=False, # vertical line
         in_increasing_direction=True # drawn top-to-bottom
     )
@@ -721,10 +746,10 @@ def get_brackets_and_braces(page: MppPage) -> List[LineGlyph]:
     for g in glyphs:
         meta = MppGlyphMetadata.of_glyph(g)
         if meta.mpp_crop_object_uid in _MISTAKES:
-            if g.glyph_class == SmuflLabels.brace.value:
-                g.glyph_class = SmuflLabels.bracket.value
-            elif g.glyph_class == SmuflLabels.bracket.value:
-                g.glyph_class = SmuflLabels.brace.value
+            if g.label == SmuflLabels.brace.value:
+                g.label = SmuflLabels.bracket.value
+            elif g.label == SmuflLabels.bracket.value:
+                g.label = SmuflLabels.brace.value
 
     return glyphs
 
@@ -761,7 +786,7 @@ def get_time_marks(page: MppPage) -> List[Glyph]:
             glyphs += _crop_objects_to_single_sprite_glyphs(
                 crop_objects=[outlink],
                 page=page,
-                glyph_class=_GLYPH_CLASS_LOOKUP[outlink.clsname]
+                label=_GLYPH_CLASS_LOOKUP[outlink.clsname]
             )
 
     return glyphs

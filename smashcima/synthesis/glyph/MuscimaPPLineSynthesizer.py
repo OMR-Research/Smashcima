@@ -1,12 +1,13 @@
+from smashcima.scene.LineGlyph import LineGlyph
 from smashcima.scene.SmashcimaLabels import SmashcimaLabels
-from .NaiveLineSynthesizer import NaiveLineSynthesizer, T
+from ..LineSynthesizer import LineSynthesizer
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.assets.AssetRepository import AssetRepository
 from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
 from smashcima.assets.glyphs.muscima_pp.LineList import LineList
 from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
-from typing import Type, Dict
+from typing import Dict
 import random
 import copy
 
@@ -19,7 +20,7 @@ _QUERY_TO_MPP_LOOKUP: Dict[str, str] = {
 }
 
 
-class MuscimaPPLineSynthesizer(NaiveLineSynthesizer):
+class MuscimaPPLineSynthesizer(LineSynthesizer):
     """
     Synthesizes line glyphs by sampling from the MUSCIMA++ dataset
     """
@@ -39,27 +40,22 @@ class MuscimaPPLineSynthesizer(NaiveLineSynthesizer):
         self.rng = rng
         "RNG used for randomization"
     
-    def pick(
-        self,
-        glyph_type: Type[T],
-        glyph_class: str,
-        delta: Vector2,
-    ) -> T:
+    def create_glyph(self, label: str, delta: Vector2) -> LineGlyph:
         # translate glyph class
-        if glyph_class not in _QUERY_TO_MPP_LOOKUP:
-            raise Exception("Unsupported glyph class: " + glyph_class)
-        mpp_glyph_class = _QUERY_TO_MPP_LOOKUP[glyph_class]
+        if label not in _QUERY_TO_MPP_LOOKUP:
+            raise Exception("Unsupported glyph label: " + label)
+        mpp_label = _QUERY_TO_MPP_LOOKUP[label]
 
         # select the proper glyph list
         glyphs = self.symbol_repository.glyphs_by_class_and_writer.get(
-            (mpp_glyph_class, self.mpp_style_domain.current_writer)
-        ) or self.symbol_repository.glyphs_by_class.get(mpp_glyph_class)
+            (mpp_label, self.mpp_style_domain.current_writer)
+        ) or self.symbol_repository.glyphs_by_class.get(mpp_label)
         assert isinstance(glyphs, LineList), \
-            f"Got line glyphs without index for {mpp_glyph_class}"
+            f"Got line glyphs without index for {mpp_label}"
 
         if glyphs is None or len(glyphs) == 0:
             raise Exception(
-                f"The glyph class {glyph_class} is not present in " + \
+                f"The glyph class {label} is not present in " + \
                 "the symbol repository"
             )
 
@@ -68,11 +64,8 @@ class MuscimaPPLineSynthesizer(NaiveLineSynthesizer):
             glyphs.pick_line(delta.magnitude, self.rng)
         )
 
-        assert type(glyph) is glyph_type, \
-            f"Picked glyph is of different type: {type(glyph)}"
-        
-        # ensure the class
-        glyph.glyph_class = glyph_class
+        # ensure the label
+        glyph.label = label
 
         return glyph
 

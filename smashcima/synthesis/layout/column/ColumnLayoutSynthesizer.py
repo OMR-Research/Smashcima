@@ -13,9 +13,9 @@ from smashcima.scene.semantic.Note import Note
 from smashcima.scene.semantic.TypeDuration import TypeDuration
 from smashcima.geometry.Transform import Transform
 from smashcima.scene.SmuflLabels import SmuflLabels
-from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
+from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
 from ..BeamStemSynthesizer import BeamStemSynthesizer
-from ...glyph.LineSynthesizer import LineSynthesizer
+from ...LineSynthesizer import LineSynthesizer
 from .Column import Column
 from .ColumnBase import ColumnBase
 from .BarlinesColumn import synthesize_barlines_column
@@ -373,19 +373,17 @@ class ColumnLayoutSynthesizer:
                 continue
 
             # get the glyph class
-            glyph_class = SmuflLabels.flag_from_type_duration_and_stem_value(
+            label = SmuflLabels.flag_from_type_duration_and_stem_value(
                 type_duration=type_duration,
                 stem_value=chord.stem_value
             ).value
 
             # create the glyph
-            glyph = self.glyph_synthesizer.synthesize_glyph(
-                glyph_class=glyph_class,
-                expected_glyph_type=Glyph
+            glyph = self.glyph_synthesizer.synthesize_glyph_at(
+                label=label,
+                parent_space=paper_space,
+                point=stem.tip.transform_to(paper_space)
             )
-            glyph.space.parent_space = paper_space
-            attachment_point = stem.tip.transform_to(paper_space)
-            glyph.space.transform = Transform.translate(attachment_point.vector)
             Flag(
                 glyph=glyph,
                 stem=stem

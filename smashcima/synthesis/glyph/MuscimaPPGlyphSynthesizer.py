@@ -1,5 +1,5 @@
-from typing import Set, Type, Dict
-from .GlyphSynthesizer import GlyphSynthesizer, T
+from typing import Set, Dict
+from ..GlyphSynthesizer import GlyphSynthesizer
 from smashcima.scene.Glyph import Glyph
 from smashcima.assets.AssetRepository import AssetRepository
 from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
@@ -50,9 +50,8 @@ _QUERY_TO_MPP_LOOKUP: Dict[str, str] = {
 
 
 class MuscimaPPGlyphSynthesizer(GlyphSynthesizer):
-    """
-    Synthesizes glyphs by sampling from the MUSCIMA++ dataset
-    """
+    """Synthesizes glyphs by sampling from the MUSCIMA++ dataset"""
+    
     def __init__(
         self,
         assets: AssetRepository,
@@ -70,50 +69,37 @@ class MuscimaPPGlyphSynthesizer(GlyphSynthesizer):
         "RNG used for randomization"
     
     @property
-    def supported_glyphs(self) -> Set[str]:
+    def supported_labels(self) -> Set[str]:
         return set(_QUERY_TO_MPP_LOOKUP.keys())
     
-    def synthesize_glyph(
-        self,
-        glyph_class: str,
-        expected_glyph_type: Type[T] = Glyph
-    ) -> T:
-        assert type(glyph_class) is str, "Requested glyph class must be str type"
-
+    def create_glyph(self, label: str) -> Glyph:
         # pick a glyph from the symbol repository
-        if glyph_class in _QUERY_TO_MPP_LOOKUP:
-            glyph = self.pick(_QUERY_TO_MPP_LOOKUP[glyph_class])
+        if label in _QUERY_TO_MPP_LOOKUP:
+            glyph = self.pick(_QUERY_TO_MPP_LOOKUP[label])
         else:
-            raise Exception("Unsupported glyph class: " + glyph_class)
+            raise Exception("Unsupported glyph label: " + label)
 
         # make a copy of that glyph before returning
         glyph_copy = copy.deepcopy(glyph)
 
         # adjust its glyph class to match what the user wants
-        # (e.g. SMUFL instead of MUSCIMA++)
-        glyph_copy.glyph_class = glyph_class
-
-        # verify before returning
-        self.verify_glyph_type_and_class(
-            glyph_class,
-            expected_glyph_type,
-            glyph_copy
-        )
+        # (because the mapping dictionary is not really 1:1)
+        glyph_copy.label = label
 
         return glyph_copy
     
-    def pick(self, glyph_class: str) -> Glyph:
+    def pick(self, label: str) -> Glyph:
         """Picks a random glyph from the symbol repository according to the
         current writer"""
         # get the list of glyphs to choose from
         # (if writer is missing this class, fall back on all writers)
         glyphs = self.symbol_repository.glyphs_by_class_and_writer.get(
-            (glyph_class, self.mpp_style_domain.current_writer)
-        ) or self.symbol_repository.glyphs_by_class.get(glyph_class)
+            (label, self.mpp_style_domain.current_writer)
+        ) or self.symbol_repository.glyphs_by_class.get(label)
 
         if glyphs is None or len(glyphs) == 0:
             raise Exception(
-                f"The glyph class {glyph_class} is not present in " + \
+                f"The glyph class {label} is not present in " + \
                 "the symbol repository"
             )
         

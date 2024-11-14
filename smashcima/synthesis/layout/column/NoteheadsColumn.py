@@ -1,7 +1,4 @@
-from smashcima.scene import LineGlyph
-from smashcima.scene.Glyph import Glyph
 from smashcima.scene.SmashcimaLabels import SmashcimaLabels
-from smashcima.scene.semantic.Clef import Clef
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.Event import Event
 from smashcima.scene.semantic.StaffSemantic import StaffSemantic
@@ -14,8 +11,8 @@ from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.visual.NoteheadSide import NoteheadSide
 from smashcima.scene.visual.LedgerLine import LedgerLine
 from smashcima.scene.SmuflLabels import SmuflLabels
-from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
-from smashcima.synthesis.glyph.LineSynthesizer import LineSynthesizer
+from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
+from smashcima.synthesis.LineSynthesizer import LineSynthesizer
 from smashcima.geometry.Point import Point
 from smashcima.random_between import random_between
 from .ColumnBase import ColumnBase
@@ -248,12 +245,11 @@ class NoteheadsColumn(ColumnBase):
         ).apply_to(Point(0, 0))
 
         glyph = self.line_synthesizer.synthesize_line(
-            glyph_type=LineGlyph,
-            glyph_class=SmashcimaLabels.ledgerLine.value,
+            label=SmashcimaLabels.ledgerLine.value,
+            parent_space=staff.space,
             start_point=start_point,
             end_point=end_point
         )
-        glyph.space.parent_space = staff.space
         line = LedgerLine(
             glyph=glyph,
             affected_noteheads=[], # populated later
@@ -310,13 +306,13 @@ def synthesize_noteheads_column(
                 staff = staves[staff_index]
                 
                 # new notehead for a note
-                glyph = glyph_synthesizer.synthesize_glyph(
-                    SmuflLabels.notehead_from_type_duration(
+                glyph = glyph_synthesizer.synthesize_glyph_at(
+                    label=SmuflLabels.notehead_from_type_duration(
                         note.type_duration
                     ).value,
-                    expected_glyph_type=Glyph
+                    parent_space=staff.space,
+                    point=Point(0, 0) # glyph positioned later
                 )
-                glyph.space.parent_space = staff.space
                 notehead = Notehead(
                     glyph=glyph,
                     notes = [note],

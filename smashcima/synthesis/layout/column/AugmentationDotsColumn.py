@@ -1,4 +1,3 @@
-from smashcima.scene.Glyph import Glyph
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.ScoreEvent import ScoreEvent
 from smashcima.scene.semantic.Note import Note
@@ -9,7 +8,7 @@ from smashcima.scene.visual.AugmentationDot import AugmentationDot
 from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.visual.RestVisual import RestVisual
 from smashcima.scene.SmuflLabels import SmuflLabels
-from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
+from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
 from smashcima.geometry.Point import Point
 from smashcima.random_between import random_between
 from .ColumnBase import ColumnBase
@@ -172,11 +171,11 @@ def synthesize_augmentation_dots_column(
                     dot.owners = [*dot.owners, owner]
 
                 # create new dot
-                glyph = glyph_synthesizer.synthesize_glyph(
-                    glyph_class=SmuflLabels.augmentationDot.value,
-                    expected_glyph_type=Glyph
+                glyph = glyph_synthesizer.synthesize_glyph_at(
+                    label=SmuflLabels.augmentationDot.value,
+                    parent_space=staves[staff_index].space,
+                    point=Point(0, 0) # glyph positioned later
                 )
-                glyph.space.parent_space = staves[staff_index].space
                 dot = AugmentationDot(
                     glyph=glyph,
                     owners=[owner],

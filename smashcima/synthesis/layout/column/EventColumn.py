@@ -1,8 +1,8 @@
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.ScoreEvent import ScoreEvent
 from smashcima.scene.visual.StaffVisual import StaffVisual
-from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
-from smashcima.synthesis.glyph.LineSynthesizer import LineSynthesizer
+from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
+from smashcima.synthesis.LineSynthesizer import LineSynthesizer
 from .NoteheadsColumn import NoteheadsColumn, synthesize_noteheads_column
 from .RestsColumn import RestsColumn, synthesize_rests_column
 from .ColumnBase import ColumnBase

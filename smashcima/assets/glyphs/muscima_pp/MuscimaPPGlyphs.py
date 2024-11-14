@@ -40,7 +40,7 @@ from typing import Optional
 # .venv/bin/python3 -m smashcima.assets.glyphs.muscima_pp --debug
 
 class MuscimaPPGlyphs(AssetBundle):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self._symbol_repository_cache: Optional[SymbolRepository] = None
 
         self.muscima_pp = self.dependency_resolver.resolve_bundle(MuscimaPP)
@@ -124,11 +124,11 @@ class MuscimaPPGlyphs(AssetBundle):
 
         # glyphs
         glyph_renderer = DebugGlyphRenderer()
-        for glyph_class, glyphs in repository.glyphs_by_class.items():
-            glyphs_folder = debug_folder / glyph_class.replace(":", "-")
+        for label, glyphs in repository.glyphs_by_class.items():
+            glyphs_folder = debug_folder / label.replace(":", "-")
             glyphs_folder.mkdir()
 
-            print(glyph_class, "...")
+            print(label, "...")
             for glyph in tqdm(glyphs):
                 meta = MppGlyphMetadata.of_glyph(glyph, fail_if_none=True)
                 cv2.imwrite(

@@ -269,7 +269,7 @@ class SmuflLabels(str, Enum):
             AccidentalValue.sharp: SmuflLabels.accidentalSharp,
             AccidentalValue.doubleSharp: SmuflLabels.accidentalDoubleSharp,
         }
-        glyph_class = _LOOKUP.get(accidental_value)
-        if glyph_class is None:
+        label = _LOOKUP.get(accidental_value)
+        if label is None:
             raise Exception(f"Unsupported accidental " + repr(accidental_value))
-        return glyph_class
+        return label

@@ -18,7 +18,7 @@ from smashcima.scene.visual.BeamHook import BeamHook
 from smashcima.scene.visual.BeamCoordinateSystem import BeamCoordinateSystem
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.geometry.Point import Point
-from smashcima.synthesis.glyph.LineSynthesizer import LineSynthesizer
+from smashcima.synthesis.LineSynthesizer import LineSynthesizer
 from smashcima.scene.SmuflLabels import SmuflLabels
 from typing import List, Optional
 from collections import Counter
@@ -113,12 +113,11 @@ class BeamStemSynthesizer:
 
         # synthesize the stem glyph
         glyph = self.line_synthesizer.synthesize_line(
-            glyph_type=LineGlyph,
-            glyph_class=SmuflLabels.stem.value,
+            label=SmuflLabels.stem.value,
+            parent_space=paper_space,
             start_point=stem_base,
             end_point=stem_tip
         )
-        glyph.space.parent_space = paper_space
         Stem(
             glyph=glyph,
             chord=chord
@@ -307,12 +306,11 @@ class BeamStemSynthesizer:
             end_tip = tips[group.chords.index(chords[-1])]
             stem_value = _determine_beam_orientation(chords)
             glyph = self.line_synthesizer.synthesize_line(
-                glyph_type=LineGlyph,
-                glyph_class=SmashcimaLabels.beam.value,
+                label=SmashcimaLabels.beam.value,
+                parent_space=paper_space,
                 start_point=f.point(start_tip.x, beam_number, stem_value),
                 end_point=f.point(end_tip.x, beam_number, stem_value)
             )
-            glyph.space.parent_space = paper_space
             Beam(
                 glyph=glyph,
                 beamed_group=group,
@@ -329,12 +327,11 @@ class BeamStemSynthesizer:
                 -HOOK_LENGTH
             )
             glyph = self.line_synthesizer.synthesize_line(
-                glyph_type=LineGlyph,
-                glyph_class=SmashcimaLabels.beamHook.value,
+                label=SmashcimaLabels.beamHook.value,
+                parent_space=paper_space,
                 start_point=f.point(start_x, beam_number, stem_value),
                 end_point=f.point(end_x, beam_number, stem_value)
             )
-            glyph.space.parent_space = paper_space
             BeamHook(
                 glyph=glyph,
                 beamed_group=group,
@@ -359,12 +356,11 @@ class BeamStemSynthesizer:
 
             # synthesize new sprites and points
             glyph = self.line_synthesizer.synthesize_line(
-                glyph_type=LineGlyph,
-                glyph_class=old_stem.glyph.glyph_class,
+                label=old_stem.glyph.label,
+                parent_space=paper_space,
                 start_point=start_point,
                 end_point=end_point
             )
-            glyph.space.parent_space = paper_space
             new_stem = Stem(
                 glyph=glyph,
                 chord=old_stem.chord

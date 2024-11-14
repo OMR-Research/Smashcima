@@ -1,5 +1,4 @@
 from smashcima.nameof_via_dummy import nameof_via_dummy
-from smashcima.scene.Glyph import Glyph
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.ScoreEvent import ScoreEvent
 from smashcima.scene.semantic.Note import Note
@@ -7,7 +6,7 @@ from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.visual.Accidental import Accidental
 from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.SmuflLabels import SmuflLabels
-from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
+from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
 from smashcima.geometry.Point import Point
 from smashcima.random_between import random_between
 from .ColumnBase import ColumnBase
@@ -113,14 +112,14 @@ def synthesize_accidentals_column(
                 continue
 
             # create accidental
-            glyph = glyph_synthesizer.synthesize_glyph(
-                glyph_class=SmuflLabels.accidental_from_accidental_value(
+            staff_index = score.staff_index_of_durable(note)
+            glyph = glyph_synthesizer.synthesize_glyph_at(
+                label=SmuflLabels.accidental_from_accidental_value(
                     note.accidental_value
                 ).value,
-                expected_glyph_type=Glyph
+                parent_space=staves[staff_index].space,
+                point=Point(0, 0) # glyph positioned later
             )
-            staff_index = score.staff_index_of_durable(note)
-            glyph.space.parent_space = staves[staff_index].space
             accidental = Accidental(
                 glyph=glyph,
                 notehead=Notehead.of_note(note, fail_if_none=True)

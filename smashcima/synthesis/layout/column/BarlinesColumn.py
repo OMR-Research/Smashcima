@@ -1,7 +1,8 @@
+from smashcima.geometry.Point import Point
 from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.Glyph import Glyph
 from smashcima.scene.SmuflLabels import SmuflLabels
-from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
+from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
 from .ColumnBase import ColumnBase
 from typing import List
 import random
@@ -35,8 +36,10 @@ def synthesize_barlines_column(
     column = BarlinesColumn(staves, rng.random())
 
     for staff in staves:
-        barline = glyph_synthesizer.synthesize_glyph(
-            SmuflLabels.barlineSingle.value
+        barline = glyph_synthesizer.synthesize_glyph_at(
+            label=SmuflLabels.barlineSingle.value,
+            parent_space=staff.space,
+            point=Point(0, 0) # glyph positioned later
         )
         barline.space.parent_space = staff.space
         column.add_barline(barline)

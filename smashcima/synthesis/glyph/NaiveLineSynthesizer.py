@@ -1,13 +1,10 @@
-from smashcima.scene.ScenePoint import ScenePoint
-from smashcima.scene.Sprite import Sprite
-from smashcima.geometry.Rectangle import Rectangle
-from smashcima.geometry.Point import Point
-from smashcima.geometry.Vector2 import Vector2
-from smashcima.geometry.Transform import Transform
-from .LineSynthesizer import LineSynthesizer, T
-from typing import Type
 import cv2
 import numpy as np
+
+from smashcima.geometry import Point, Rectangle, Transform, Vector2
+from smashcima.scene import Glyph, LineGlyph, ScenePoint, Sprite, AffineSpace
+
+from ..LineSynthesizer import LineSynthesizer
 
 
 class NaiveLineSynthesizer(LineSynthesizer):
@@ -21,62 +18,15 @@ class NaiveLineSynthesizer(LineSynthesizer):
         self.dpi = dpi
         "DPI at which to synthesize the line sprite"
 
-    def synthesize_line(
-        self,
-        glyph_type: Type[T],
-        glyph_class: str,
-        start_point: Point,
-        end_point: Point
-    ) -> T:
-        assert type(glyph_class) is str, "Requested glyph class must be str type"
-
-        delta = end_point.vector - start_point.vector
-
-        glyph = self.pick(
-            glyph_type=glyph_type,
-            glyph_class=glyph_class,
-            delta=delta
-        )
-
-        # compute the transform from the picked glyph
-        # to the desired placement
-        # (frame is [origin, X unit, Y unit])
-        from_origin = glyph.start_point.point.vector
-        from_delta = glyph.end_point.point.vector - glyph.start_point.point.vector
-        from_frame = np.float32([
-            list(from_origin),
-            list(from_origin + from_delta),
-            list(from_origin + from_delta.normalize().rotate90degCC())
-        ])
-
-        to_origin=start_point.vector
-        to_delta=delta
-        to_frame = np.float32([
-            list(to_origin),
-            list(to_origin + to_delta),
-            list(to_origin + to_delta.normalize().rotate90degCC())
-        ])
-
-        matrix = cv2.getAffineTransform(from_frame, to_frame)
-        glyph.space.transform = Transform(matrix)
-
-        return glyph
-    
-    def pick(
-        self,
-        glyph_type: Type[T],
-        glyph_class: str,
-        delta: Vector2,
-    ) -> T:
+    def create_glyph(self, label: str, delta: Vector2) -> LineGlyph:
         length = delta.magnitude
 
-        glyph = glyph_type(
-            glyph_class=glyph_class
-        )
+        # create the glyph space
+        space = AffineSpace()
 
         # create a sprite, lying horizontally, centered on origin
         sprite = Sprite.rectangle(
-            glyph.space,
+            space,
             Rectangle(
                 x=-length/2,
                 y=-self.line_width/2,
@@ -86,16 +36,25 @@ class NaiveLineSynthesizer(LineSynthesizer):
             fill_color=self.color,
             dpi=self.dpi
         )
-        glyph.sprites = [sprite]
 
-        # set the two points
-        glyph.start_point = ScenePoint(
+        # create the two points
+        start_point = ScenePoint(
             point=Point(-length/2, 0),
-            space=glyph.space
+            space=space
         )
-        glyph.end_point = ScenePoint(
+        end_point = ScenePoint(
             point=Point(length/2, 0),
-            space=glyph.space
+            space=space
         )
 
-        return glyph
+        # put it all together into a line glyph
+        return LineGlyph(
+            space=space,
+            region=Glyph.build_region_from_sprites_alpha_channel(
+                label=label,
+                sprites=[sprite]
+            ),
+            sprites=[sprite],
+            start_point=start_point,
+            end_point=end_point
+        )

@@ -1,25 +1,26 @@
 from dataclasses import dataclass
-from smashcima.scene.SceneObject import SceneObject
-from smashcima.scene.Glyph import Glyph
-from .MppPage import MppPage
 from typing import Optional
+
 from smashcima.nameof_via_dummy import nameof_via_dummy
+from smashcima.scene import Glyph, SceneObject
+
+from .MppPage import MppPage
 
 
 @dataclass
 class MppGlyphMetadata(SceneObject):
-    """A glyph from the MUSCIMA++ dataset"""
+    """Metadata information object for a glyph from the MUSCIMA++ dataset"""
 
-    glyph: Glyph = None
+    glyph: Glyph
     "The glyph that this metadata refers to"
     
-    mpp_writer: int = None
+    mpp_writer: int
     "Writer index (1 to 50) from the MUSCIMA++ dataset"
 
-    mpp_piece: int = None
+    mpp_piece: int
     "Music piece index (1 to 20) from the MUSCIMA++ dataset"
 
-    mpp_numeric_objid: int = None
+    mpp_numeric_objid: int
     "Id number assigned to the corresponding crop object in the MUSCIMA++ dataset"
 
     def __post_init__(self):

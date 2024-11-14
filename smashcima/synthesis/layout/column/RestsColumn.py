@@ -1,5 +1,4 @@
-from smashcima.scene import LineGlyph, SmashcimaLabels
-from smashcima.scene.Glyph import Glyph
+from smashcima.scene import SmashcimaLabels
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.semantic.Event import Event
 from smashcima.scene.semantic.StaffSemantic import StaffSemantic
@@ -9,8 +8,8 @@ from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.visual.RestVisual import RestVisual
 from smashcima.scene.visual.LedgerLine import LedgerLine
 from smashcima.scene.SmuflLabels import SmuflLabels
-from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
-from smashcima.synthesis.glyph.LineSynthesizer import LineSynthesizer
+from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
+from smashcima.synthesis.LineSynthesizer import LineSynthesizer
 from smashcima.geometry.Point import Point
 from smashcima.random_between import random_between
 from .ColumnBase import ColumnBase
@@ -79,14 +78,14 @@ def synthesize_rests_column(
             )
 
             # create the rest
-            glyph_class = SmuflLabels.rest_from_type_duration(
+            label = SmuflLabels.rest_from_type_duration(
                 durable.type_duration
             )
-            glyph = glyph_synthesizer.synthesize_glyph(
-                glyph_class.value,
-                expected_glyph_type=Glyph
+            glyph = glyph_synthesizer.synthesize_glyph_at(
+                label=label.value,
+                parent_space=staff.space,
+                point=Point(0, 0) # glyph positioned later
             )
-            glyph.space.parent_space = staff.space
             rest = RestVisual(
                 glyph=glyph,
                 rest_semantic=durable,
@@ -100,7 +99,7 @@ def synthesize_rests_column(
             # (and attach it under the glyph space for simplicity)
             _synthesize_ledger_line_if_necessary(
                 rest=rest,
-                glyph_class=glyph_class,
+                label=label,
                 line_synthesizer=line_synthesizer,
                 rng=rng
             )
@@ -108,12 +107,12 @@ def synthesize_rests_column(
 
 def _synthesize_ledger_line_if_necessary(
     rest: RestVisual,
-    glyph_class: SmuflLabels,
+    label: SmuflLabels,
     line_synthesizer: LineSynthesizer,
     rng: random.Random
 ):
     # the rest is not whole nor half, no ledger line needed
-    if glyph_class not in [SmuflLabels.restWhole, SmuflLabels.restHalf]:
+    if label not in [SmuflLabels.restWhole, SmuflLabels.restHalf]:
         return
 
     # the rest is still within the staff, no ledgerline needed
@@ -124,12 +123,11 @@ def _synthesize_ledger_line_if_necessary(
         * random_between(1.2, 2.5, rng)
     
     glyph = line_synthesizer.synthesize_line(
-        glyph_type=LineGlyph,
-        glyph_class=SmashcimaLabels.ledgerLine.value,
+        label=SmashcimaLabels.ledgerLine.value,
+        parent_space=rest.glyph.space,
         start_point=Point(-width / 2, 0),
         end_point=Point(width / 2, 0)
     )
-    glyph.space.parent_space = rest.glyph.space
     LedgerLine(
         glyph=glyph,
         affected_noteheads=[], # none

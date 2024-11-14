@@ -1,16 +1,17 @@
+from smashcima.geometry.Point import Point
 from smashcima.scene.semantic.Clef import Clef
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.Glyph import Glyph
 from smashcima.scene.SmuflLabels import SmuflLabels
-from smashcima.synthesis.glyph.GlyphSynthesizer import GlyphSynthesizer
+from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
 from .ColumnBase import ColumnBase
 from typing import List, Set
 import random
 
 
 class ClefsColumn(ColumnBase):
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.clefs: List[Clef] = []
 
         # this column should not be grown much, really
@@ -59,14 +60,17 @@ def synthesize_header_clefs(
             staff = staves[staff_index]
 
             # determine the glyph class
-            glyph_class: str = SmuflLabels.clef_from_clef_sign(
+            label = SmuflLabels.clef_from_clef_sign(
                 clef_sign=clef.sign,
                 small=False
             ).value
 
             # synthesize the glyph
-            glyph = glyph_synthesizer.synthesize_glyph(glyph_class)
-            glyph.space.parent_space = staff.space
+            glyph = glyph_synthesizer.synthesize_glyph_at(
+                label=label,
+                parent_space=staff.space,
+                point=Point(0, 0) # glyph positioned later
+            )
             column.add_clef(clef, glyph)
 
             # verification logic

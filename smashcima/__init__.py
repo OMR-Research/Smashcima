@@ -6,6 +6,8 @@ __version__ = "0.2.0dev"
 from .geometry import *
 from .scene import *
 from .orchestration.Model import Model
+from .synthesis.GlyphSynthesizer import GlyphSynthesizer
+from .synthesis.LineSynthesizer import LineSynthesizer
 
 # -----------------------------------------------------------------------------
 # import sub-modules to make them accessible from this module

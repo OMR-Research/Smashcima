@@ -27,7 +27,7 @@ def _plot_glyph_on_axis(ax: plt.Axes, glyph: Glyph, glyph_index: int):
 
 def display_glyphs(rows: int, columns: int, glyphs: List[Glyph], start_from=0):
     fig, axs = plt.subplots(rows, columns, sharex=True, sharey=True)
-    fig.suptitle(glyphs[0].glyph_class + f" ({len(glyphs)} total)")
+    fig.suptitle(glyphs[0].label + f" ({len(glyphs)} total)")
     fig.tight_layout()
     
     for r in range(rows):
