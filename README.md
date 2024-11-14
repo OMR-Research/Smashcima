@@ -5,7 +5,7 @@
 
 <div align="center">
     <br/>
-    <img src="docs/assets/smashcima-logo.svg" width="400px">
+    <img src="docs/assets/smashcima-logo.svg" width="600px">
     <br/>
     <br/>
     <br/>
