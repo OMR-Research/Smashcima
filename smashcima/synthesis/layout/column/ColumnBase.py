@@ -6,7 +6,7 @@ from smashcima.scene.Glyph import Glyph
 from smashcima.scene.Sprite import Sprite
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.geometry.Rectangle import Rectangle
-from smashcima.rendering.traverse_sprites import traverse_sprites
+from smashcima.exporting.traverse_sprites import traverse_sprites
 import random
 
 

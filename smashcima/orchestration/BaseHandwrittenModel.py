@@ -6,7 +6,7 @@ import numpy as np
 
 from smashcima.geometry import Vector2
 from smashcima.loading import load_score
-from smashcima.rendering import BitmapRenderer
+from smashcima.exporting import BitmapRenderer
 from smashcima.scene import AffineSpace, Page, Scene, Score
 from smashcima.synthesis import (BeamStemSynthesizer, ColumnLayoutSynthesizer,
                                  LineSynthesizer, MuscimaPPGlyphSynthesizer,

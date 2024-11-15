@@ -1,6 +1,6 @@
 from ...AssetBundle import AssetBundle
 from ...datasets.MuscimaPP import MuscimaPP
-from smashcima.rendering.DebugGlyphRenderer import DebugGlyphRenderer
+from smashcima.exporting.DebugGlyphRenderer import DebugGlyphRenderer
 from .MppPage import MppPage
 from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.scene.SmashcimaLabels import SmashcimaLabels
