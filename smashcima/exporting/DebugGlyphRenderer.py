@@ -1,7 +1,6 @@
 from smashcima.scene.AffineSpace import AffineSpace
 from smashcima.scene.Glyph import Glyph
 from smashcima.scene.ViewBox import ViewBox
-from smashcima.scene.Scene import Scene
 from .BitmapRenderer import BitmapRenderer
 import numpy as np
 import copy
@@ -15,12 +14,14 @@ class DebugGlyphRenderer:
         # add sprites to display debug points
         glyph.place_debug_overlay()
 
-        scene = Scene(AffineSpace())
-        glyph.space.parent_space = scene.root_space
-        scene.add_closure()
+        root_space = AffineSpace()
+        glyph.space.parent_space = root_space
 
-        view_box = ViewBox(glyph.get_bbox_in_space(scene.root_space))
+        view_box = ViewBox(
+            rectangle=glyph.get_bbox_in_space(root_space),
+            space=root_space
+        )
         dpi = max(s.dpi for s in glyph.sprites)
 
         renderer = BitmapRenderer(dpi=dpi)
-        return renderer.render(scene, view_box)
+        return renderer.render(view_box)

@@ -4,7 +4,7 @@ from typing import List
 import cv2
 import numpy as np
 
-from smashcima.geometry import Point, Polygon, Rectangle
+from smashcima.geometry import Contours, Point, Polygon, Rectangle
 
 from .AffineSpace import AffineSpace
 from .LabeledRegion import LabeledRegion
@@ -87,7 +87,7 @@ class Glyph(SceneObject):
         assert all(s.space is space for s in sprites), \
             "All provided sprites must be in the same affine space"
         
-        out_contours: List[Polygon] = []
+        contour_polygons: List[Polygon] = []
 
         # for each sprite
         for sprite in sprites:
@@ -101,18 +101,18 @@ class Glyph(SceneObject):
             )
 
             # wrap the results in geometry instances
-            transform = sprite.get_pixels_to_scene_transform()\
+            transform = sprite.get_pixels_to_origin_space_transform()\
                 .then(sprite.transform)
             for cv_contour in cv_contours:
-                out_contour = transform.apply_to(
+                polygon = transform.apply_to(
                     Polygon.from_cv2_contour(cv_contour)
                 )
-                out_contours.append(out_contour)
+                contour_polygons.append(polygon)
         
         # build the final region instance
         return LabeledRegion(
             space=space,
-            contours=out_contours,
+            contours=Contours(contour_polygons),
             label=label
         )
     
@@ -128,7 +128,7 @@ class Glyph(SceneObject):
         """Places sprites that act as debugging overlay for the glyph.
         Override this method to add more overlay for specialized glyphs."""
         overlay: List[Sprite] = []
-        
+
         # green origin point
         p = ScenePoint(
             point=Point(0, 0),

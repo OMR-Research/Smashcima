@@ -1,7 +1,8 @@
-from .SceneObject import SceneObject
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import List, Optional
+
 from ..geometry.Transform import Transform
+from .SceneObject import SceneObject
 
 
 @dataclass
@@ -24,6 +25,13 @@ class AffineSpace(SceneObject):
     def get_children(self) -> List["AffineSpace"]:
         """Returns child affine spaces as a list"""
         return AffineSpace.many_of(self, lambda s: s.parent_space)
+    
+    def get_root(self) -> "AffineSpace":
+        """Returns the top-most root affine space"""
+        space = self
+        while space.parent_space is not None:
+            space = space.parent_space
+        return space
 
     def transform_from(self, sub_space: "AffineSpace") -> Transform:
         """Returns the transform from the given space to the current space"""

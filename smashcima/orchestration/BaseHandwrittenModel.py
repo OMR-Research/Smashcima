@@ -55,7 +55,7 @@ class BaseHandwrittenScene(Scene):
         """Renders the bitmap BGRA image of a page"""
         assert page in self.pages, "Given page is not in this scene"
         renderer = BitmapRenderer(dpi=dpi)
-        bitmap = renderer.render(self, page.view_box)
+        bitmap = renderer.render(page.view_box)
         return bitmap
 
 

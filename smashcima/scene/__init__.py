@@ -1,6 +1,7 @@
 # -----------------------------------------------------------------------------
 # import local types
 from .AffineSpace import AffineSpace
+from .AffineSpaceVisitor import AffineSpaceVisitor
 from .ComposedGlyph import ComposedGlyph
 from .Glyph import Glyph
 from .LabeledRegion import LabeledRegion

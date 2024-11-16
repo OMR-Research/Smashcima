@@ -6,7 +6,6 @@ from smashcima.scene.Glyph import Glyph
 from smashcima.scene.Sprite import Sprite
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.geometry.Rectangle import Rectangle
-from smashcima.exporting.traverse_sprites import traverse_sprites
 import random
 
 
@@ -86,7 +85,7 @@ class ColumnBase(Column, metaclass=abc.ABCMeta):
 
                 # get all sprites in that glyph and transform their corners
                 # into the staff space
-                for (sprite, transform) in traverse_sprites(
+                for (sprite, transform) in Sprite.traverse_sprites(
                     glyph.space,
                     include_pixels_transform=True,
                     include_sprite_transform=True,

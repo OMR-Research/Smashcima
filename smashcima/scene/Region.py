@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-from typing import List
 
-from smashcima.geometry import Polygon, Rectangle
+from smashcima.geometry import Contours, Rectangle
 
 from .AffineSpace import AffineSpace
 from .SceneObject import SceneObject
@@ -24,7 +23,7 @@ class Region(SceneObject):
     space: AffineSpace
     """Space in which the region is situated. Not owned by the region."""
 
-    contours: List[Polygon]
+    contours: Contours
     """Polygon areas that define the region (in parent space coordinates)"""
 
     def detach(self):
@@ -34,22 +33,20 @@ class Region(SceneObject):
     @classmethod
     def many_of_space(cls, space: AffineSpace):
         return cls.many_of(space, lambda r: r.space)
-    
-    def get_contours_in_space(self, target_space: AffineSpace) -> List[Polygon]:
+
+    def get_contours_in_space(self, target_space: AffineSpace) -> Contours:
         """Returns the contours polygons transformed to the target space
         
         :param target_space: The space to which coordinates of the contours
             should be transformed. Must be an ancestor of this region's space.
         """
         transform = target_space.transform_from(self.space)
-        return [transform.apply_to(p) for p in self.contours]
-    
+        return transform.apply_to(self.contours)
+
     def get_bbox_in_space(self, target_space: AffineSpace) -> Rectangle:
         """Returns the bounding box rectangle in the target space coordinates
         
         :param target_space: The space to which coordinates of the contours
             should be transformed. Must be an ancestor of this region's space.
         """
-        contours = self.get_contours_in_space(target_space)
-        point_cloud = Polygon([p for c in contours for p in c.points])
-        return point_cloud.bbox()
+        return self.get_contours_in_space(target_space).bbox()

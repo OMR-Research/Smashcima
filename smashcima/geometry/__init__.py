@@ -1,3 +1,4 @@
+from .Contours import Contours
 from .Point import Point
 from .Polygon import Polygon
 from .Quad import Quad

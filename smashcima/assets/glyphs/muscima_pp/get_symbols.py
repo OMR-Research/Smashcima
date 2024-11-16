@@ -155,11 +155,11 @@ def _crop_objects_to_line_glyphs(
             dpi=MUSCIMA_PP_DPI
         )
         start_point = ScenePoint(
-            point=sprite.get_pixels_to_scene_transform().apply_to(points[0]),
+            point=sprite.get_pixels_to_origin_space_transform().apply_to(points[0]),
             space=space
         )
         end_point = ScenePoint(
-            point=sprite.get_pixels_to_scene_transform().apply_to(points[-1]),
+            point=sprite.get_pixels_to_origin_space_transform().apply_to(points[-1]),
             space=space
         )
         glyph = LineGlyph(

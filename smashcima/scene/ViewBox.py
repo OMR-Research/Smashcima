@@ -1,11 +1,17 @@
-from ..geometry.Rectangle import Rectangle
+from dataclasses import dataclass
+
+from smashcima.geometry import Rectangle
+
+from .AffineSpace import AffineSpace
 from .SceneObject import SceneObject
 
 
+@dataclass
 class ViewBox(SceneObject):
-    """Viewport into the scene, always denoted in the global scene space"""
+    """Viewport into the scene, used for framing exports."""
 
-    def __init__(self, rectangle: Rectangle):
-        super().__init__()
+    space: AffineSpace
+    """The space in which the view is placed"""
 
-        self.rectangle = rectangle
+    rectangle: Rectangle
+    """The rectangular position of the view in its space"""

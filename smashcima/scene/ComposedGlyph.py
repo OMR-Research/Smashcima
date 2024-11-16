@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from smashcima.geometry import Polygon
+from smashcima.geometry import Contours
 
 from .AffineSpace import AffineSpace
 from .Glyph import Glyph
@@ -77,9 +77,10 @@ class ComposedGlyph(Glyph):
         sprites: List[Sprite] = [s for g in sub_glyphs for s in g.sprites]
 
         # gather contours
-        contours: List[Polygon] = [
-            c for g in sub_glyphs for c in g.region.get_contours_in_space(space)
-        ]
+        contours = Contours([
+            c for g in sub_glyphs
+            for c in g.region.get_contours_in_space(space).polygons
+        ])
 
         return ComposedGlyph(
             space=space,

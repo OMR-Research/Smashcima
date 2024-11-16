@@ -24,18 +24,20 @@ class Polygon:
             rectangle.bottom_left_corner
         ])
 
+    @staticmethod
     def from_quad(quad: Quad) -> "Polygon":
         """Constructs a polygon from a quad."""
         return Polygon([quad.a, quad.b, quad.c, quad.d])
 
+    @staticmethod
     def from_cv2_contour(contour: np.ndarray) -> "Polygon":
         """Constructs a polygon from an OpenCV contour instance"""
         # enumerated points are vertical vectors: [[X, Y]]
         return Polygon([Point(p[0, 0], p[0, 1]) for p in contour])
-    
+
     def __repr__(self):
         return f"Quad({self.a}, {self.b}, {self.c}, {self.d})"
-    
+
     def bbox(self) -> Rectangle:
         """Returns the bounding box of the polygon"""
         pts = self.points

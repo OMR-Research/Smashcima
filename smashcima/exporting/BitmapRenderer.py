@@ -1,14 +1,10 @@
-import numpy as np
-import cv2
 from math import ceil
-from smashcima.geometry.Transform import Transform
-from smashcima.geometry.Rectangle import Rectangle
-from smashcima.geometry.Quad import Quad
-from ..scene.Scene import Scene
-from ..scene.ViewBox import ViewBox
-from ..geometry.units import mm_to_px
-from .traverse_sprites import traverse_sprites
 
+import cv2
+import numpy as np
+
+from smashcima.geometry import Quad, Rectangle, Transform, mm_to_px
+from smashcima.scene import Sprite, ViewBox
 
 # Alpha compositing via the "over" operator + alpha premultiplication:
 # https://en.wikipedia.org/wiki/Alpha_compositing
@@ -58,7 +54,7 @@ class BitmapRenderer:
         self.dpi = float(dpi)
         "DPI at which the scene should be rasterized"
 
-    def render(self, scene: Scene, view_box: ViewBox) -> np.ndarray:
+    def render(self, view_box: ViewBox) -> np.ndarray:
         # bounding box of the canvas in pixel space
         canvas_px_bbox = Rectangle(
             x=0,
@@ -80,9 +76,12 @@ class BitmapRenderer:
                 .then(Transform.scale(mm_to_px(1, dpi=self.dpi)))
         )
 
+        # root scene space
+        root_space = view_box.space.get_root()
+
         # go through all the sprites in the scene
-        for (sprite, sprite_transform) in traverse_sprites(
-            scene.root_space,
+        for (sprite, sprite_transform) in Sprite.traverse_sprites(
+            root_space,
             include_pixels_transform=True,
             include_sprite_transform=True,
             include_root_space_transform=False
@@ -93,7 +92,7 @@ class BitmapRenderer:
                 sprite_transform # recursive scene hierarchy transforms
                 .then(scene_to_canvas_transform)
             )
-            
+
             # get the window in the canvas that we're going to paint over
             canvas_window: Rectangle = (
                 to_canvas_transform.apply_to(
@@ -114,7 +113,7 @@ class BitmapRenderer:
             # do not render sprites that have no overlap with the canvas
             if canvas_window.has_no_area:
                 continue
-            
+
             # prepare the sprite bitmap into mRGBA float
             sprite_bitmap = sprite.bitmap
             sprite_bitmap = cv2.cvtColor(sprite_bitmap, cv2.COLOR_RGBA2mRGBA)
@@ -139,6 +138,7 @@ class BitmapRenderer:
             )
 
         # convert to uint8 RGBA (BGRA actually) and return
-        canvas = _float32_to_uint8(canvas)
-        canvas = cv2.cvtColor(canvas, cv2.COLOR_mRGBA2RGBA)
-        return canvas
+        return cv2.cvtColor(
+            _float32_to_uint8(canvas),
+            cv2.COLOR_mRGBA2RGBA
+        )

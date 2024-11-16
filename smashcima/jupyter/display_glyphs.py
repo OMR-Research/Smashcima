@@ -1,6 +1,5 @@
-from smashcima.exporting.traverse_sprites import traverse_sprites
-from smashcima.geometry.Vector2 import Vector2
-from smashcima.scene.Glyph import Glyph
+from smashcima.geometry import Vector2
+from smashcima.scene import Glyph, Sprite
 import matplotlib.pyplot as plt
 from typing import List
 import cv2
@@ -9,7 +8,7 @@ import cv2
 def _plot_glyph_on_axis(ax: plt.Axes, glyph: Glyph, glyph_index: int):
     ax.set_title(str(glyph_index))
 
-    for sprite, transform in traverse_sprites(glyph.space):
+    for sprite, transform in Sprite.traverse_sprites(glyph.space):
         # upper left image corner
         a = transform.apply_to(Vector2(0, 0))
 

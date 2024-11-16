@@ -63,13 +63,15 @@ class SimplePageSynthesizer:
             transform=Transform.translate(page_origin)
         )
 
-        # TODO: view box should be attached to an affine space
-        view_box = ViewBox(Rectangle(
-            page_origin.x,
-            page_origin.y,
-            self.page_setup.size.x,
-            self.page_setup.size.y
-        ))
+        view_box = ViewBox(
+            rectangle=Rectangle(
+                page_origin.x,
+                page_origin.y,
+                self.page_setup.size.x,
+                self.page_setup.size.y
+            ),
+            space=page_space
+        )
 
         self.paper_synthesizer.synthesize_paper(
             page_space=page_space,
