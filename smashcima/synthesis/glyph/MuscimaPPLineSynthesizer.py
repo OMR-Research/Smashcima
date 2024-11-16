@@ -9,7 +9,6 @@ from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
 from typing import Dict
 import random
-import copy
 
 
 _QUERY_TO_MPP_LOOKUP: Dict[str, str] = {
@@ -60,9 +59,12 @@ class MuscimaPPLineSynthesizer(LineSynthesizer):
             )
 
         # pick a random glyph from the list and copy it
-        glyph = copy.deepcopy(
-            glyphs.pick_line(delta.magnitude, self.rng)
-        )
+        packed_glyph = glyphs.pick_line(delta.magnitude, self.rng)
+
+        # deserialization makes sure we create a new instance here
+        glyph = packed_glyph.unpack()
+        assert isinstance(glyph, LineGlyph), \
+            "The unpacked glyph is not a LineGlyph"
 
         # ensure the label
         glyph.label = label

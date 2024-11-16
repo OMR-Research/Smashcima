@@ -19,6 +19,13 @@ class LineGlyph(Glyph):
     """End point of the line, must be set during construction of the glyph.
     Coordinates are relative to the glyph space."""
 
+    @property
+    def line_length(self) -> float:
+        """Length of the line glyph"""
+        return (
+            self.end_point.point.vector - self.start_point.point.vector
+        ).magnitude
+
     def place_debug_overlay(self) -> List[Sprite]:
         overlay = super().place_debug_overlay()
 

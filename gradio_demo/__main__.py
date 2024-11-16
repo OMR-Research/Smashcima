@@ -1,7 +1,7 @@
 from .asset_bundles import MXL_FILES, WRITERS, BACKGROUND_SAMPLES
 from .utils import img_smashcima2gradio
 from .DemoModel import DemoModel
-from typing import Optional
+from typing import Optional, Tuple
 import gradio as gr
 import numpy as np
 import random
@@ -80,7 +80,7 @@ with gr.Blocks() as demo:
         mxl_file_name: str,
         writer: int,
         bg_index: int
-    ) -> np.ndarray:
+    ) -> Tuple[np.ndarray, DemoModel]:
         # create the model with the first user request
         if model is None:
             model = DemoModel()
@@ -96,7 +96,8 @@ with gr.Blocks() as demo:
             = BACKGROUND_SAMPLES[bg_index].patch
 
         # run the synthesizer
-        img = model(mxl_path)
+        scene = model(mxl_path)
+        img = scene.render(scene.pages[0])
 
         return img_smashcima2gradio(img), model
     

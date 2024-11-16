@@ -1,12 +1,7 @@
-from smashcima.scene.LineGlyph import LineGlyph
 import bisect
 import random
 
-
-def _get_line_length(glyph: LineGlyph) -> float:
-    return (
-        glyph.end_point.point.vector - glyph.start_point.point.vector
-    ).magnitude
+from .PackedGlyph import PackedGlyph
 
 
 class LineList(list):
@@ -15,17 +10,18 @@ class LineList(list):
         super().__init__(*args, **kwargs)
         
         for glyph in self:
-            assert isinstance(glyph, LineGlyph)
+            assert isinstance(glyph, PackedGlyph), "Glyphs must be packed"
+            assert glyph.line_length is not None, "Glyphs must be line glyphs"
         
-        self.sort(key=_get_line_length)
-        self.line_lengths = [_get_line_length(g) for g in self]
+        self.sort(key=lambda pg: pg.line_length)
+        self.line_lengths = [pg.line_length for pg in self]
     
     def pick_line(
         self,
         target_length: float,
         rng: random.Random,
         percentile_spread=0.1
-    ) -> LineGlyph:
+    ) -> PackedGlyph:
         center = bisect.bisect_left(
             self.line_lengths,
             target_length,

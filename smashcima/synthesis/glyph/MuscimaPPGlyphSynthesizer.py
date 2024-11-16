@@ -6,7 +6,6 @@ from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
 from ...scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
 import random
-import copy
 
 
 _QUERY_TO_MPP_LOOKUP: Dict[str, str] = {
@@ -79,29 +78,29 @@ class MuscimaPPGlyphSynthesizer(GlyphSynthesizer):
         else:
             raise Exception("Unsupported glyph label: " + label)
 
-        # make a copy of that glyph before returning
-        glyph_copy = copy.deepcopy(glyph)
-
         # adjust its glyph class to match what the user wants
         # (because the mapping dictionary is not really 1:1)
-        glyph_copy.label = label
+        glyph.label = label
 
-        return glyph_copy
+        return glyph
     
     def pick(self, label: str) -> Glyph:
         """Picks a random glyph from the symbol repository according to the
         current writer"""
         # get the list of glyphs to choose from
         # (if writer is missing this class, fall back on all writers)
-        glyphs = self.symbol_repository.glyphs_by_class_and_writer.get(
+        packed_glyphs = self.symbol_repository.glyphs_by_class_and_writer.get(
             (label, self.mpp_style_domain.current_writer)
         ) or self.symbol_repository.glyphs_by_class.get(label)
 
-        if glyphs is None or len(glyphs) == 0:
+        if packed_glyphs is None or len(packed_glyphs) == 0:
             raise Exception(
                 f"The glyph class {label} is not present in " + \
                 "the symbol repository"
             )
         
         # pick a random glyph from the list
-        return self.rng.choice(glyphs)
+        packed_glyph = self.rng.choice(packed_glyphs)
+        
+        # deserialization here makes sure we create a new instance
+        return packed_glyph.unpack()
