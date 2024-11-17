@@ -1,12 +1,10 @@
 import abc
+from typing import TypeVar
 
 from .AffineSpace import AffineSpace
 from .SceneObject import SceneObject
 
-try:
-    from typing import Self  # type: ignore
-except:
-    from typing_extensions import Self
+T = TypeVar("T", bound="AffineSpaceVisitor")
 
 
 class AffineSpaceVisitor(abc.ABC):
@@ -16,7 +14,7 @@ class AffineSpaceVisitor(abc.ABC):
 
     def run(self):
         """Executes the tree visiting algorithm"""
-        # IMPORTANT: Iterate in the oder in which inlinks are listed!
+        # IMPORTANT: Iterate in the order in which inlinks are listed!
         for link in self.space.inlinks:
             if isinstance(link.source, AffineSpace):
                 sub_visitor = self.create_sub_visitor(link.source)
@@ -26,12 +24,12 @@ class AffineSpaceVisitor(abc.ABC):
                 self.visit_scene_object(link.source)
     
     @abc.abstractmethod
-    def create_sub_visitor(self, sub_space: AffineSpace) -> Self:
+    def create_sub_visitor(self: T, sub_space: AffineSpace) -> T:
         """Creates the visitor instance for a sub space"""
         raise NotImplementedError
 
     @abc.abstractmethod
-    def accept_sub_visitor(self, sub_visitor: Self):
+    def accept_sub_visitor(self: T, sub_visitor: T):
         """Once sub space visiting finished, incorporate its results"""
         raise NotImplementedError
 
