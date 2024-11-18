@@ -46,7 +46,7 @@ class BeamStemSynthesizer:
 
     def synthesize_beams_and_stems_for_measure(
         self,
-        paper_space: AffineSpace,
+        page_space: AffineSpace,
         score_measure: ScoreMeasure
     ):
         # get all chords and beamed groups
@@ -70,17 +70,17 @@ class BeamStemSynthesizer:
         
         # synthesize stems for all chords
         for chord in chords:
-            self.synthesize_stem(paper_space, chord)
+            self.synthesize_stem(page_space, chord)
 
         # synthesize beam for each beamed group
         for group in groups:
-            self.synthesize_beams(paper_space, group)
+            self.synthesize_beams(page_space, group)
 
         # adjust stems for beamed groups
         for group in groups:
-            self.adjust_stems_for_beam_group(paper_space, group)
+            self.adjust_stems_for_beam_group(page_space, group)
 
-    def synthesize_stem(self, paper_space: AffineSpace, chord: Chord):
+    def synthesize_stem(self, page_space: AffineSpace, chord: Chord):
         # notehead in the middle of the stem (the "top" notehead)
         center_notehead = Notehead.of_note(
             chord.notes[-1 if chord.stem_value == StemValue.up else 0]
@@ -101,10 +101,10 @@ class BeamStemSynthesizer:
             return
 
         # get both stem points
-        stem_base = paper_space.transform_from(base_notehead.glyph.space).apply_to(
+        stem_base = page_space.transform_from(base_notehead.glyph.space).apply_to(
             self.get_stem_base_point(base_notehead, stem_value)
         )
-        stem_center = paper_space.transform_from(center_notehead.glyph.space).apply_to(
+        stem_center = page_space.transform_from(center_notehead.glyph.space).apply_to(
             self.get_stem_base_point(center_notehead, stem_value)
         )
         stem_tip = self.get_stem_tip_point(stem_center, stem_value)
@@ -112,7 +112,7 @@ class BeamStemSynthesizer:
         # synthesize the stem glyph
         glyph = self.line_synthesizer.synthesize_line(
             label=SmuflLabels.stem.value,
-            parent_space=paper_space,
+            parent_space=page_space,
             start_point=stem_base,
             end_point=stem_tip
         )
@@ -192,12 +192,12 @@ class BeamStemSynthesizer:
         
         return Point.from_origin_vector(base_point.vector + delta_vector)
 
-    def synthesize_beams(self, paper_space: AffineSpace, group: BeamedGroup):
+    def synthesize_beams(self, page_space: AffineSpace, group: BeamedGroup):
         assert len(group.chords) >= 2, \
             "There must be at least 2 chords in a beamed group"
 
         stems = [Stem.of_chord(ch) for ch in group.chords]
-        tips = [s.tip.transform_to(paper_space) for s in stems]
+        tips = [s.tip.transform_to(page_space) for s in stems]
         up_stem_count = len(
             [s for s in stems if s.chord.stem_value == StemValue.up]
         )
@@ -284,7 +284,7 @@ class BeamStemSynthesizer:
         
         f = BeamCoordinateSystem(
             beamed_group=group,
-            paper_space=paper_space,
+            page_space=page_space,
             k=slope,
             q=q,
             beam_spacing=BEAM_SPACING
@@ -306,7 +306,7 @@ class BeamStemSynthesizer:
             stem_value = _determine_beam_orientation(chords)
             glyph = self.line_synthesizer.synthesize_line(
                 label=SmashcimaLabels.beam.value,
-                parent_space=paper_space,
+                parent_space=page_space,
                 start_point=f.point(start_tip.x, beam_number, stem_value),
                 end_point=f.point(end_tip.x, beam_number, stem_value)
             )
@@ -327,7 +327,7 @@ class BeamStemSynthesizer:
             )
             glyph = self.line_synthesizer.synthesize_line(
                 label=SmashcimaLabels.beamHook.value,
-                parent_space=paper_space,
+                parent_space=page_space,
                 start_point=f.point(start_x, beam_number, stem_value),
                 end_point=f.point(end_x, beam_number, stem_value)
             )
@@ -341,7 +341,7 @@ class BeamStemSynthesizer:
 
     def adjust_stems_for_beam_group(
         self,
-        paper_space: AffineSpace,
+        page_space: AffineSpace,
         group: BeamedGroup
     ):
         stems = [Stem.of_chord(ch) for ch in group.chords]
@@ -350,13 +350,13 @@ class BeamStemSynthesizer:
         
         for old_stem in stems:
             # get the new placement of the stem
-            start_point = old_stem.base.transform_to(paper_space)
-            end_point = f.point(old_stem.tip.transform_to(paper_space).x)
+            start_point = old_stem.base.transform_to(page_space)
+            end_point = f.point(old_stem.tip.transform_to(page_space).x)
 
             # synthesize new sprites and points
             glyph = self.line_synthesizer.synthesize_line(
                 label=old_stem.glyph.label,
-                parent_space=paper_space,
+                parent_space=page_space,
                 start_point=start_point,
                 end_point=end_point
             )

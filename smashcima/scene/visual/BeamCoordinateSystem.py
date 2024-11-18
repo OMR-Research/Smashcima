@@ -12,7 +12,7 @@ class BeamCoordinateSystem(SceneObject):
     def __init__(
         self,
         beamed_group: BeamedGroup,
-        paper_space: AffineSpace,
+        page_space: AffineSpace,
         k: float,
         q: float,
         beam_spacing: float
@@ -29,7 +29,7 @@ class BeamCoordinateSystem(SceneObject):
         super().__init__()
         
         self.beamed_group = beamed_group
-        self.paper_space = paper_space
+        self.page_space = page_space
         self.k = k
         self.q = q
         self.beam_spacing = beam_spacing

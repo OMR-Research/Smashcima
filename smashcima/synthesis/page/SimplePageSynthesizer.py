@@ -110,7 +110,7 @@ class SimplePageSynthesizer:
         staves: List[StaffVisual] = []
         for i in range(self.page_setup.staff_count):
             stafflines = self.stafflines_synthesizer.synthesize_stafflines(
-                parent_space=page_space,
+                page_space=page_space,
                 position=Vector2(
                     content_box.x,
                     starting_point + i * vertical_step

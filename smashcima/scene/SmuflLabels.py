@@ -13,6 +13,12 @@ class SmuflLabels(str, Enum):
     brace = "smufl::brace"
     bracket = "smufl::bracket"
 
+    # Staves
+    # https://www.w3.org/2019/03/smufl13/tables/staves.html
+    # IMPORTANT: The stafflines and ledger lines section in SMuFL is intended
+    # only for text-based applications. Use Smashcima label to represent
+    # staves and stafflines instead.
+
     # Barlines
     # https://w3c.github.io/smufl/latest/tables/barlines.html
     barlineSingle = "smufl::barlineSingle"

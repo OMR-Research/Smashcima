@@ -316,19 +316,19 @@ class ColumnLayoutSynthesizer:
 
         # === phase 4: synthesizing beams, stems and flags ===
 
-        # TODO: get paper_space as an argument
-        paper_space = staves[0].space.parent_space
+        # TODO: get page_space as an argument, assert is ancestor of staves
+        page_space = staves[0].space.parent_space
 
         for i in range(system.measure_count):
             score_measure = score.get_score_measure(
                 system.first_measure_index + i
             )
             self.beam_stem_synthesizer.synthesize_beams_and_stems_for_measure(
-                paper_space,
+                page_space,
                 score_measure
             )
             self.synthesize_flags_in_measure(
-                paper_space,
+                page_space,
                 score_measure
             )
         
@@ -341,7 +341,7 @@ class ColumnLayoutSynthesizer:
     
     def synthesize_flags_in_measure(
         self,
-        paper_space: AffineSpace,
+        page_space: AffineSpace,
         score_measure: ScoreMeasure
     ):
         # get all chords
@@ -381,8 +381,8 @@ class ColumnLayoutSynthesizer:
             # create the glyph
             glyph = self.glyph_synthesizer.synthesize_glyph_at(
                 label=label,
-                parent_space=paper_space,
-                point=stem.tip.transform_to(paper_space)
+                parent_space=page_space,
+                point=stem.tip.transform_to(page_space)
             )
             Flag(
                 glyph=glyph,

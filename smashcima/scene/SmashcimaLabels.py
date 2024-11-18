@@ -4,14 +4,30 @@ from enum import Enum
 class SmashcimaLabels(str, Enum):
     """Glyph and region classification labels that are not in SMuFL"""
     
+    # Staff Glyphs
+    #
+    # While SMuFL defines staves, they are indended for text-based applications
+    # only. Therefore we define our own classes here, since their semantics
+    # are slightly different. But the class names are analogous.
+    # https://www.w3.org/2019/03/smufl13/tables/staves.html
+    staffLine = "smashcima::staffLine"
+    ledgerLine = "smashcima::ledgerLine"
+
     # Line Glyphs
     #
     # Line glyphs are not really represented in SMuFL,
     # so instead they must be added to the set of classes here.
-    ledgerLine = "smashcima::ledgerLine"
     beam = "smashcima::beam"
     beamHook = "smashcima::beamHook"
     slur = "smashcima::slur"
+
+    # Layout Regions
+    staff = "smashcima::staff"
+    grandStaff = "smashcima::grandStaff"
+    system = "smashcima::system"
+    staffMeasure = "smashcima::staffMeasure"
+    grandStaffMeasure = "smashcima::grandStaffMeasure"
+    systemMeasure = "smashcima::systemMeasure"
 
     # Isolated Flags
     #

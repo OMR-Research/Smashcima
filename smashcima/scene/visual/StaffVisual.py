@@ -1,9 +1,8 @@
-from dataclasses import dataclass, field
-from typing import List
+from dataclasses import dataclass
 
 from ..AffineSpace import AffineSpace
+from ..Glyph import Glyph
 from ..SceneObject import SceneObject
-from ..Sprite import Sprite
 from .StaffCoordinateSystem import StaffCoordinateSystem
 
 
@@ -17,8 +16,10 @@ class StaffVisual(SceneObject):
     staff_coordinate_system: StaffCoordinateSystem
     "Coordinate system that maps from pitch-time space to 2D position"
 
-    space: AffineSpace = field(default_factory=AffineSpace)
-    "The affine space that contains all glyphs on these stafflines"
+    space: AffineSpace
+    """The affine space that contains all glyphs (noteheads, rests, accidentals)
+    on these stafflines"""
 
-    sprites: List[Sprite] = field(default_factory=list)
-    "Sprites that together make up the stafflines visually"
+    glyph: Glyph
+    """Glyph of the stafflines themselves (all lines together, usually composite
+    where each line is a sub-glyph). Child of the staff space."""
