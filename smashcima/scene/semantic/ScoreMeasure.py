@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 from .Measure import Measure
 from .ScoreEvent import ScoreEvent
-from typing import List
+from .StaffSemantic import StaffSemantic
+from typing import List, Generator, Tuple
 
 
 @dataclass
@@ -20,3 +21,22 @@ class ScoreMeasure:
             measures=measures,
             events=ScoreEvent.merge_from_measures(measures)
         )
+    
+    def measure_for_staff(self, staff_index: int) -> Measure:
+        """Returns the part measure that contains the given staff index"""
+        assert staff_index < sum(len(m.staves) for m in self.measures), \
+            "Staff index is larger than the number of staves in the score"
+        mi = 0
+        skipped_staves = 0
+        while skipped_staves + len(self.measures[mi].staves) < staff_index:
+            mi += 1
+            skipped_staves += len(self.measures[mi].staves)
+        return self.measures[mi]
+
+    def iterate_staves_with_measures(
+        self
+    ) -> Generator[Tuple[StaffSemantic, Measure], None, None]:
+        """Iterates over semantic staves and their measures in the score"""
+        for measure in self.measures:
+            for staff in measure.staves:
+                yield (staff, measure)

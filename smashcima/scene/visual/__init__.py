@@ -14,3 +14,4 @@ from .StaffMeasure import StaffMeasure
 from .StaffVisual import StaffVisual
 from .Stem import Stem
 from .System import System
+from .SystemMeasure import SystemMeasure

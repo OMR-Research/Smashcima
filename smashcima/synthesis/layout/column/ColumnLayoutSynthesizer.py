@@ -1,5 +1,13 @@
+from matplotlib.patches import Rectangle
+from smashcima.geometry.Contours import Contours
+from smashcima.geometry.Point import Point
+from smashcima.geometry.Polygon import Polygon
+from smashcima.geometry.Quad import Quad
 from smashcima.scene.Glyph import Glyph
+from smashcima.scene.LabeledRegion import LabeledRegion
+from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from smashcima.scene.visual.Flag import Flag
+from smashcima.scene.visual.StaffMeasure import StaffMeasure
 from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.semantic.Score import Score
 from smashcima.scene.visual.System import System
@@ -13,6 +21,7 @@ from smashcima.scene.semantic.Note import Note
 from smashcima.scene.semantic.TypeDuration import TypeDuration
 from smashcima.geometry.Transform import Transform
 from smashcima.scene.SmuflLabels import SmuflLabels
+from smashcima.scene.visual.SystemMeasure import SystemMeasure
 from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
 from ..BeamStemSynthesizer import BeamStemSynthesizer
 from ...LineSynthesizer import LineSynthesizer
@@ -188,6 +197,7 @@ class ColumnLayoutSynthesizer:
 
             # synthesize a single system
             system = self.synthesize_system(
+                page_space=page.space,
                 staves=page.staves[
                     completed_staves:
                     completed_staves+score.staff_count
@@ -206,6 +216,7 @@ class ColumnLayoutSynthesizer:
     
     def synthesize_system(
         self,
+        page_space: AffineSpace,
         staves: List[StaffVisual],
         score: Score,
         start_on_measure: int
@@ -216,6 +227,10 @@ class ColumnLayoutSynthesizer:
 
         assert len(staves) == score.staff_count, \
             "Given staves do not match the required number of staves per system"
+
+        for staff_visual in staves:
+            assert staff_visual.space.parent_space is page_space, \
+                "Given staves do not live in the given page space"
 
         # === phase 1: synthesizing columns ===
 
@@ -308,16 +323,68 @@ class ColumnLayoutSynthesizer:
         # === phase 3: construct the system object ===
 
         # TODO: create layout bboxes and add them to the system
-
         system = System(
+            # TODO: this scene object should be implemented fully
+            # (like the SystemMeasure is)
             first_measure_index=start_on_measure,
             measure_count=state.measure_count
         )
 
-        # === phase 4: synthesizing beams, stems and flags ===
+        # NOTE: this is a very rough measure boundary,
+        # this needs to be refactored before being used for training
+        # (i.e. leading barline and staff header are not included now)
+        for measure_index, columns in state.columns_per_measure.items():
+            start_time = min(c.time_position - c.left_width for c in columns)
+            end_time = max(c.time_position + c.right_width for c in columns)
 
-        # TODO: get page_space as an argument, assert is ancestor of staves
-        page_space = staves[0].space.parent_space
+            score_measure = score.get_score_measure(measure_index)
+            staff_measures: List[StaffMeasure] = []
+
+            for staff_visual, (staff_semantic, measure) in zip(
+                staves,
+                score_measure.iterate_staves_with_measures(),
+                strict=True
+            ):
+                a = staff_visual.staff_coordinate_system.get_transform(
+                    pitch_position=4, time_position=start_time
+                ).apply_to(Point(0, 0))
+                b = staff_visual.staff_coordinate_system.get_transform(
+                    pitch_position=4, time_position=end_time
+                ).apply_to(Point(0, 0))
+                c = staff_visual.staff_coordinate_system.get_transform(
+                    pitch_position=-4, time_position=end_time
+                ).apply_to(Point(0, 0))
+                d = staff_visual.staff_coordinate_system.get_transform(
+                    pitch_position=-4, time_position=start_time
+                ).apply_to(Point(0, 0))
+                contours = Contours([Polygon([a, b, c, d])])
+
+                staff_measures.append(StaffMeasure(
+                    measure=measure,
+                    staff_semantic=staff_semantic,
+                    staff_visual=staff_visual,
+                    region=LabeledRegion(
+                        space=staff_visual.space,
+                        contours=contours,
+                        label=SmashcimaLabels.staffMeasure.value
+                    )
+                ))
+            
+            # construct the complete system measure
+            polygons: List[Polygon] = []
+            for sm in staff_measures:
+                polygons += sm.region.get_contours_in_space(page_space).polygons
+            SystemMeasure(
+                score_measure=score_measure,
+                staff_measures=staff_measures,
+                region=LabeledRegion(
+                    space=page_space,
+                    contours=Contours(polygons),
+                    label=SmashcimaLabels.systemMeasure.value
+                )
+            )
+
+        # === phase 4: synthesizing beams, stems and flags ===
 
         for i in range(system.measure_count):
             score_measure = score.get_score_measure(
