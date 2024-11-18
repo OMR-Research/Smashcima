@@ -239,7 +239,7 @@ class ColumnLayoutSynthesizer:
 
             # until there is space left
             if not self.disable_wrapping:
-                if state.total_width < available_width:
+                if state.total_width > available_width:
                     break
 
             # or until there are measures to synthesize

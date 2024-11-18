@@ -32,7 +32,8 @@ class BaseHandwrittenScene(Scene):
         score: Score,
         mpp_writer: int,
         mzk_background_patch: Patch,
-        pages: List[Page]
+        pages: List[Page],
+        renderer: BitmapRenderer
     ):
         super().__init__(root_space)
         
@@ -48,15 +49,16 @@ class BaseHandwrittenScene(Scene):
         self.pages = pages
         """All the pages of music that were synthesized"""
 
+        self.renderer = renderer
+        """The renderer to be used for page rasterization"""
+
         # add to the list of scene objects
         self.add_many([score, *pages])
 
-    def render(self, page: Page, dpi=300) -> np.ndarray:
+    def render(self, page: Page) -> np.ndarray:
         """Renders the bitmap BGRA image of a page"""
         assert page in self.pages, "Given page is not in this scene"
-        renderer = BitmapRenderer(dpi=dpi)
-        bitmap = renderer.render(page.view_box)
-        return bitmap
+        return self.renderer.render(page.view_box)
 
 
 class BaseHandwrittenModel(Model[BaseHandwrittenScene]):
@@ -212,5 +214,6 @@ class BaseHandwrittenModel(Model[BaseHandwrittenScene]):
             score=score,
             mpp_writer=self.mpp_style_domain.current_writer,
             mzk_background_patch=self.mzk_paper_style_domain.current_patch,
-            pages=pages
+            pages=pages,
+            renderer=BitmapRenderer(dpi=300)
         )

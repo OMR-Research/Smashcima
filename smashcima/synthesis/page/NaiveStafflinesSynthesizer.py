@@ -35,6 +35,7 @@ class NaiveStafflinesSynthesizer(StafflinesSynthesizer):
     def __init__(self) -> None:
         self.staff_space: float = MUSCIMA_STAFF_SPACE
         self.line_width: float = MUSCIMA_LINE_WIDTH
+        self.line_color = (0, 0, 0, 255)
 
     @property
     def staff_height(self) -> float:
@@ -59,7 +60,7 @@ class NaiveStafflinesSynthesizer(StafflinesSynthesizer):
                     width=width,
                     height=self.line_width
                 ),
-                fill_color=(0, 0, 0, 255),
+                fill_color=self.line_color,
                 dpi=300
             )
             for i in range(-2, 3)

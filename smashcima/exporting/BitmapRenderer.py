@@ -1,4 +1,5 @@
 from math import ceil
+from typing import Tuple
 
 import cv2
 import numpy as np
@@ -49,10 +50,15 @@ class BitmapRenderer:
     """Renders a scene into a bitmap RGBA opencv representation"""
     def __init__(
         self,
-        dpi: float = 300
+        dpi: float = 300,
+        background_color = (0, 0, 0, 0)
     ):
         self.dpi = float(dpi)
-        "DPI at which the scene should be rasterized"
+        """DPI at which the scene should be rasterized"""
+
+        self.background_color: Tuple[int, int, int, int] = background_color
+        """Color to use for the blank canvas, transparent by default
+        (BGRA uint8 format)"""
 
     def render(self, view_box: ViewBox) -> np.ndarray:
         # bounding box of the canvas in pixel space
@@ -68,6 +74,13 @@ class BitmapRenderer:
             shape=(int(canvas_px_bbox.height), int(canvas_px_bbox.width), 4),
             dtype=np.float32
         )
+
+        # fill with background color
+        background_color_premultiplied = _uint8_to_float32(cv2.cvtColor(
+            np.array([[self.background_color]], dtype=np.uint8),
+            cv2.COLOR_RGBA2mRGBA
+        ))
+        canvas[:, :] = background_color_premultiplied
 
         # converts from scene millimeter coordinate system
         # to the canvas pixel coordinate system
