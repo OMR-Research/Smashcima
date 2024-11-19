@@ -25,6 +25,9 @@ class StaffVisual(SceneObject):
     """Glyph of the stafflines themselves (all lines together, usually composite
     where each line is a sub-glyph). Child of the staff space."""
 
+    staff_height: float
+    """Average height of all stafflines in millimeters"""
+
     def __post_init__(self):
         assert self.glyph.region.label == SmashcimaLabels.staff.value, \
             "StaffVisual must have 'smashcima::staff' as its glyph label."

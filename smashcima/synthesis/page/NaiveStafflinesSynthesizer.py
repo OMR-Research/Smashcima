@@ -67,7 +67,8 @@ class NaiveStafflinesSynthesizer(StafflinesSynthesizer):
                 staff_space=self.staff_space_unit
             ),
             space=staff_space,
-            glyph=glyph
+            glyph=glyph,
+            staff_height=self.staff_height
         )
     
     def create_staff_glyph(

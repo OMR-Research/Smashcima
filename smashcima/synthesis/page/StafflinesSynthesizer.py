@@ -10,7 +10,7 @@ class StafflinesSynthesizer(abc.ABC):
     @property
     @abc.abstractmethod
     def staff_height(self) -> float:
-        """Returns the height of synthesized staff in millimeters"""
+        """Returns the average height of synthesized staff in millimeters"""
         raise NotImplementedError
 
     @abc.abstractmethod

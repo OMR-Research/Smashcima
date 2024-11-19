@@ -121,3 +121,31 @@ class Rectangle:
             width=width,
             height=height
         )
+    
+    def relativize_to(self, viewport: "Rectangle") -> "Rectangle":
+        """Returns this rectangle with relative coodrinates to the viewport
+        
+        Relative coordinates vary between [0, 0] and [1, 1] within the viewport,
+        but can get outside the bounds if this rectangle is not completely
+        within the viewport. Use intersect_with() for clamping.
+        """
+        return Rectangle(
+            x=(self.x - viewport.x) / viewport.width,
+            y=(self.y - viewport.y) / viewport.height,
+            width=self.width / viewport.width,
+            height=self.height / viewport.height
+        )
+    
+    def absolutize_to(self, viewport: "Rectangle") -> "Rectangle":
+        """Return rectangle with absolute coordinates given a viewport
+
+        Relative coordinates vary between [0, 0] and [1, 1] within the viewport,
+        if `self` is relativized to these coordinates, use this method to
+        convert this rectangle's coordinates back to absolute numbers.
+        """
+        return Rectangle(
+            x=viewport.x + self.x * viewport.width,
+            y=viewport.y + self.y * viewport.height,
+            width=viewport.width * self.width,
+            height=viewport.height * self.height
+        )
