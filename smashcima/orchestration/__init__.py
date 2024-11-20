@@ -3,4 +3,4 @@ from .Container import Container
 from .Model import Model
 
 # specific models
-from .BaseHandwrittenModel import BaseHandwrittenModel
+from .BaseHandwrittenModel import BaseHandwrittenModel, BaseHandwrittenScene

@@ -8,16 +8,28 @@ These items are more high-level but there are also more low-level TODO's in the 
 - [ ] Column layout synthesizer's wrap-on-overflow does not work right now, because the `.detach()` methods do not function properly
 
 
+## Various
+
+- [ ] MyPy: *Skipping analyzing "smashcima": module is installed, but missing library stubs or py.typed.* - This message is displayed by MyPy to any user of smashcima. I guess I need to export the types with the package somehow.
+
+
 ## Scene
 
 - [ ] SceneObject `__setattr__` should replace lists with modified lists that either prevent `.append`, `.pop`, `+=`, or modify the in/out-links accordingly
 - [ ] Voices should be defined and loaded from MusicXML, they should behave similar to `BeamedGroup`s.
 - [ ] The `.detach()` method should be standardized and ideally automated.
 - [ ] `ScoreMeasure` should be a permanent scene object, not a throw-away view object. Just like `System` and `StaffVisual` and `StaffMeasure` are all permanent.
+- [ ] Introduce methods for controlling the inlink/outlink ordering, since that in-turn controls the rasterization order.
+
+
+## Loading
+
+- [ ] Load compressed MusicXML files (MXL)
 
 
 ## Exporting
 
+- [ ] Rendering layers - compositing. Ink interaction with the paper, etc.
 - [ ] Add a MuNG exporter.
 
 

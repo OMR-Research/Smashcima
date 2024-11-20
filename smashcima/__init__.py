@@ -20,3 +20,4 @@ from smashcima import loading
 from smashcima import orchestration
 from smashcima import scene
 from smashcima import synthesis
+from smashcima import config
