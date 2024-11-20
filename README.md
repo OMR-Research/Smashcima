@@ -53,6 +53,8 @@ Smashcima is primarily a framework and a set of crafted interfaces for building 
 - Asset bundles
 - ...
 
+If you feel like improving the library, take a look at the [TODO List](docs/todo-list.md).
+
 
 ## After cloning
 
