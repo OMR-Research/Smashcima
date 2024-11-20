@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from .Measure import Measure
 from .ScoreEvent import ScoreEvent
 from .StaffSemantic import StaffSemantic
-from typing import List, Generator, Tuple
+from typing import List, Iterator, Tuple
 
 
 @dataclass
@@ -35,7 +35,7 @@ class ScoreMeasure:
 
     def iterate_staves_with_measures(
         self
-    ) -> Generator[Tuple[StaffSemantic, Measure], None, None]:
+    ) -> Iterator[Tuple[StaffSemantic, Measure]]:
         """Iterates over semantic staves and their measures in the score"""
         for measure in self.measures:
             for staff in measure.staves:

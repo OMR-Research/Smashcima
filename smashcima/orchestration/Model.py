@@ -25,8 +25,8 @@ class Model(Generic[T], abc.ABC):
     painfully wired together with other synthesizers in order to work
     and it serves some small, abstract task.
     """
-    
-    def __init__(self):
+
+    def __init__(self) -> None:
         self.container = Container()
         """IoC container with services used during synthesis"""
 
@@ -54,7 +54,7 @@ class Model(Generic[T], abc.ABC):
         # register the styler
         self.container.type(Styler)
 
-    def resolve_services(self):
+    def resolve_services(self) -> None:
         """Defines model fields that hold specific services.
         
         Called from the constructor in order to resolve the specific

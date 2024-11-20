@@ -1,5 +1,5 @@
 import math
-from typing import Generator, Any
+from typing import Iterator
 
 
 class Vector2:
@@ -16,15 +16,7 @@ class Vector2:
     @property
     def top(self) -> float:
         return self.y
-    
-    @property
-    def right(self) -> float:
-        return self.x + self.width
-    
-    @property
-    def bottom(self) -> float:
-        return self.y + self.height
-    
+
     @property
     def magnitude_squared(self) -> float:
         return self.x * self.x + self.y * self.y
@@ -63,7 +55,7 @@ class Vector2:
         else:
             raise ValueError("Vectors can only be divided by scalars")
     
-    def __iter__(self) -> Generator[float, Any, Any]:
+    def __iter__(self) -> Iterator[float]:
         yield self.x
         yield self.y
 

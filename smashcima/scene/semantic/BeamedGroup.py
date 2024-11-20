@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from ..SceneObject import SceneObject
-from typing import List, Optional, Dict, Tuple, Generator, Any
+from typing import List, Optional, Dict, Tuple, Iterator
 from .Chord import Chord
 from .BeamValue import BeamValue
 
@@ -38,7 +38,7 @@ class BeamedGroup(SceneObject):
             return False
         return self.beam_values[-1].get(1, None) == BeamValue.end
     
-    def iterate_beams(self) -> Generator[Tuple[int, List[Chord]], Any, Any]:
+    def iterate_beams(self) -> Iterator[Tuple[int, List[Chord]]]:
         """Return all beams to be drawn"""
         open_beams: Dict[int, List[Chord]] = dict()
         for chord, beam_values in zip(self.chords, self.beam_values):
@@ -54,7 +54,7 @@ class BeamedGroup(SceneObject):
                     yield (beam_number, chords)
         assert len(open_beams) == 0
     
-    def iterate_hooks(self) -> Generator[Tuple[int, Chord, BeamValue], Any, Any]:
+    def iterate_hooks(self) -> Iterator[Tuple[int, Chord, BeamValue]]:
         """Return all hooks to be drawn"""
         for chord, beam_values in zip(self.chords, self.beam_values):
             for beam_number, beam_value in beam_values.items():
