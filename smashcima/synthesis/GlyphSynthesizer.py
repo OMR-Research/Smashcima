@@ -8,10 +8,9 @@ from smashcima.scene import AffineSpace, Glyph
 class GlyphSynthesizer(abc.ABC):
     """Interface for a glyph synthesizer"""
 
-    @property
     @abc.abstractmethod
-    def supported_labels(self) -> Set[str]:
-        """Returns the set of supported glyph labels
+    def supports_label(self, label: str) -> bool:
+        """Returns true if the given glyph type can be synthesized.
         
         Override this when building custom glyph synthesizers.
         """

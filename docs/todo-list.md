@@ -47,6 +47,7 @@ These items are more high-level but there are also more low-level TODO's in the 
 - [ ] Synthesize slurs and ties
 - [ ] Default display pitch for rests must be modified if there are multiple voices present, otherwise we render multiple rests over each other
 - [ ] Add a proper stafflines synthesizer
+- [ ] Music notation synthesizer should check the list of supported glyphs from the glyph synthesizer
 
 
 ## Assets

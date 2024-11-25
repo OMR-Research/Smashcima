@@ -22,7 +22,7 @@ for i, page in enumerate(scene.pages):
 
 ## Synthesizers
 
-Internally, a `Model` is a collection of *synthesizers* that are configured and connected together to serve a single purpose. Synthesizes come from the `smashcima.synthesis` module and they are responsible for:
+Internally, a `Model` is a collection of *synthesizers* that are configured and connected together to serve a single purpose. Synthesizers come from the `smashcima.synthesis` module and they are responsible for:
 
 - synthesizing page layout (dimensions and staff placement)
 - synthesizing staves (empty stafflines)
@@ -35,7 +35,7 @@ As you can see, each synthesizer is like a very narrow model, that is designed t
 
 ## Using different paper synthesizer
 
-We can modify an existing model by changing the configuration of its internal synthesizers. The model is configured inside its constructor, so in order to change it, we need to make a child class and override proper methods.
+We can modify an existing model by changing the configuration of its internal synthesizers. The model is configured inside its constructor, so in order to change it, we need to make a child class and override these methods:
 
 ```py
 from smashcima.synthesis import PaperSynthesizer, SolidColorPaperSynthesizer
@@ -70,9 +70,9 @@ The model consists of a group of synthesizers and additional classes that togeth
 
 - `register_services` Registers types into the container, binds them to interfaces.
 - `resolve_services` Asks the container to construct services we will use later.
-- `configure_services` Modify resolved services instances.
+- `configure_services` Configures resolved services instances.
 
-> **Explainer:** The purpose of a service container is to construct services (also known as resolving services). You first tell the container what services it should know about (e.g. *When asked about a car, construct a Toyota Corolla.*). Then you resolve services that the model will use later and store them in the model in `self.my_car`. Finally, you adjust the configuration on the constrctued service instances to suit your needs. When the container resolves a service, it recursively resolves all of its dependencies (constructor arguments), which greatly simplifies the service construction process.
+> **Explainer:** The purpose of a service container is to construct services (also known as *resolving services*). You first tell the container what services it should know about (e.g. *When asked about a car, construct a Toyota Corolla.*). Then you resolve services that the model will use later and store them in the model in `self.my_car`. Finally, you adjust the configuration on the constrctued service instances to suit your needs. When the container resolves a service, it recursively resolves all of its dependencies (constructor arguments), which greatly simplifies the service construction process.
 
 > **Note:** If you call `.resolve` on the same type multiple times, you only
 get one instance constructed and then returned repeatedly. Another words, all services are registered as singletons.
@@ -95,7 +95,7 @@ You can use `(255, 255, 255, 255)` to get white background and `(0, 0, 0, 0)` to
 
 # Replacing the random number generator
 
-Not all services in the model are synthesizers. For example, all models and synthesizers need a source of randomness. Therefore each model has a `random.Random` instance registered as a service in the container. The instance is also stored on the model in the `self.rng` field. You can check they are the same:
+Not all services in the model are synthesizers. For example, most synthesizers need a source of randomness. Therefore there is a `random.Random` instance registered as a service in the container. The instance is also stored on the model in the `self.rng` field. You can check they are the same:
 
 ```py
 import random

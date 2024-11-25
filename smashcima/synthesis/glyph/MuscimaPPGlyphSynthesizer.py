@@ -66,11 +66,10 @@ class MuscimaPPGlyphSynthesizer(GlyphSynthesizer):
         
         self.rng = rng
         "RNG used for randomization"
-    
-    @property
-    def supported_labels(self) -> Set[str]:
-        return set(_QUERY_TO_MPP_LOOKUP.keys())
-    
+
+    def supports_label(self, label: str) -> bool:
+        return label in _QUERY_TO_MPP_LOOKUP
+
     def create_glyph(self, label: str) -> Glyph:
         # pick a glyph from the symbol repository
         if label in _QUERY_TO_MPP_LOOKUP:
