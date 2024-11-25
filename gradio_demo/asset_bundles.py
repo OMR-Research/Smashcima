@@ -8,7 +8,7 @@ from .utils import REPO_FOLDER, random_name, img_smashcima2gradio
 import numpy as np
 
 
-ASSET_REPO = AssetRepository(REPO_FOLDER / "smashcima_assets")
+ASSET_REPO = AssetRepository.default()
 
 
 #################

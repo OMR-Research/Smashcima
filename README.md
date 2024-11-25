@@ -72,29 +72,22 @@ python3 -m venv .venv
 ```
 
 
-## Publishing new version to PyPI
+## Checklists
 
-Production PyPI at: https://pypi.org/
-
-Testing PyPI at: https://test.pypi.org/
-
-1. Run all Jupyter notebook tests and unit tests.
-2. Update the version in `smashcima/_version.py`.
-3. Build the package `make build`.
-4. Upload to PyPI `make push-prod` or TestPyPI `make push-test`.
-5. When asked, use `__token__` for username and paste in the access token for the password (with the `pypi-` prefix).
-6. Check the version has been uploaded and try its installation.
-7. Submit the version commit and create a release on GitHub.
-
-> **Note:** Don't forget keeping the version at `X.Y.Zdev` when developing version `X.Y.Z`. See the `smashcima/_version_.py` file.
-
-> **Note:** to install from the test pypi, use: `pip3 install --index-url https://test.pypi.org/simple/ --no-deps smashcima`. More info [here](https://packaging.python.org/en/latest/tutorials/packaging-projects/#installing-your-newly-uploaded-package).
+- [Before commit](docs/checklists/before-commit.md)
+- [Publishing to PyPI](docs/checklists/publishing-to-pypi.md)
+- [Deploying Gradio Demo](docs/checklists/deploying-gradio-demo.md)
 
 
-## Packaging and development notes
+## Acknowledgement
 
-- Read this: https://packaging.python.org/en/latest/tutorials/packaging-projects/
-- Package configuration inspired by this: https://github.com/vega/altair/blob/main/pyproject.toml
-- For development setup inspiration check out: https://altair-viz.github.io/getting_started/installation.html#development-installation
-- jupyter notebooks in git: https://mg.readthedocs.io/git-jupyter.html
-- deploying voila: https://voila.readthedocs.io/en/stable/deploy.html
+There's a publication being written. Until then, you can cite the original Mashcima paper:
+
+> Jiří Mayer and Pavel Pecina. Synthesizing Training Data for Handwritten Music Recognition. *16th International Conference on Document Analysis and Recognition, ICDAR 2021.* Lausanne, September 8-10, pp. 626-641, 2021.
+
+
+## Contact
+
+<img src="https://ufal.mff.cuni.cz/~hajicj/2024/images/logo-large.png" width="600px">
+
+Developed and maintained by [Jiří Mayer](https://ufal.mff.cuni.cz/jiri-mayer) ([mayer@ufal.mff.cuni.cz](mailto:mayer@ufal.mff.cuni.cz)) as part of the [Prague Music Computing Group](https://ufal.mff.cuni.cz/pmcg) lead by [Jan Hajič jr.](https://ufal.mff.cuni.cz/jan-hajic-jr) ([hajicj@ufal.mff.cuni.cz](mailto:hajicj@ufal.mff.cuni.cz)).

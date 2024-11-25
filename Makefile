@@ -14,7 +14,7 @@ push-test:
 	.venv/bin/python3 -m twine upload --repository testpypi dist/*
 
 demo-serve:
-	.venv/bin/python3 -m gradio_demo
+	MC_ASSETS_CACHE=./smashcima_assets .venv/bin/python3 -m gradio_demo
 
 clear-jupyter-outputs:
 	.venv/bin/jupyter nbconvert --clear-output --inplace jupyter/*.ipynb jupyter/*/*.ipynb jupyter/*/*/*.ipynb jupyter/*/*/*/*.ipynb

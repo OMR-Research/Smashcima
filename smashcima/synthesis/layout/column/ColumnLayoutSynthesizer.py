@@ -1,4 +1,3 @@
-from matplotlib.patches import Rectangle
 from smashcima.geometry.Contours import Contours
 from smashcima.geometry.Point import Point
 from smashcima.geometry.Polygon import Polygon
