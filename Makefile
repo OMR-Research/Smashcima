@@ -24,7 +24,7 @@ clear-jupyter-outputs:
 # Docker Gradio Demo #
 ######################
 
-VERSION=$$(grep -oP "__version__\\s*=\\s*\"\K[^\"]+" smashcima/__init__.py)
+VERSION=$$(grep -oP "__version__\\s*=\\s*\"\K[^\"]+" smashcima/_version.py)
 TAG=jirkamayer/smashcima-demo:$(VERSION)
 
 .PHONY: docker-demo-build docker-demo-push docker-demo-run docker-demo-shell

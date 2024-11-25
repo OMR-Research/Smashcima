@@ -4,7 +4,7 @@ from ..download_file import download_file
 from pathlib import Path
 from tqdm import tqdm
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import List, Sequence
 import numpy as np
 import csv
 import cv2
@@ -17,20 +17,24 @@ import cv2
 
 @dataclass
 class Patch:
+    is_commented: bool
     mzk_uuid: str
     rectangle: Rectangle
     dpi: int
 
-    def from_record(record: Tuple[str, str, str, str, str, str]) -> "Patch":
+    @staticmethod
+    def from_record(record: Sequence[str]) -> "Patch":
+        assert len(record) == 7, "Patch record should have 7 columns"
         return Patch(
-            mzk_uuid=record[0],
+            is_commented=(record[0] == "#"),
+            mzk_uuid=record[1],
             rectangle=Rectangle(
-                x=int(record[1]),
-                y=int(record[2]),
-                width=int(record[3]),
-                height=int(record[4]),
+                x=int(record[2]),
+                y=int(record[3]),
+                width=int(record[4]),
+                height=int(record[5]),
             ),
-            dpi=int(record[5])
+            dpi=int(record[6])
         )
 
 
@@ -58,7 +62,7 @@ class MzkPaperPatches(AssetBundle):
             download_file(url, path, with_progress_bar=False)
     
     @staticmethod
-    def load_patch_index() -> List[Patch]:
+    def load_patch_index(skip_commented: bool = True) -> List[Patch]:
         """Loads the list of patches from the CSV file"""
         index_path = Path(__file__).parent / "mzk_paper_patches.csv"
         
@@ -67,11 +71,16 @@ class MzkPaperPatches(AssetBundle):
             reader = csv.reader(f, delimiter=",", quotechar='"')
             
             # header
-            assert next(reader) == ["uuid", "x", "y", "width", "height", "dpi"]
+            assert next(reader) == [
+                "commented", "uuid", "x", "y", "width", "height", "dpi"
+            ]
             
             # records
             for record in reader:
-                index.append(Patch.from_record(record))
+                patch = Patch.from_record(record)
+                if skip_commented and patch.is_commented:
+                    continue
+                index.append(patch)
         
         return index
     
