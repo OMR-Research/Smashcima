@@ -43,6 +43,21 @@ class AssetBundle(abc.ABC):
 
         self.dependency_resolver = dependency_resolver
         "Use this to resolve additional bundle dependencies"
+    
+    def version(self) -> Any:
+        """Returns version of this bundle. Override this method to modify.
+        
+        Bundle versions should be incremented to trigger bundle re-install
+        for all users who have this bundle already installed. This is useful
+        whenever the bundle folder structure changes, or the pickled types
+        change.
+
+        Although this should primarily be incrementing integers to trigger
+        cache busing, you can return anything that can be serialized to JSON
+        and stored in the meta file. Therefore if your bundle requires
+        more complex versioning, you can use strings or tuples.
+        """
+        return 1
 
     @abc.abstractmethod
     def install(self):
@@ -60,7 +75,8 @@ class AssetBundle(abc.ABC):
             # more metadata can be added in the future,
             # such as install datetime, install smashcima version, etc.
             "installed": True,
-            "smashcima_version": SMASHCIMA_VERSION_STR
+            "smashcima_version": SMASHCIMA_VERSION_STR,
+            "version": self.version()
         }
         with open(self.bundle_directory / BUNDLE_META_FILE, "w") as f:
             json.dump(metadata, f)
@@ -79,6 +95,10 @@ class AssetBundle(abc.ABC):
         # if smashcima version changed, we need re-install, because there
         # might be pickles with old type versions from the library
         if metadata.get("smashcima_version") != SMASHCIMA_VERSION_STR:
+            return True
+        
+        # if bundle version changed, we also need to re-install
+        if metadata.get("version") != self.version():
             return True
 
         return False
