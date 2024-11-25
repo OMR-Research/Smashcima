@@ -52,5 +52,5 @@ These items are more high-level but there are also more low-level TODO's in the 
 ## Assets
 
 - [ ] Speed-up background synthesis by pre-synthesizing 512x512 base patches
-- [ ] Re-install asset bundles when smashcima version changes
 - [ ] Asset bundles should be versioned, so that re-installs are triggered (especially useful for user-defined bundles)
+- [ ] `MzkPaperPatches` should be prepackaged as a zip and mirrored to GitHub to prevent excessive usage of the IIIF API

@@ -56,7 +56,7 @@ class AssetRepository(BundleResolver):
             bundle.__post_init__()
 
         # do nothing if already installed
-        if bundle.metadata_exists() and not force_install:
+        if not bundle.needs_installation() and not force_install:
             return bundle
         
         print(f"[Smashcima Assets]: Installing bundle {bundle_type.__name__}...")

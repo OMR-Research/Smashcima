@@ -78,14 +78,15 @@ Production PyPI at: https://pypi.org/
 
 Testing PyPI at: https://test.pypi.org/
 
-1. Update the version in `smashcima/__init__.py`.
-2. Build the package `make build`.
-3. Upload to PyPI `make push-prod` or TestPyPI `make push-test`.
-4. When asked, use `__token__` for username and paste in the access token for the password (with the `pypi-` prefix).
-5. Check the version has been uploaded and try its installation.
-6. Submit the version commit and create a release on GitHub.
+1. Run all Jupyter notebook tests and unit tests.
+2. Update the version in `smashcima/_version.py`.
+3. Build the package `make build`.
+4. Upload to PyPI `make push-prod` or TestPyPI `make push-test`.
+5. When asked, use `__token__` for username and paste in the access token for the password (with the `pypi-` prefix).
+6. Check the version has been uploaded and try its installation.
+7. Submit the version commit and create a release on GitHub.
 
-> **Note:** Don't forget keeping the version at `X.Y.Zdev` when developing version `X.Y.Z`. See the `smashcima/__init__.py` file.
+> **Note:** Don't forget keeping the version at `X.Y.Zdev` when developing version `X.Y.Z`. See the `smashcima/_version_.py` file.
 
 > **Note:** to install from the test pypi, use: `pip3 install --index-url https://test.pypi.org/simple/ --no-deps smashcima`. More info [here](https://packaging.python.org/en/latest/tutorials/packaging-projects/#installing-your-newly-uploaded-package).
 

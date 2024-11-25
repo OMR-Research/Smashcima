@@ -1,5 +1,4 @@
-__version__ = "0.2.0dev"
-
+from ._version import __version__
 
 # -----------------------------------------------------------------------------
 # import important types that should also be accessible at the top level

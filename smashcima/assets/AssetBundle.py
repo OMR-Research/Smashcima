@@ -1,9 +1,10 @@
 import abc
-from pathlib import Path
-import shutil
 import json
-from typing import TypeVar, Type
+import shutil
+from pathlib import Path
+from typing import Any, Dict, Type, TypeVar
 
+from .._version import SMASHCIMA_VERSION_STR
 
 T = TypeVar("T", bound="AssetBundle")
 
@@ -58,10 +59,29 @@ class AssetBundle(abc.ABC):
         metadata = {
             # more metadata can be added in the future,
             # such as install datetime, install smashcima version, etc.
-            "installed": True
+            "installed": True,
+            "smashcima_version": SMASHCIMA_VERSION_STR
         }
         with open(self.bundle_directory / BUNDLE_META_FILE, "w") as f:
             json.dump(metadata, f)
+    
+    def needs_installation(self) -> bool:
+        """Returns true if the bundle should be (re-)installed before use"""
+        # if there's no metadata file, it probably is not even installed,
+        # we definitely need to install before use
+        if not self.metadata_exists():
+            return True
+        
+        # load bundle metadata
+        with open(self.bundle_directory / BUNDLE_META_FILE, "r") as f:
+            metadata: Dict[str, Any] = json.load(f)
+        
+        # if smashcima version changed, we need re-install, because there
+        # might be pickles with old type versions from the library
+        if metadata.get("smashcima_version") != SMASHCIMA_VERSION_STR:
+            return True
+
+        return False
     
     def metadata_exists(self) -> bool:
         """Returns true if the metadata file exists for the bundle"""
