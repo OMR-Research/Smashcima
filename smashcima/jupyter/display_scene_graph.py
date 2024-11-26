@@ -1,5 +1,7 @@
 import IPython.display
 import ipycytoscape
+
+from smashcima.scene.AffineSpace import AffineSpace
 from ..scene.Scene import Scene
 from smashcima.scene.SceneObject import SceneObject, Link
 from typing import List
@@ -122,7 +124,7 @@ def display_scene_object_graph(
     obj_clone = deepcopy(obj)
     if discard_object_inlinks:
         obj_clone.inlinks = []
-    scene = Scene()
+    scene = Scene(root_space=AffineSpace())
     scene.objects.clear() # remove the root affine space
     scene.add(obj_clone, recurse_via_inlinks=recurse_via_inlinks)
     display_scene_graph(scene)

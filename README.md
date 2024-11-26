@@ -42,7 +42,7 @@ Smashcima is primarily a framework and a set of crafted interfaces for building 
 - [Introduction](docs/introduction.md)
 - Models and service orchestration
 - Scene
-    - Scene objects
+    - [Scene objects](docs/scene-objects.md)
     - Affine spaces and rendering
     - Semantic music scene objects
     - Visual music scene objects
