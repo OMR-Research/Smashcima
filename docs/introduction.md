@@ -49,7 +49,7 @@ While synthesizers do the heavy lifting, their configuration is complex and they
 
 Models act as a ready-to-use wrappers around various synthesis pipelines, being reasonably pre-configured out of the box. While a synthesizer is meant to be as general as possible, a model is built to be as specific as possible. The idea being that you build your own model for your specific task domain - either by bending existing models, or by putting together a custom synthesizer pipeline from scratch.
 
-Models models are meant to orchestrate synthesizers, they live in the `smashcima.orchestration` module.
+Models are meant to orchestrate synthesizers, they live in the `smashcima.orchestration` module.
 
 
 ## Assets

@@ -68,7 +68,7 @@ Then we can build a renderer, that goes over all noteheads and puts them togethe
 Here, an interesting problem arises: We hold the score in a variable as a `list[Note]`. How do we get to the noteheads?
 
 1. Currently the `Notehead` references a `Note`. This made sense so far, since we first load the notes and only then add the noteheads. But it prevents us getting to the noteheads from notes.
-2. If we invert the relationship and have the `Note` reference a `Notehead`, we have to make the `Notehead` optional (being able to be `None`), otherwise the loader cannot load the notes. But that's incorrent semantically. You cannot have a note in the music score without any notehead. And relaxing this invariant just because of a technical difficulty seems incorrect.
+2. If we invert the relationship and have the `Note` reference a `Notehead`, we have to make the `Notehead` optional (being able to be `None`), otherwise the loader cannot load the notes. But that's incorrect semantically. You cannot have a note in the music score without any notehead. And relaxing this invariant just because of a technical difficulty seems incorrect.
 
 To solve this problem (and many more), the `SceneObject` base class actually tracks all references to-and-from any `SceneObject` instance and remembers them internally. This allows us to query the inverse relationship like this:
 
@@ -91,13 +91,13 @@ It also allows us to focus on the semantics of the data and don't let the techni
 - `Event` Notes with the same onset.
 - `Chord` Notes with a shared stem, same onset, and same duration.
 - `Beam` Notes sharing a beam.
-- `Voice` Notes in the same voice in plyphonic music.
+- `Voice` Notes in the same voice in polyphonic music.
 - `Slur` Notes tied by the same slur.
 - `Tuplet` Notes being part of the same tuplet.
 
-It's the responsibility of the container to know what notes it contains, NOT the note's to remember what container it belongs in. If it was the note's responsibility, then each time we add another container, we have to extend the `Note` class. That's ugly and hiders extensibility.
+It's the responsibility of the container to know what notes it contains, NOT the note's to remember what container it belongs to. If it was the note's responsibility, then each time we add another container, we have to extend the `Note` class. That's ugly and hinders extensibility.
 
-At the same time, when synthesizing the music notation, the synthesizer must be able to ask a know about the chord it belongs to, about the slur it belongs to, etc. So we need this inverse querying capability. That's why we inherit from the `SceneObject` base class, which keeps track of all these references (most importantly the back-links).
+At the same time, when synthesizing the music notation, the synthesizer must be able to ask a note about the chord it belongs to, about the slur it belongs to, etc. So we need this inverse querying capability. That's why we inherit from the `SceneObject` base class, which keeps track of all these references (most importantly the back-links).
 
 <img src="assets/scene-objects/containers-graph.png"/>
 
@@ -157,7 +157,7 @@ For example, there is no reason why a `Voice` should be inside `Event` or why `E
 
 Now that you have the motivation for the design, we can talk about how this behaviour is implemented.
 
-The `SceneObject` class overrides the `__setattr__` magic method, so it knows about all situations when anyone is setting any field on the instance (`obj.bar = baz`). When this happens, it updates the scene object's `inlinks` and `outlinks` fields. These fields hold the list of references pointing away from this object, and the list of references pointing towards this object. Each link also known its `name`, which means you can have more than one link between two object instances.
+The `SceneObject` class overrides the `__setattr__` magic method, so it knows about all situations when anyone is setting any field on the instance (`obj.bar = baz`). When this happens, it updates the scene object's `inlinks` and `outlinks` fields. These fields hold the list of references pointing away from this object, and the list of references pointing towards this object. Each link also knows its `name`, which means you can have more than one link between two object instances.
 
 These links are only tracked between pairs of `SceneObjects`. If only one side is a `SceneObject`, then no link is tracked. This means that scene objects can have fields containing `str`, `int`, `Fraction`, or any other type, and these behave like any other pyhon code. It's only when a scene object "contains" another scene object. In that case you cannot really say it "contains" that object. Rather, you should think about "referencing" that object in the scene graph.
 
@@ -175,7 +175,7 @@ Note that, since all of this logic happens in `__setattr__` magic method, the sy
 
 ### Memory leaks
 
-Because scene objects track these back-references, it's very easy to leak memory, since objects are being referenced even when they would not be in plain python code. For example, creating the `NoteColor` instance in this way makes it attached to the `Note` instance and it will never garbage collected, unless the `my_note` instance can also be garbage collected at the same time:
+Because scene objects track these back-references, it's very easy to leak memory, since objects are being referenced even when they would not be in plain python code. For example, creating the `NoteColor` instance in this way makes it attached to the `Note` instance and it will never be garbage collected, unless the `my_note` instance can also be garbage collected at the same time:
 
 ```py
 my_note_color = NoteColor(
@@ -212,23 +212,114 @@ class Notehead(sc.SceneObject):
         self.note = None # type: ignore
 ```
 
-Also note that you cannot really *destroy* a python class instance. Only the garbage collector can do that. And only when no live instances point at it. Doing `del my_note_color` only deletes the local variable, NOT the instance. You can still get hold of the instance via `my_note.inlinks`. That's why you need a dedicated `detach()` method that breaks those links.
+Also note that you cannot really *destroy* a python class instance. Only the garbage collector can do that. And only when no live instances point to it. Doing `del my_note_color` only deletes the local variable, NOT the instance. You can still get hold of the instance via `my_note.inlinks`. That's why you need a dedicated `detach()` method that breaks these links.
 
 
 ## Relationship querying
 
-TODO
+Since a `Notehead` points to a `Note`, traversing this forward link is as simple as accessing a python field:
 
-- `foo.of(bar, lambda f: f.bar)`
-- of_or_none
-- many_of
+```py
+# get the Note of a Notehead
+my_note = my_notehead.note
+```
 
-Implementing custom `Chord.of_note` aliases.
+The special syntax is only needed when we do the reverse querying:
+
+```py
+# get the Notehead of a Note
+my_notehead: Notehead \
+    = Notehead.of(my_note, lambda n: n.note)
+```
+
+The `.of` method is a class-method defined on the `SceneObject`, meaning it will be available on every type ingeriting from the `SceneObject` and it always returns the specific type (e.g. `Notehead`).
+
+If the scene link may not exist (and it is ok for it not to exist), you can instruct the query to return `None` in such cases:
+
+```py
+# get Stem for a Notehead (which may not exist)
+my_stem: Optional[Stem] \
+    = Stem.of_or_none(my_notehead, lambda: s: s.noteheads)
+```
+
+Note that the stem also points to a list of `noteheads` and the query also works as expected.
+
+Lastly, you might want to ask for a list of scene objects on the other side of a link with a given name:
+
+```py
+# get children of an AffineSpace
+children: list[AffineSpace] \
+    = AffineSpace.many_of(self, lambda s: s.parent_space)
+```
+
+
+### Named queries
+
+While using these generic inverse queries with `lambda` expressions for link names is possible, it's a little bit verbose and hard to read. Instead, when defining a new scene object type, you should provide a set of custom methods that define better names for these queries.
+
+For example, we can extend the `Notehead` class to define the query to get a notehead for a corresponding `Note`:
+
+```py
+class Notehead(sc.SceneObject):
+    # ...
+
+    @classmethod
+    def of_note(cls, note: Note):
+        return cls.of(note, lambda n: n.note)
+```
+
+Now we can get the notehead with much shorter and more readable code:
+
+```py
+# get the Notehead of a Note
+my_notehead = Notehead.of_note(my_note)
+```
+
+Similar method could be added for stems:
+
+```py
+class Stem(sc.SceneObject):
+    # ...
+
+    @classmethod
+    def of_notehead_or_none(cls, notehead: Notehead):
+        return cls.of_or_none(notehead, lambda s: s.notes)
+```
+
+When doing this, please keep the terminology consistent:
+
+- `X.of_Y` to get `X` that should always exist for `Y` and should raise an exception if missing
+- `X.of_Y_or_none` to get `X` that may sometimes not exist and should return `None` in such case
+- `X.of_many_Y` to get a `list[X]`, which may also be an empty list
 
 
 ## When to use the `Scene` class
 
-TODO: when you want to put a few scene objects into a logical container; when its returned from a model; it's not clearly defined; when you have disjoined scene graphs that you want to hold as a single thing
+So far, all scene objects lived in custom variables as python instances. You don't really need a container (such as a `Scene`) when creating scene objects. However sometimes you want to return a disjoint group of `SceneObject`s as a single object. For that purpose there exists the `sc.Scene` type.
+
+One place where this type might be used is when defining a return type of a `Model` type. Models are supposed to return scenes - the specifics of the scene depend on the model and the domain it models, but the scene class can inherit from `sc.Scene` to utilize some of its pre-defined logic (like recursive scene object addition and closure addition).
+
+You can add scene objects into a scene like this:
+
+```py
+scene = sc.Scene(
+    root_space=sc.AffineSpace()
+)
+
+scene.add(my_note)
+```
+
+The scene holds one `AffineSpace` as a root affine space, which may be used as a starting point when traversing visual scene objects.
+
+Objects added into a scene are added with all other linked objects (to and from).
+
+We can also check that the added note also added its notehead:
+
+```py
+scene.has(my_notehead) # returns True
+```
+
+> **Note:** The precise responsibility of the `sc.Scene` class is not quite defined and it might happen that it gets sharpen, modified, or dropped in the future. It's partly a relict from times when scene objects needed to be in a container.
 
 
 ## Conclusion
