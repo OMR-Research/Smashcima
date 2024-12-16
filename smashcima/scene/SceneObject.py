@@ -104,6 +104,17 @@ class SceneObject:
         subject: "SceneObject",
         name_probe: Callable[[T], Any]
     ) -> T:
+        """Uses scene graph links to resolve a `cls` type instance linking
+        to `subject` via a field name resolved from the `name_probe`.
+        Raises an exception if there is no scene object to be found or
+        if there are more than one object found.
+
+        :param subject: The inlinked object we start from.
+        :param name_probe: Lambda that given a `cls` type (dummy) instance
+        returns the field to be used for link name. It can also return string
+        to be used directly as the link name.
+        :returns: An outlinked object, linking to `subject` via `name`.
+        """
         if subject is None:
             raise ValueError("Passed in subject cannot be None")
         
@@ -129,6 +140,17 @@ class SceneObject:
         subject: Optional["SceneObject"],
         name_probe: Callable[[T], Any]
     ) -> Optional[T]:
+        """Uses scene graph links to resolve a `cls` type instance linking
+        to `subject` via a field name resolved from the `name_probe`.
+        If there is no such object found, it returns None.
+        Raises an exception if there are more than one object found.
+
+        :param subject: The inlinked object we start from.
+        :param name_probe: Lambda that given a `cls` type (dummy) instance
+        returns the field to be used for link name. It can also return string
+        to be used directly as the link name.
+        :returns: An outlinked object, linking to `subject` via `name` or `None`.
+        """
         if subject is None:
             return None
         
@@ -151,6 +173,15 @@ class SceneObject:
         subject: "SceneObject",
         name_probe: Callable[[T], Any]
     ) -> List[T]:
+        """Uses scene graph links to resolve a list of `cls` type instances
+        linking to `subject` via a field name resolved from the `name_probe`.
+
+        :param subject: The inlinked object we start from.
+        :param name_probe: Lambda that given a `cls` type (dummy) instance
+        returns the field to be used for link name. It can also return string
+        to be used directly as the link name.
+        :returns: A list of outlinked objects, linking to `subject` via `name`.
+        """
         if subject is None:
             raise ValueError("Passed in subject cannot be None")
         
