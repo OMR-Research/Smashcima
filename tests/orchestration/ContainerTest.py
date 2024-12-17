@@ -118,7 +118,7 @@ class ContainerTest(unittest.TestCase):
         with self.assertRaises(punq.MissingDependencyError):
             c.resolve(Container)
 
-    def test_it_can_register_interface_via_factory(self):
+    def test_it_can_register_interface_via_factory(self) -> None:
         c = Container()
         core: Optional[_MyCoreService] = None
 
@@ -127,7 +127,7 @@ class ContainerTest(unittest.TestCase):
             core = _MyCoreService()
             return core
 
-        c.interface(_MyAbstractInterface, _factory)
+        c.factory(_MyAbstractInterface, _factory)
 
         assert core is None
 
