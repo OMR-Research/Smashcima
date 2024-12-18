@@ -206,11 +206,11 @@ cv2.imwrite("red-circles.png", bitmap)
 
 ## Glyphs and line glyphs
 
-You can see that the resulting image still contains stafflines, barlines, and stems.
+You can see that the resulting image still contains stafflines, beams, and stems.
 
 Stafflines are special, they are synthesized using a `StafflinesSynthesizer` and they completely side-step the `GlyphSynthesizer` interface (because they come with their own non-affine coordinate system and lots of specifics).
 
-Barlines and stems are synthesized separately, because they are `LineGlyph`s. A `LineGlyph` inherits from `Glyph`, so it has all the same properties, but it has two points - the starting and the ending point. These two points are also used to synthesize line glyphs, so the `LineGlyphSynthesizer` interface has a slightly different API. Overriding those is analogous to regular glyphs.
+Beams and stems are synthesized separately, because they are `LineGlyph`s. A `LineGlyph` inherits from `Glyph`, so it has all the same properties, but it has two points - the starting and the ending point. These two points are also used to synthesize line glyphs, so the `LineGlyphSynthesizer` interface has a slightly different API. Overriding those is analogous to regular glyphs.
 
 While line glyphs have these two special points, regular glyphs have only one - the affine space origin point. This point is used to place glyphs into the scene by the music notation synthesizer. Where exactly this origin point is located in relation to the glyph image depends on the glyph label (glyph type). Most glyphs have the origin as the geometric center (noteheads, rests), but some have it offset to some important location (the 4th line for the G-clef, the eye center of a flat, the touching line for a whole and half rests, etc.). See the documentation on Glyphs to learn more.
 

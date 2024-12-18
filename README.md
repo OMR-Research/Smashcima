@@ -55,22 +55,19 @@ To quickly learn how to start using Smashcima for your project, start with the t
 
 Smashcima is primarily a framework and a set of crafted interfaces for building custom visual-data related synthesizers.
 
-
 - [Introduction](docs/introduction.md)
 - [Models and service orchestration](docs/models-and-service-orchestration.md)
 - Scene
     - [Scene objects](docs/scene-objects.md)
     - [Affine spaces and rendering](docs/affine-spaces-and-rendering.md)
-    - Semantic music scene objects
-    - Visual music scene objects
 - Synthesis
     - [Synthesizer interfaces](docs/synthesizer-interfaces.md)
         - [`MusicNotationSynthesizer` interface](docs/music-notation-synthesizer.md)
         - [`GlyphSynthesizer` interface](docs/glyph-synthesizer.md)
     - [Glyphs](docs/glyphs.md)
+    - [Line glyphs](docs/line-glyphs.md)
     - Style control
 - Asset bundles
-- ...
 
 If you feel like improving the library, take a look at the [TODO List](docs/todo-list.md).
 

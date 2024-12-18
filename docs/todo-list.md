@@ -8,6 +8,17 @@ These items are more high-level but there are also more low-level TODO's in the 
 - [ ] Column layout synthesizer's wrap-on-overflow does not work right now, because the `.detach()` methods do not function properly
 
 
+## Documentation
+
+- [ ] Scene / Semantic music scene objects
+- [ ] Scene / Visual music scene objects
+- [ ] Synthesis / Synthesizer interfaces / `LineSynthesizer` interface
+- [ ] Synthesis / Line glyphs
+- [ ] all remaining synthesizer interfaces
+- [ ] loaders
+- [ ] exporters
+
+
 ## Various
 
 - [ ] MyPy: *Skipping analyzing "smashcima": module is installed, but missing library stubs or py.typed.* - This message is displayed by MyPy to any user of smashcima. I guess I need to export the types with the package somehow.
