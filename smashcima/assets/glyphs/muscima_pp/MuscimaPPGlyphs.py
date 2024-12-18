@@ -124,12 +124,13 @@ class MuscimaPPGlyphs(AssetBundle):
 
         # glyphs
         glyph_renderer = DebugGlyphRenderer()
-        for label, glyphs in repository.glyphs_by_class.items():
+        for label, packed_glyphs in repository.glyphs_by_class.items():
             glyphs_folder = debug_folder / label.replace(":", "-")
             glyphs_folder.mkdir()
 
             print(label, "...")
-            for glyph in tqdm(glyphs):
+            for packed_glyph in tqdm(packed_glyphs):
+                glyph = packed_glyph.unpack()
                 meta = MppGlyphMetadata.of_glyph(glyph)
                 cv2.imwrite(
                     str(glyphs_folder / (meta.mpp_crop_object_uid + ".png")),
