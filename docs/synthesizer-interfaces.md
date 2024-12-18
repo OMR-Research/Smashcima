@@ -16,7 +16,7 @@ This is an overview list of synthesizer interfaces in the order from the most ab
 - `StafflinesSynthesizer` produces empty stafflines
 - `PaperSynthesizer` produces images of sheets of paper
 - `LineSynthesizer` produces line-like music symbols (beams, stems, braces)
-- `GlyphSynthesizer` produces musical symbols (notes, rests, accidentals)
+- [`GlyphSynthesizer`](glyph-synthesizer.md) produces musical symbols (notes, rests, accidentals)
 
 These synthesizers are each described in a separate documentation page, please follow the links to read more.
 

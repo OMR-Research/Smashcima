@@ -51,13 +51,15 @@ class GlyphSynthesizer(abc.ABC):
         label: str,
         parent_space: AffineSpace,
         point: Point
-    ):
+    ) -> Glyph:
         """Synthesizes a new glyph with its origin translated to a point.
 
         :param label: Which kind of glyh to synthesize (classification label)
         :param parent_space: The glyph will be placed into this space
         :param point: The glyph's origin will be placed over this point.
             The coordinates are relative to the parent space.
+        :returns: The newly synthesized glyph instance, already attached to
+            the parent space.
         """
         return self.synthesize_glyph(
             label=label,

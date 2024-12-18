@@ -66,8 +66,8 @@ Smashcima is primarily a framework and a set of crafted interfaces for building 
 - Synthesis
     - [Synthesizer interfaces](docs/synthesizer-interfaces.md)
         - [`MusicNotationSynthesizer` interface](docs/music-notation-synthesizer.md)
-        - `GlyphSynthesizer` interface
-    - Glyphs
+        - [`GlyphSynthesizer` interface](docs/glyph-synthesizer.md)
+    - [Glyphs](docs/glyphs.md)
     - Style control
 - Asset bundles
 - ...
