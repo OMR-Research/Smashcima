@@ -59,17 +59,17 @@ class SmuflLabels(str, Enum):
     # https://www.w3.org/2019/03/smufl13/tables/individual-notes.html
     # IMPORTANT: This should only be used for ligatures,
     # the default usecase is synthesizing notehead-stem-flag separately.
-    noteWhole = "smulf::noteWhole"
-    noteHalfUp = "smulf::noteHalfUp"
-    noteHalfDown = "smulf::noteHalfDown"
-    noteQuarterUp = "smulf::noteQuarterUp"
-    noteQuarterDown = "smulf::noteQuarterDown"
-    note8thUp = "smulf::note8thUp"
-    note8thDown = "smulf::note8thDown"
-    note16thUp = "smulf::note16thUp"
-    note16thDown = "smulf::note16thDown"
-    note32ndUp = "smulf::note32ndUp"
-    note32ndDown = "smulf::note32ndDown"
+    noteWhole = "smufl::noteWhole"
+    noteHalfUp = "smufl::noteHalfUp"
+    noteHalfDown = "smufl::noteHalfDown"
+    noteQuarterUp = "smufl::noteQuarterUp"
+    noteQuarterDown = "smufl::noteQuarterDown"
+    note8thUp = "smufl::note8thUp"
+    note8thDown = "smufl::note8thDown"
+    note16thUp = "smufl::note16thUp"
+    note16thDown = "smufl::note16thDown"
+    note32ndUp = "smufl::note32ndUp"
+    note32ndDown = "smufl::note32ndDown"
     note64thUp = "smufl::note64thUp"
     note64thDown = "smufl::note64thDown"
     note128thUp = "smufl::note128thUp"
@@ -80,7 +80,7 @@ class SmuflLabels(str, Enum):
     note512thDown = "smufl::note512thDown"
     note1024thUp = "smufl::note1024thUp"
     note1024thDown = "smufl::note1024thDown"
-    augmentationDot = "smulf::augmentationDot"
+    augmentationDot = "smufl::augmentationDot"
 
     # Stems
     # https://w3c.github.io/smufl/latest/tables/stems.html
@@ -157,20 +157,20 @@ class SmuflLabels(str, Enum):
 
     # Rests
     # https://www.w3.org/2019/03/smufl13/tables/rests.html
-    restMaxima = "smulf::restMaxima"
-    restLonga = "smulf::restLonga"
-    restDoubleWhole = "smulf::restDoubleWhole"
-    restWhole = "smulf::restWhole"
-    restHalf = "smulf::restHalf"
-    restQuarter = "smulf::restQuarter"
-    rest8th = "smulf::rest8th"
-    rest16th = "smulf::rest16th"
-    rest32nd = "smulf::rest32nd"
-    rest64th = "smulf::rest64th"
-    rest128th = "smulf::rest128th"
-    rest256th = "smulf::rest256th"
-    rest512th = "smulf::rest512th"
-    rest1024th = "smulf::rest1024th"
+    restMaxima = "smufl::restMaxima"
+    restLonga = "smufl::restLonga"
+    restDoubleWhole = "smufl::restDoubleWhole"
+    restWhole = "smufl::restWhole"
+    restHalf = "smufl::restHalf"
+    restQuarter = "smufl::restQuarter"
+    rest8th = "smufl::rest8th"
+    rest16th = "smufl::rest16th"
+    rest32nd = "smufl::rest32nd"
+    rest64th = "smufl::rest64th"
+    rest128th = "smufl::rest128th"
+    rest256th = "smufl::rest256th"
+    rest512th = "smufl::rest512th"
+    rest1024th = "smufl::rest1024th"
 
     @staticmethod
     def notehead_from_type_duration(duration: TypeDuration) -> "SmuflLabels":
