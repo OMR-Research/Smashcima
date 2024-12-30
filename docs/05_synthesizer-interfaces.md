@@ -11,12 +11,12 @@ To give some structure to the resulting synthesis pipelines and to allow for int
 
 This is an overview list of synthesizer interfaces in the order from the most abstract to the most concrete:
 
-- [`MusicNotationSynthesizer`](music-notation-synthesizer.md) places musical symbols onto empty stafflines
+- [`ColumnLayoutSynthesizer`](06_column-layout-synthesizer.md) places musical symbols onto empty stafflines
 - `PageSynthesizer` produces a sheet of paper with empty stafflines with a given layout
 - `StafflinesSynthesizer` produces empty stafflines
 - `PaperSynthesizer` produces images of sheets of paper
 - `LineSynthesizer` produces line-like music symbols (beams, stems, braces)
-- [`GlyphSynthesizer`](glyph-synthesizer.md) produces musical symbols (notes, rests, accidentals)
+- [`GlyphSynthesizer`](07_glyph-synthesizer.md) produces musical symbols (notes, rests, accidentals)
 
 These synthesizers are each described in a separate documentation page, please follow the links to read more.
 

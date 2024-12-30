@@ -1,6 +1,4 @@
-# `MusicNotationSynthesizer` interface
-
-> **TODO:** The interface is not yet extracted from the class `ColumnLayoutSynthesizer`. The module `layout` should be renamed to `notation` and the class should be renamed to `ColumnMusicNotationSynthesizer` and the interface should be extracted, documented, and used in the `BaseHandwrittenModel`.
+# `ColumnLayoutSynthesizer` interface
 
 This interface represents the (human) writer sitting at a blank piece of paper with stafflines, transcribing a piece of music onto that paper.
 
