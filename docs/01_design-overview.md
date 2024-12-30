@@ -1,4 +1,4 @@
-# Introduction
+# Design Overview
 
 Smashcima is a python package aimed at synthesizing training data for Optical Music Recognition (OMR). Therefore the ultimate goal is to create synthetic images of music notation, together with the corresponding annotations (textual, visual, or both). The internal structure of Smashcima follows from this goal and is described in this file.
 
