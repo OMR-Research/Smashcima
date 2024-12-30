@@ -11,7 +11,7 @@
     <br/>
 </div>
 
-A library and a framework for synthesizing images containing handwritten music, intended for the creation of training data for OMR models.
+Smashcima is a library and framework for synthesizing images containing handwritten music for creating synthetic training data for OMR models.
 
 **Try out the demo on [🤗 Huggingface Spaces](https://huggingface.co/spaces/Jirka-Mayer/Smashcima) right now!**<br/>
 Example output with MUSCIMA++ writer no. 28 style:
