@@ -93,7 +93,7 @@ for i, page in enumerate(scene.pages):
 You can use `(255, 255, 255, 255)` to get white background and `(0, 0, 0, 0)` to get transparent background.
 
 
-# Replacing the random number generator
+## Replacing the random number generator
 
 Not all services in the model are synthesizers. For example, most synthesizers need a source of randomness. Therefore there is a `random.Random` instance registered as a service in the container. The instance is also stored on the model in the `self.rng` field. You can check they are the same:
 

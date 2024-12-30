@@ -39,17 +39,17 @@ First, smashcima starts downloading assets it needs for the synthesis. This happ
 Downloading MUSCIMA++ dataset...
 Downloading https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11372/LRT-2372/MUSCIMA-pp_v1.0.zip
 and saving it to /home/jirka/.cache/smashcima/assets/MuscimaPP/MUSCIMA-pp_v1.0.zip
-100%|██████████| 21.8M/21.8M [00:17<00:00, 1.26MiB/s]
+100%|++++++++++| 21.8M/21.8M [00:17<00:00, 1.26MiB/s]
 Extracting the zip...
 Checking bundle directory structure...
 [Smashcima Assets]: Bundle MuscimaPP installed.
 [Smashcima Assets]: Installing bundle MuscimaPPGlyphs...
-100%|██████████| 140/140 [02:17<00:00,  1.02it/s]
+100%|++++++++++| 140/140 [02:17<00:00,  1.02it/s]
 Writing... /home/jirka/.cache/smashcima/assets/MuscimaPPGlyphs/symbol_repository.pkl
 [Smashcima Assets]: Bundle MuscimaPPGlyphs installed.
 [Smashcima Assets]: Installing bundle MzkPaperPatches...
 Downloading MZK paper patches...
-100%|██████████| 10/10 [00:06<00:00,  1.52it/s]
+100%|++++++++++| 10/10 [00:06<00:00,  1.52it/s]
 [Smashcima Assets]: Bundle MzkPaperPatches installed.
 ```
 

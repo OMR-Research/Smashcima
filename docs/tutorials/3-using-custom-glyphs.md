@@ -215,6 +215,6 @@ Beams and stems are synthesized separately, because they are `LineGlyph`s. A `Li
 While line glyphs have these two special points, regular glyphs have only one - the affine space origin point. This point is used to place glyphs into the scene by the music notation synthesizer. Where exactly this origin point is located in relation to the glyph image depends on the glyph label (glyph type). Most glyphs have the origin as the geometric center (noteheads, rests), but some have it offset to some important location (the 4th line for the G-clef, the eye center of a flat, the touching line for a whole and half rests, etc.). See the documentation on Glyphs to learn more.
 
 
-# Conclusion
+## Conclusion
 
 You've learned how to implement a custom glyph synthesizer and use it in a larger model. Overriding other synthesizers is analogous. Now you can read the rest of the documentation to learn in more detail about various parts of the Smashcima framework.
