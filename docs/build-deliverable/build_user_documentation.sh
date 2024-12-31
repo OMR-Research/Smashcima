@@ -35,14 +35,14 @@ done
 # ----------
 
 # This is a separate step because in html, including images works properly.
-pandoc -s --resource-path=..\;../assets --extract-media=media/ --metadata title="Smashcima User Documentation" ../00_introduction.md ../tutorials/*.md -o ${DOCNAME}.html
+pandoc -s --resource-path=..\;../assets --extract-media=media/ --metadata title="Smashcima User Documentation" ../tutorials/*.md -o ${DOCNAME}.html
 
 
 # PDF build
 # ---------
 
 # First we build tex, to inspect errors.
-pandoc ${DOCNAME}.html -o ${DOCNAME}.tex -s --toc --top-level-division chapter -V geometry:margin=2.5cm --metadata-file=defaults.yaml --number-sections
+pandoc ${DOCNAME}.html -o ${DOCNAME}.tex -s --toc --top-level-division chapter -V geometry:margin=2.5cm --metadata-file=defaults.yaml --number-sections --template pandoc_smashcima_template.latex
  # --template pandoc_smashcima_template.latex
 
 # Then convert to PDF (do this twice to get hyperref and TOC correctly)

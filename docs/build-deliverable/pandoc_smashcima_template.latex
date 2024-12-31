@@ -399,7 +399,7 @@ $if(csquotes)$
 $endif$
 
 $if(title)$
-  \title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
+  \title{$title$} % Removed thanks because it was not showing up in the title page with custom maketitle.
 $endif$
 $if(subtitle)$
   $if(beamer)$
@@ -427,7 +427,29 @@ $if(logo)$
 $endif$
 $endif$
 
+
+\makeatletter
+\def\maketitle{%
+  \includegraphics[width=1.0\textwidth]{docs/assets/smashcima-logo.png}
+  \vfill
+  {\LARGE \textbf{\@title}\footnote{This work has been done by the OmniOMR project within the 2023-2030 NAKI III programme, supported by the Ministry of Culture of the Czech Republic (DH23P03OVV008).}\par}%
+  \vskip 1cm
+  {\normalsize \@date\par}%
+  \vskip 1cm
+  {\large \@author\par}%
+  {\normalsize Prague Music Computing Group\par}%
+  {\normalsize Institute of Formal and Applied Linguistics, Faculty of Mathematics and Physics, Charles University\par}%
+  \includegraphics[width=0.2\textwidth]{docs/assets/ufal-logo.pdf}
+  \vskip 2cm
+  \vfill
+  \includegraphics[width=0.2\textwidth]{docs/assets/omniomr-logo.png}
+  \vfill
+  }
+\makeatother
+
+
 \begin{document}
+
 $if(has-frontmatter)$
 \frontmatter
 $endif$

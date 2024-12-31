@@ -1,8 +1,8 @@
 # Synthesizer interfaces
 
-Synthesizer is any service that creates or manipulates a scene to produce synthetic data. Its API completely depends on the synthetic data it produces.
+Synthesizer is any service that creates or manipulates a scene to produce synthetic data. Its API therefore completely depends on the synthetic data it produces.
 
-Whereas a model comes pre-configured and ready to use to synthesize final data, a synthesizer should have just one narrow responsibility and allow for maximal configuration. The lesser work it does, the more it can be used as a LEGO piece in a larger synthesis pipeline.
+Whereas a model comes pre-configured and ready to use to synthesize final data, a synthesizer should have just one narrow responsibility and allow for maximal configuration. The less work it does, the more it can be used as a LEGO piece in a larger synthesis pipeline.
 
 To give some structure to the resulting synthesis pipelines and to allow for intechangebility of synthesizers, Smashcima defines a set of synthesizer interfaces, together with their implementations. This documentation page goes over these interfaces.
 
@@ -17,8 +17,6 @@ This is an overview list of synthesizer interfaces in the order from the most ab
 - `PaperSynthesizer` produces images of sheets of paper
 - `LineSynthesizer` produces line-like music symbols (beams, stems, braces)
 - [`GlyphSynthesizer`](07_glyph-synthesizer.md) produces musical symbols (notes, rests, accidentals)
-
-These synthesizers are each described in a separate documentation page, please follow the links to read more.
 
 
 ## Using synthesizers

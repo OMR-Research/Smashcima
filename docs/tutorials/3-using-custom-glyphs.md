@@ -1,4 +1,4 @@
-# Tutorial 3: Using custom glyphs
+# Using custom glyphs
 
 This tutorial shows how you can provide your own set of glyphs for synthesis.
 

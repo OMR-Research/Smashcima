@@ -63,7 +63,7 @@ glyph.space.transform = sc.Transform.translate(sc.Vector2(10, 20))
 
 ### Glyph origin point
 
-You can see that placing the glyph into a scene is performed by placing its affine space. More specifically, by placing it's affine space's origin point.
+You can see that placing the glyph into a scene is performed by placing its affine space. More specifically, by placing its affine space's origin point.
 
 For this reason it's important to be consistent in where exactly this origin point is located for each glyph type (e.g. noteheads have it as their center, whole rests have it as the position of the staffline).
 
@@ -74,7 +74,7 @@ The list of glyph labels and their proper origin points is documented in the [Gl
 
 The `Glyph` scene object only represents a visual glyph in the scene, but it carries no semantic information. We would like to have a `Notehead` that will have a link to its semantic `Note` and contain additional links to, for example, the `StaffVisual`.
 
-You should NOT do this via inheritance! The documentation section on scene objects details the complications you'd run into. Instead, you create a `Notehead` scene object and add a reference to the glyph and other scene objects:
+You should **NOT** do this via inheritance! The documentation section on scene objects details the complications you would run into. Instead, you create a `Notehead` scene object and add a reference to the glyph and other scene objects:
 
 ```py
 from dataclasses import dataclass
@@ -142,7 +142,7 @@ Since not all glyph synthesizers support all glyph classification labels, there'
 def supports_label(label: str) -> bool:
 ```
 
-If you're building a synthesizer that in-turn uses a `GlyphSynthesizer` as a dependency, make sure to call this method before synthesizing. This helps detect compatibility issues before they have a chance to manifest in production after 2 hours of runtime once the input data suddently contains a triple-flat accidental, but the glyph synthesizer you've used so far does not support them.
+If you're building a synthesizer that in-turn uses a `GlyphSynthesizer` as a dependency, make sure to call this method before synthesizing. This helps detect compatibility issues before they have a chance to manifest in production (for instance after 2 hours of runtime once the input data suddently contains a triple-flat accidental but the glyph synthesizer you have been using so far does not support them).
 
 
 ## Implementing a glyph synthesizer

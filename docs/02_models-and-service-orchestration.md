@@ -4,8 +4,8 @@ When you first start using Smashcima, you will mostly interact with models (exte
 
 Therefore the responsibilities of models are twofold:
 
-1. Provide a polished external interface for synthesizing the modelled data domain
-2. Set up and configure internal synthesizers and services to facilitate the data domain modelling, while allowing for at least some re-configuration by the user (i.e. orchestrate its internal services)
+1. Provide a polished external interface for synthesizing the modelled data domain.
+2. Set up and configure internal synthesizers and services to facilitate the data domain modelling, while allowing for at least some re-configuration by the user (i.e. orchestrate its internal services).
 
 Code explored in this documentation section lives in the `smashcima.orchestration` module.
 
@@ -32,7 +32,7 @@ The returned data sample is called a *scene*, because it contains much more info
 
 Arguments to the model invocation depend completely on the specific model. The `BaseHandwrittenModel` shown in this example expects a MusicXML input, either as a file, or as an XML string. But you might have models that require no arguments, or others that require some random latent vector **z** (e.g. Generative Adversarial Networks), etc.
 
-Similarly, the type of the returned scene instance is also completely controlled by the specific model used. The `BaseHandwrittenModel` returns an instance of `BaseHandwrittenScene`, which contains representation of the music, the synthesized pages, a renderer that will be used for rasterization, and metadata about the chosen MUSCIMA++ writer style.
+Similarly, the type of the returned scene instance is also completely controlled by the specific model used. The `BaseHandwrittenModel` returns an instance of `BaseHandwrittenScene`, which contains representation of the music, the synthesized pages, a renderer that will be used for rasterization, and metadata about the chosen MUSCIMA++ writer style (MUSCIMA++ is the default source of assets).
 
 For this specific scene type, getting the bitmap image is done like this:
 
@@ -41,7 +41,7 @@ For this specific scene type, getting the bitmap image is done like this:
 img = new_scene.render(new_scene.pages[0])
 ```
 
-> **Note:** You can imagine how this is very tightly linked to the data domain of handwritten scores of music notation in the MUSCIMA++ dataset. A model designed for synthesis of isolated musical symbols would have a completely different API, accepting a symbol class as an argument and outputting a single symbol image as output, with possible latent space embedding (or similar metadata).
+> **Note:** You can imagine how this is very tightly linked to the data domain of handwritten scores of music notation in the MUSCIMA++ dataset. A model designed for synthesis of isolated musical symbols, rather than entire scores, could have a completely different API: accepting a symbol class as an argument and outputting a single symbol image as output, with possible latent space embedding (or similar metadata).
 
 The synthesized scene is also assigned to the model instance under the `.scene` field. This field is `None` before the first invocation. This is for situations when you cannot store the return value from the model invocation immediately:
 
@@ -66,7 +66,7 @@ Since the manual construction of these services would be tedious and modificatio
 
 Each model has its own service container available under the `.container` field.
 
-Service container can be used to construct a dependency graph of service instances in two steps:
+The service container can be used to construct a dependency graph of service instances in two steps:
 
 1. You register services into the container
 2. You resolve the service you want to use
@@ -126,7 +126,7 @@ It means that even if `random.Random` is requested by twenty other services, the
 
 #### No implicit registrations
 
-The service container cannot resolve types that have not been explicitly registered. If that occurs, the resolution raises an exception and you need to provide the registration manually.
+The service container cannot resolve types that have not been explicitly registered. If that occurs, the resolution raises an exception, and you need to provide the registration manually.
 
 
 #### Complex service constructors
@@ -152,7 +152,7 @@ container.factory(MyService, my_service_factory)
 
 ### Service construction in a model
 
-Now that we know how a service container works, we will look at how it's utilized within a model constructor.
+Now that we know how a service container works, we will look at how it is utilized within a model constructor.
 
 At the end of the `Model.__init__` method, there are these three methods invoked:
 
@@ -205,7 +205,7 @@ The `Model` base class automatically registers a number of useful services into 
 - `sc.AssetRepository` instance to provide access to asset bundles
 - `sc.Styler` instance to control style parameters for each synthesized sample
 
-These instances are likely to be needed by almost all models and they are very common synthesizer dependencies.
+These instances are likely to be needed by almost all models, and they are very common synthesizer dependencies.
 
 The random number generator and styler are also exposed via model fields, so that you can access them inside and outside the model:
 

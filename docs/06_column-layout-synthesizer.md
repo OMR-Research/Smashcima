@@ -2,7 +2,7 @@
 
 This interface represents the (human) writer sitting at a blank piece of paper with stafflines, transcribing a piece of music onto that paper.
 
-To create images of music symbols (glyphs), it uses as a dependency a `GlyphSynthesizer` (and a `LineSynthesizer`). It's responsibility to create these based on the input musical score and position them on the piece of paper according to the rules of common western music notation.
+To create images of music symbols (glyphs), it uses as a dependency a `GlyphSynthesizer` (and a `LineSynthesizer`). Its responsibility is to create these based on the input musical score and position them on the piece of paper according to the rules of common western music notation.
 
 
 ## Public API
@@ -34,7 +34,7 @@ def fill_page(
 ) -> List[System]:
 ```
 
-You give it a page with empty stafflines and a music score plus a measure index from which to start transcribing and it fills the page up with music notation.
+You give it a page with empty stafflines and a music score plus a measure index from which to start transcribing, and it fills the page up with music notation.
 
 The interface also defines these public `bool` flags that you can modify after the synthesizer is instantiated to control the music notation flow:
 

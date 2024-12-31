@@ -5,4 +5,6 @@ title: "Smashcima Technical Documentation"
 date: 2024-12-30
 thanks: "This work has been done by the OmniOMR project within the 2023-2030 NAKI III programme, supported by the Ministry of Culture of the Czech Republic (DH23P03OVV008)."
 number-sections: true
+colorlinks: true
+graphics: true
 ---

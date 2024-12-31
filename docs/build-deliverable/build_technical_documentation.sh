@@ -42,8 +42,7 @@ pandoc -s --resource-path=..\;../assets --extract-media=media/ --metadata title=
 # ---------
 
 # First we build tex, to inspect errors.
-pandoc ${DOCNAME}.html -o ${DOCNAME}.tex -s --toc --top-level-division chapter -V geometry:margin=2.5cm --metadata-file=defaults.yaml --number-sections
- # --template pandoc_smashcima_template.latex
+pandoc ${DOCNAME}.html -o ${DOCNAME}.tex -s --toc --top-level-division chapter -V geometry:margin=2.5cm --metadata-file=defaults.yaml --number-sections --template pandoc_smashcima_template.latex
 
 # Then convert to PDF (do this twice to get hyperref and TOC correctly)
 pdflatex ${DOCNAME}.tex

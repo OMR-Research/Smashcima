@@ -1,4 +1,4 @@
-# Tutorial 2: Changing background texture
+# Changing background texture
 
 This tutorial shows how to modify an existing `Model` class. More specifically, how to change the background texture for the `BaseHandwrittenModel`.
 

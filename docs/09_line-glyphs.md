@@ -2,8 +2,6 @@
 
 This documentation page lists all `LineGlyph` classification labels explicitly known about by Smashcima and defines their start, end, and origin point positions.
 
-> **TODO:** Change barline to a line glyph and add it here.
-
 > Legend:
 > - Red = start point
 > - Green = origin point (of the glyph's affine space)

@@ -1,13 +1,13 @@
 # Affine spaces and rendering
 
-In the previous documentation section we talked about scene objects and how they can represents arbitrary graph-like data. We used the concepts of a `Note` and a `Notehead` to represent semantic and visual objects. In this documentation section we will describe how the visual portion of a scene is described and rendered (delving into how a `Notehead` visual object might be actually implemented in Smashcima).
+In the previous documentation section we talked about scene objects and how they can represent arbitrary graph-like data. We used the concepts of a `Note` and a `Notehead` to represent semantic and visual objects. In this documentation section we will describe how the visual portion of a scene is described and rendered (delving into how a `Notehead` visual object might be actually implemented in Smashcima).
 
 
 ## Affine space
 
 Most 2D computer graphics software is built on the concept of a 2D affine space. This mathematical construct is used in both vector and raster computer graphics software, including [Inkscape](https://inkscape.org/), [Krita](https://krita.org/), [Photoshop](https://www.adobe.com/products/photoshop.html), [Illustrator](https://www.adobe.com/products/illustrator.html), [Figma](https://www.figma.com/) and even the [SVG](https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform) vector graphics data format.
 
-In Smashcima I imagine an affine space as a 2D coordinate system, with an origin somewhere in space and coordinates defined by two basis vectors X and Y sitting at the origin. The two basis vectors can have any length and any direction, although in majority of cases they have unit length and are orthogonal.
+In Smashcima we imagine an affine space as a 2D coordinate system, with an origin somewhere in space and coordinates defined by two basis vectors X and Y sitting at the origin. The two basis vectors can have any length and any direction, although in the majority of cases they have unit length and are orthogonal.
 
 The affine space lets us put 2D real-valued coordinates on the underlying geometric space.
 
@@ -18,14 +18,14 @@ All visual objects that exist in Smashcima must be situated in some affine space
 - `ScenePoint` a 2D point
 - `Region` a polygonal area outline in the scene
 
-For example, when you have a `Point` it consists of two coordinates: X and Y. But these coordinates have no meaning on their own. The point has to be placed into an `AffineSpace`, that defines what these numbers mean in spatial terms. Therefore a `ScenePoint` is nothing more than a `Point` combined with an `AffineSpace` reference.
+For example, when you have a `Point` it consists of two coordinates: X and Y. But these coordinates have no meaning on their own. The point has to be placed into an `AffineSpace`, that defines what these numbers mean in spatial terms. Therefore, a `ScenePoint` is nothing more than a `Point` combined with an `AffineSpace` reference.
 
 
 ### Space hierarchy
 
 Each affine space can be placed into another existing affine space as a child. Its position within the parent space is defined by an affine `Transform`. An affine transform is just a linear transform (rotation, scale, skew, mirror) that also allows for translational movement (translation).
 
-Another words, in the parent space, the child space's origin can be placed anywhere and the child space can be deformed and rotated in any way that keeps its coordinate grid as straight lines that are evenly spaced.
+In other words, in the parent space, the child space's origin can be placed anywhere and the child space can be deformed and rotated in any way that keeps its coordinate grid as straight lines that are evenly spaced.
 
 This nesting of affine spaces lets us take a subset of the scene's visual objects (attached to the child space) and place them anywhere within the parent space as one piece. This means that, for example, a glyph synthesizer can operate in the glyph's local affine space, placing all the glyph strokes properly and then a music notation synthesizer can position the glyph as a whole on a staff.
 
@@ -65,9 +65,9 @@ other_child_space.transform = sc.Transform.identity()
 
 ### Understanding transforms
 
-The affine space's transform is fomally defined as a `2x3` matrix that maps from the child's coordinate system into the parent's coordinate system.
+The affine space's transform is formally defined as a `2x3` matrix that maps from the child's coordinate system into the parent's coordinate system.
 
-Another words, with the parent-child setup from above, with the root space and a child space placed at `(10, 20)`, if we take a point at `(-1, 0)` in the child space, and apply the child's transform to it, we will get `(9, 20)`, which is the point's coordinates in the root space:
+In other words, with the parent-child setup from above, with the root space and a child space placed at `(10, 20)`, if we take a point at `(-1, 0)` in the child space, and apply the child's transform to it, we will get `(9, 20)`, which is the point's coordinates in the root space:
 
 ```py
 point_in_child_coords = sc.Point(-1, 0)
@@ -102,7 +102,7 @@ So far affine spaces have been defined purely mathematically without any units. 
 
 This is because we are mostly dealing with scales in the range of a piece of paper, where a millimeter is an appropriate unit (used by many 2D computer graphics software tools).
 
-Smashcima uses physical spatial units, as opposed to pixels, because it aims to harmonize data from various scanned source datasets, which may have been rasterized at various DPIs. Sticking to millimiters is a way to reconcile these differences.
+Smashcima uses physical spatial units, as opposed to pixels, because it aims to harmonize data from various scanned source datasets, which may have been rasterized at various DPIs. Sticking to millimeters is a way to reconcile these differences.
 
 To convert between millimeters and pixels with a given DPI, you can use these utility functions:
 
@@ -116,7 +116,7 @@ print(sc.px_to_mm(1, dpi=300)) # 0.08133333333333333
 
 ## Sprites
 
-Now that we have the space itself covered with coordinate systems, we need to place some objects into it. Because most handwritten musical symbol datasets use raster images, I built the Smashcima visual rendering system on raster images as well.
+Now that we have the space itself covered with coordinate systems, we need to place some objects into it. Because most handwritten musical symbol datasets use raster images, we built the Smashcima visual rendering system on raster images as well.
 
 A `Sprite` is a raster image, placed somewhere in an `AffineSpace`, with well-defined scale.
 
@@ -199,4 +199,4 @@ The renderer is given only the `view_box` but since it links to its affine space
 
 The whole visual scene hangs on the root space and is not garbage collected, because of the double-linking tracked by `SceneObject`s discussed in the previous documetation section.
 
-> **TODO:** View boxes currently assume they are placed in the root affine space. It should be supported that they can be placed in any sub-space. But they must still render the whole scene from its root space. (note it's not view boxes that assume that, it's the BitmapRenderer that assumes that)
+> **NOTE:** View boxes currently assume they are placed in the root affine space. It should be supported that they can be placed in any sub-space. But they must still render the whole scene from its root space. (Specifically, it is not view boxes that assume that, it is the BitmapRenderer that assumes that.)

@@ -16,7 +16,7 @@ Example output with MUSCIMA++ writer no. 28 style:
 pip install smashcima
 ```
 
-This document is for those who want to not just apply Smashcima in their OMR workflows within their visual domains (such as new manuscript datasets), but to understand how it is designed and contribute to its development (e.g. to enable it to operate without individual glyphs).
+This document is meant for OMR developers who want to use Smashcima to produce synthetic data for their use case. That includes adapting it to the visual domain with new annotations of music notation glyphs. (The technical documentation, on the other hand, is meant for those who want to contribute to the development of Smashcima and extends its capabilities beyond the glyph-based paradigm that it currently serves.)
 
 ## What is Smashcima, who is it for, and how is it novel?
 

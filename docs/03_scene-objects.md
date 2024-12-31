@@ -43,7 +43,7 @@ my_note = Note(
 )
 ```
 
-> **Note:** Using the `@dataclass` decorator helps us auto-generate the constructor with all the arguments and verifying that all are provided. It is not necessary to use it though.
+> **Note:** Using the `@dataclass` decorator helps us auto-generate the constructor with all the arguments and verifying that all are provided. It is not necessary to use it, though.
 
 Now we can build a \*\*kern loader that reads a `.krn` file and constructs a list of these notes. We can now represent the music semantically (although very simplified for the purpose of this example). We can imagine that the loader returns a `list[Note]` instance which lets us hold the whole score in one variable.
 
@@ -111,11 +111,11 @@ In your own project, you would be tempted to modify the `Note` class and just ad
 Another option could be to create a `ColoredNote` class, which inherits from the `Note` class. But this also poses a few problems:
 
 1. How do you construct the `ColoredNote` instance, if the kern loader returns `Note` instances? And if you just copy all the values around, how do you know it won't break with a future update to Smashcima that adds new fields you didn't expect to be added?
-2. What if a third person wants to also represent notehead shapes (square, slash, cross). They would build a `ShapedNote` class. But what does the inheritance chain look like now? Does the `ShapedNote` inherit from `ColoredNote` or the other way around? And what if you two don't even know about one another, but a third person wants to use both of your extensions?
+2. What if a third person wants to also represent notehead shapes (square, slash, cross)? They would build a `ShapedNote` class. But what does the inheritance chain look like now? Does the `ShapedNote` inherit from `ColoredNote` or the other way around? And what if you two don't even know about one another, but a third person wants to use both of your extensions?
 
-You can see how inheritance only leads to hell in this situation.
+You can see how inheritance quickly leads to unmaintainable software in such situations.
 
-Instead what I came up with in Smashcima is the ability to just extend the scene graph by adding a few new nodes and attaching them to existing instances:
+Instead, we deal with extensibility in Smashcima by giving you the ability to extend the _scene graph_ by adding new nodes and attaching them to existing instances.
 
 You can define a `NoteColor` scene object and link it to a note:
 
@@ -168,7 +168,7 @@ Scene objects can also reference other scene objects optionally, e.g. having a f
 
 Similarly, a scene object can reference a list of objects (e.g. a `Voice` references a list of `Note`s). When a `SceneObject` is assigned a `list` instance, the logic goes through the list and creates a graph link to all of the contained scene objects (while ignoring plain python types).
 
-Note that, since all of this logic happens in `__setattr__` magic method, the system does not pick up `.append` or `.pop` or `del list[4]` or `+= [item]` invocations. If you want to modify a list of scene objects, you have to construct a new list and then set it using `obj.list = new_list`! Another words, you should treat the list as being immutable.
+Note that, since all of this logic happens in `__setattr__` magic method, the system does not pick up `.append` or `.pop` or `del list[4]` or `+= [item]` invocations. If you want to modify a list of scene objects, you have to construct a new list and then set it using `obj.list = new_list`! In other words, you should treat the list as being immutable.
 
 > **Warning:** If you do call `.append` on a list of scene object, you will de-synchronize the graph links from the python instance values and this will result in unexpected behaviour when querying those links. There is no safety logic that would detect that!
 
@@ -187,7 +187,7 @@ my_note_color = NoteColor(
 
 ### Detaching objects from scene
 
-Because if this linking behaviour, if you want to throw away part of the scene (to replace it, or just to completely delete it), you cannot just forget about it. You have to also break its references to the rest of the scene.
+Because of this linking behaviour, if you want to throw away part of the scene (to replace it, or just to completely delete it), you cannot just forget about it. You have to also break its references to the rest of the scene.
 
 For example, to destroy the `NoteColor` instance we created earlier, we need to set its reference to the `Note` to `None`:
 
@@ -197,7 +197,7 @@ my_note_color.note = None
 
 Only now will the `my_note_color` instance be garbage collected.
 
-Because this operation makes sense for many scene objects, but the way in which to achieve it depends on the semantics (you need to know, which reference is THE reference that links this sub-scene to the rest of the scene), you must implement this logic manually (it cannot be provided by default by the `SceneObject` class).
+Because this operation makes sense for many scene objects, but the way in which to achieve it depends on the semantics (you need to know, which reference is _the_ reference that links this sub-scene to the rest of the scene), you must implement this logic manually (it cannot be provided by default by the `SceneObject` class).
 
 When you encapsulate this detachment logic into a method, the convention is to call this method `detach()`:
 
@@ -212,7 +212,7 @@ class Notehead(sc.SceneObject):
         self.note = None # type: ignore
 ```
 
-Also note that you cannot really *destroy* a python class instance. Only the garbage collector can do that. And only when no live instances point to it. Doing `del my_note_color` only deletes the local variable, NOT the instance. You can still get hold of the instance via `my_note.inlinks`. That's why you need a dedicated `detach()` method that breaks these links.
+Also note that you cannot really *destroy* a python class instance. Only the garbage collector can do that. And only when no live instances point to it. Doing `del my_note_color` only deletes the local variable, _not_ the instance. You can still get hold of the instance via `my_note.inlinks`. That is why a dedicated `detach()` method that breaks these links is necessary.
 
 
 ## Relationship querying
@@ -232,7 +232,7 @@ my_notehead: Notehead \
     = Notehead.of(my_note, lambda n: n.note)
 ```
 
-The `.of` method is a class-method defined on the `SceneObject`, meaning it will be available on every type ingeriting from the `SceneObject` and it always returns the specific type (e.g. `Notehead`).
+The `.of` method is a class-method defined on the `SceneObject`, meaning it will be available on every type inheriting from the `SceneObject` and it always returns the specific type (e.g. `Notehead`).
 
 If the scene link may not exist (and it is ok for it not to exist), you can instruct the query to return `None` in such cases:
 
@@ -255,7 +255,7 @@ children: list[AffineSpace] \
 
 ### Named queries
 
-While using these generic inverse queries with `lambda` expressions for link names is possible, it's a little bit verbose and hard to read. Instead, when defining a new scene object type, you should provide a set of custom methods that define better names for these queries.
+While using these generic inverse queries with `lambda` expressions for link names is possible, it is a little bit verbose and hard to read. Instead, when defining a new scene object type, you should provide a set of custom methods that define better names for these queries.
 
 For example, we can extend the `Notehead` class to define the query to get a notehead for a corresponding `Note`:
 
@@ -324,4 +324,4 @@ scene.has(my_notehead) # returns True
 
 ## Conclusion
 
-This documentation page talks about `SceneObject`s in the abstract. But that's just the very core of Smashcima. You then also have a libarary of already pre-defined scene objects with fixed meaning that can be used to desribe a synthetic sheet of music. The rest of the scene documentation talks about those.
+This documentation page talks about `SceneObject`s in the abstract. But that's just the very core of Smashcima. You then also have a library of already pre-defined scene objects with fixed meaning that can be used to describe a synthetic sheet of music. The rest of the scene documentation talks about those.
