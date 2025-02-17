@@ -74,8 +74,6 @@ If you feel like improving the library, take a look at the [TODO List](docs/todo
 
 ## Development
 
-### After cloning
-
 Create a virtual environment and install dependencies:
 
 ```bash
@@ -89,12 +87,7 @@ python3 -m venv .venv
 .venv/bin/pip3 install -e .[gradio]
 ```
 
-
-### Checklists
-
-- [Before commit](docs/checklists/before-commit.md)
-- [Publishing to PyPI](docs/checklists/publishing-to-pypi.md)
-- [Deploying Gradio Demo](docs/checklists/deploying-gradio-demo.md)
+Read the [Development Setup](docs/development-setup.md) documentation page to see how to develop, debug, and deploy the project.
 
 
 ## Financing
