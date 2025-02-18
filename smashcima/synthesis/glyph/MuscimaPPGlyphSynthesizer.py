@@ -1,4 +1,4 @@
-from typing import Set, Dict
+from typing import Dict
 from ..GlyphSynthesizer import GlyphSynthesizer
 from smashcima.scene.Glyph import Glyph
 from smashcima.assets.AssetRepository import AssetRepository
@@ -88,9 +88,10 @@ class MuscimaPPGlyphSynthesizer(GlyphSynthesizer):
         current writer"""
         # get the list of glyphs to choose from
         # (if writer is missing this class, fall back on all writers)
-        packed_glyphs = self.symbol_repository.glyphs_by_class_and_writer.get(
-            (label, self.mpp_style_domain.current_writer)
-        ) or self.symbol_repository.glyphs_by_class.get(label)
+        glyphs_index = self.symbol_repository.glyphs_index
+        packed_glyphs = glyphs_index.glyphs_by_label_and_style.get(
+            (label, str(self.mpp_style_domain.current_writer))
+        ) or glyphs_index.glyphs_by_label.get(label)
 
         if packed_glyphs is None or len(packed_glyphs) == 0:
             raise Exception(

@@ -4,7 +4,6 @@ from ..LineSynthesizer import LineSynthesizer
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.assets.AssetRepository import AssetRepository
 from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
-from smashcima.assets.glyphs.muscima_pp.LineList import LineList
 from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
 from typing import Dict
@@ -46,19 +45,18 @@ class MuscimaPPLineSynthesizer(LineSynthesizer):
         mpp_label = _QUERY_TO_MPP_LOOKUP[label]
 
         # select the proper glyph list
-        glyphs = self.symbol_repository.glyphs_by_class_and_writer.get(
-            (mpp_label, self.mpp_style_domain.current_writer)
-        ) or self.symbol_repository.glyphs_by_class.get(mpp_label)
-        assert isinstance(glyphs, LineList), \
-            f"Got line glyphs without index for {mpp_label}"
+        line_glyphs_index = self.symbol_repository.line_glyphs_index
+        glyphs = line_glyphs_index.glyphs_by_label_and_style.get(
+            (mpp_label, str(self.mpp_style_domain.current_writer))
+        ) or line_glyphs_index.glyphs_by_label.get(mpp_label)
 
-        if glyphs is None or len(glyphs) == 0:
+        if glyphs is None or len(glyphs.lines) == 0:
             raise Exception(
                 f"The glyph class {label} is not present in " + \
                 "the symbol repository"
             )
 
-        # pick a random glyph from the list and copy it
+        # pick a random glyph from the list
         packed_glyph = glyphs.pick_line(delta.magnitude, self.rng)
 
         # deserialization makes sure we create a new instance here
@@ -66,7 +64,8 @@ class MuscimaPPLineSynthesizer(LineSynthesizer):
         assert isinstance(glyph, LineGlyph), \
             "The unpacked glyph is not a LineGlyph"
 
-        # ensure the label
+        # adjust its glyph class to match what the user wants
+        # (because the mapping dictionary is not really 1:1)
         glyph.label = label
 
         return glyph

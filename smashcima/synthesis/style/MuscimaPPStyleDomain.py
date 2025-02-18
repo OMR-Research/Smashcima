@@ -13,7 +13,9 @@ class MuscimaPPStyleDomain(StyleDomain):
         bundle = assets.resolve_bundle(MuscimaPPGlyphs)
         symbol_repository = bundle.load_symbol_repository()
         
-        self.all_writers: List[int] = list(sorted(symbol_repository.all_writers))
+        self.all_writers: List[int] = list(sorted(
+            int(style) for style in symbol_repository.get_all_styles()
+        ))
         "The domain of all MPP writers (their numbers)"
         
         self.rng = rng

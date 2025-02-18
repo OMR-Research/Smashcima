@@ -1,9 +1,8 @@
 import pickle
-from typing import Optional
 
-from smashcima.scene import Glyph, LineGlyph
+from smashcima.scene import Glyph
 
-from .MppGlyphMetadata import MppGlyphMetadata
+from .MungGlyphMetadata import MungGlyphMetadata
 
 
 class PackedGlyph:
@@ -20,27 +19,24 @@ class PackedGlyph:
     
     def __init__(
         self,
-        line_length: Optional[float],
-        mpp_writer: int,
+        label: str,
+        mung_style: str,
         data: bytes
     ):
-        self.line_length = line_length
-        """If a line glyph, stores its length for sampling lookups"""
+        self.label = label
+        """Glyph classification label"""
         
-        self.mpp_writer = mpp_writer
-        """Number of the MUSCIMA++ writer"""
+        self.mung_style = mung_style
+        """Style identifier of the mung glyph (writer number, book UUID, ...)"""
 
         self.data = data
         """The pickled glyph instance"""
 
     @staticmethod
-    def pack(glyph: Glyph) -> "PackedGlyph":
-        line_length: Optional[float] = None
-        if isinstance(glyph, LineGlyph):
-            line_length = glyph.line_length
+    def pack_glyph(glyph: Glyph) -> "PackedGlyph":
         return PackedGlyph(
-            line_length=line_length,
-            mpp_writer=MppGlyphMetadata.of_glyph(glyph).mpp_writer,
+            label=glyph.label,
+            mung_style=MungGlyphMetadata.of_glyph(glyph).mung_style,
             data=pickle.dumps(glyph)
         )
     

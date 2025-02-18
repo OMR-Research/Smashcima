@@ -1,3 +1,5 @@
+from ..mung.MungSymbolRepository import MungSymbolRepository
+from smashcima.scene import Glyph, LineGlyph
 from ...AssetBundle import AssetBundle
 from ...datasets.MuscimaPP import MuscimaPP
 from smashcima.exporting.DebugGlyphRenderer import DebugGlyphRenderer
@@ -26,14 +28,13 @@ from .get_symbols import \
     get_accidentals, \
     get_brackets_and_braces, \
     get_time_marks
-from .SymbolRepository import SymbolRepository
 from .MppGlyphMetadata import MppGlyphMetadata
 from pathlib import Path
 import pickle
 from tqdm import tqdm
 import shutil
 import cv2
-from typing import Optional
+from typing import Any, List, Optional
 
 
 # Re-install asset bunle during development by running:
@@ -41,7 +42,7 @@ from typing import Optional
 
 class MuscimaPPGlyphs(AssetBundle):
     def __post_init__(self) -> None:
-        self._symbol_repository_cache: Optional[SymbolRepository] = None
+        self._symbol_repository_cache: Optional[MungSymbolRepository] = None
 
         self.muscima_pp = self.dependency_resolver.resolve_bundle(MuscimaPP)
 
@@ -49,68 +50,63 @@ class MuscimaPPGlyphs(AssetBundle):
     def symbol_repository_path(self) -> Path:
         return self.bundle_directory / "symbol_repository.pkl"
     
-    def install(self):
+    def install(self) -> None:
         """Extracts data from the MUSCIMA++ dataset and bundles it up
         in the symbol repository in a pickle file."""
         document_paths = list(
             self.muscima_pp.cropobjects_directory.glob("CVC-MUSCIMA_*-ideal.xml")
         )
 
-        repository = SymbolRepository()
+        items: List[Any] = []
 
         # go through all the MUSCIMA++ XML files
         for document_path in tqdm(document_paths):
             page = MppPage.load(document_path)
 
             # and extract glyphs
-            repository.add_glyphs(get_full_noteheads(page))
-            repository.add_glyphs(get_empty_noteheads(page))
-            repository.add_glyphs(get_normal_barlines(page))
-            repository.add_glyphs(get_whole_rests(page))
-            repository.add_glyphs(get_half_rests(page))
-            repository.add_glyphs(get_quarter_rests(page))
-            repository.add_glyphs(get_eighth_rests(page))
-            repository.add_glyphs(get_sixteenth_rests(page))
-            repository.add_glyphs(get_g_clefs(page))
-            repository.add_glyphs(get_f_clefs(page))
-            repository.add_glyphs(get_c_clefs(page))
-            repository.add_glyphs(get_stems(page))
-            repository.add_glyphs(get_beams(page))
-            repository.add_glyphs(get_beam_hooks(page))
-            repository.add_glyphs(get_ledger_lines(page))
-            repository.add_glyphs(get_duration_dots(page))
-            repository.add_glyphs(get_staccato_dots(page))
-            repository.add_glyphs(get_accidentals(page))
-            repository.add_glyphs(get_brackets_and_braces(page))
-            repository.add_glyphs(get_time_marks(page))
+            items += get_full_noteheads(page)
+            items += get_empty_noteheads(page)
+            items += get_normal_barlines(page)
+            items += get_whole_rests(page)
+            items += get_half_rests(page)
+            items += get_quarter_rests(page)
+            items += get_eighth_rests(page)
+            items += get_sixteenth_rests(page)
+            items += get_g_clefs(page)
+            items += get_f_clefs(page)
+            items += get_c_clefs(page)
+            items += get_stems(page)
+            items += get_beams(page)
+            items += get_beam_hooks(page)
+            items += get_ledger_lines(page)
+            items += get_duration_dots(page)
+            items += get_staccato_dots(page)
+            items += get_accidentals(page)
+            items += get_brackets_and_braces(page)
+            items += get_time_marks(page)
             # (flags must come after stems)
             glyphs_8th_flag, glyphs_16th_flag = get_flags(page)
-            repository.add_glyphs(glyphs_8th_flag)
-            repository.add_glyphs(glyphs_16th_flag)
-
-            # and construct line indexes
-            repository.index_lines([
-                SmuflLabels.stem.value,
-                SmashcimaLabels.beam.value,
-                SmashcimaLabels.beamHook.value,
-                SmashcimaLabels.ledgerLine.value
-            ])
+            items += glyphs_8th_flag
+            items += glyphs_16th_flag
 
             # TODO: and extract distributions
+
+        # build the repository
+        repository = MungSymbolRepository.build_from_items(items)
 
         # dump the repository into a pickle file
         with open(self.symbol_repository_path, "wb") as file:
             pickle.dump(repository, file)
             print("Writing...", self.symbol_repository_path)
     
-    def load_symbol_repository(self) -> SymbolRepository:
+    def load_symbol_repository(self) -> MungSymbolRepository:
         """Loads the symbol repository from its pickle file"""
         if self._symbol_repository_cache is None:
             with open(self.symbol_repository_path, "rb") as file:
                 repository = pickle.load(file)
-            assert isinstance(repository, SymbolRepository)
+            assert isinstance(repository, MungSymbolRepository)
             self._symbol_repository_cache = repository
-        
+
         return self._symbol_repository_cache
     
     def build_debug_folder(self):
@@ -122,9 +118,15 @@ class MuscimaPPGlyphs(AssetBundle):
         shutil.rmtree(debug_folder, ignore_errors=True)
         debug_folder.mkdir()
 
+        def _iter_label_pgs():
+            for label, pgs in repository.glyphs_index.glyphs_by_label.items():
+                yield label, pgs
+            for label, pgls in repository.line_glyphs_index.glyphs_by_label.items():
+                yield label, pgls.lines
+
         # glyphs
         glyph_renderer = DebugGlyphRenderer()
-        for label, packed_glyphs in repository.glyphs_by_class.items():
+        for label, packed_glyphs in _iter_label_pgs():
             glyphs_folder = debug_folder / label.replace(":", "-")
             glyphs_folder.mkdir()
 
