@@ -14,6 +14,7 @@ dependencies = [
     "tqdm",
     "nameof",
     "punq",
+    "mung",
     "muscima",
     "scikit-image", # needed for `muscima`
 ]

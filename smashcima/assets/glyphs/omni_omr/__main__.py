@@ -14,8 +14,8 @@ assets = AssetRepository(Path("smashcima_assets"))
 print("Re-installing OmniOMR glyphs...")
 bundle = assets.resolve_bundle(OmniOMRGlyphs, force_install=True)
 
-# if len(sys.argv) >= 2 and sys.argv[1] == "--debug":
-#     print("Building the debug folder...")
-#     bundle.build_debug_folder()
+if len(sys.argv) >= 2 and sys.argv[1] == "--debug":
+    print("Building the debug folder...")
+    bundle.build_debug_folder()
 
 print("Done.")
