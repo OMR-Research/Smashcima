@@ -81,6 +81,46 @@ class BaseSymbolExtractor(ABC):
 
         # and add to the bag
         self.bag.add_glyph(glyph)
+    
+    def emit_glyph_on_staffline(
+        self,
+        node: Node,
+        glyph_label: str,
+        staffline_index_from_top: int
+    ):
+        """Creates a glyph from mung node and positions the sprite origin
+        vertically to align with the given staffline"""
+        assert staffline_index_from_top >= 0 and staffline_index_from_top < 5
+        
+        # get the staffline
+        linked_staff_nodes = self.graph.children(node, ["staff"])
+        assert len(linked_staff_nodes) > 0, \
+            "There is no linked staff for the given MuNG node"
+        staff_node = linked_staff_nodes[0]
+        staffline_nodes = self.graph.children(staff_node, ["staffLine"])
+        
+        # TODO: DEBUG
+        if len(staffline_nodes) != 5:
+            print(staff_node)
+            print(staffline_nodes)
+            exit()
+
+        assert len(staffline_nodes) == 5, \
+            "The linked staff does not have 5 stafflines"
+        staffline_nodes.sort(key=lambda s: s.top)
+        staffline_node = staffline_nodes[staffline_index_from_top]
+        
+        # compute origin point
+        line_y = (staffline_node.top + staffline_node.bottom) // 2
+        origin_y = (line_y - node.top) / node.height
+        sprite_origin = Point(0.5, origin_y)
+
+        # emit the glyph
+        self.emit_glyph_from_mung_node(
+            node=node,
+            glyph_label=glyph_label,
+            sprite_origin=sprite_origin
+        )
 
     ###############################
     # Specific Extraction Methods #
@@ -90,6 +130,11 @@ class BaseSymbolExtractor(ABC):
         """Executes extraction logic for all implemented symbols"""
         self.extract_full_noteheads()
         self.extract_empty_noteheads()
+        self.extract_whole_rests()
+        self.extract_half_rests()
+        self.extract_quarter_rests()
+        self.extract_eighth_rests()
+        self.extract_sixteenth_rests()
         # ...
         self.extract_c_clefs()
         # ...
@@ -100,6 +145,26 @@ class BaseSymbolExtractor(ABC):
     
     @abstractmethod
     def extract_empty_noteheads(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def extract_whole_rests(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def extract_half_rests(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def extract_quarter_rests(self):
+        raise NotImplementedError
+    
+    @abstractmethod
+    def extract_eighth_rests(self):
+        raise NotImplementedError
+    
+    @abstractmethod
+    def extract_sixteenth_rests(self):
         raise NotImplementedError
 
     # ...

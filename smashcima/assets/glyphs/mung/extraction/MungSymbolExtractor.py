@@ -28,6 +28,46 @@ class MungSymbolExtractor(BaseSymbolExtractor):
                 sprite_origin=Point(0.5, 0.5)
             )
 
+    def extract_whole_rests(self):
+        for node in self.iterate_nodes(["restWhole"]):
+            self.emit_glyph_on_staffline(
+                node=node,
+                glyph_label=SmuflLabels.restWhole.value,
+                staffline_index_from_top=1 # 2nd line
+            )
+
+    def extract_half_rests(self):
+        for node in self.iterate_nodes(["restHalf"]):
+            self.emit_glyph_on_staffline(
+                node=node,
+                glyph_label=SmuflLabels.restHalf.value,
+                staffline_index_from_top=2 # middle line
+            )
+
+    def extract_quarter_rests(self):
+        for node in self.iterate_nodes(["restQuarter"]):
+            self.emit_glyph_on_staffline(
+                node=node,
+                glyph_label=SmuflLabels.restQuarter.value,
+                staffline_index_from_top=2 # middle line
+            )
+    
+    def extract_eighth_rests(self):
+        for node in self.iterate_nodes(["rest8th"]):
+            self.emit_glyph_on_staffline(
+                node=node,
+                glyph_label=SmuflLabels.rest8th.value,
+                staffline_index_from_top=2 # middle line
+            )
+    
+    def extract_sixteenth_rests(self):
+        for node in self.iterate_nodes(["rest16th"]):
+            self.emit_glyph_on_staffline(
+                node=node,
+                glyph_label=SmuflLabels.rest16th.value,
+                staffline_index_from_top=2 # middle line
+            )
+
     # ...
 
     def extract_c_clefs(self):

@@ -1,7 +1,8 @@
 import pickle
 import shutil
+import traceback
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 import cv2
 from tqdm import tqdm
@@ -14,6 +15,9 @@ from ..mung.extraction.ExtractedBag import ExtractedBag
 from ..mung.extraction.MungDocument import MungDocument
 from ..mung.MungGlyphMetadata import MungGlyphMetadata
 from ..mung.repository.MungSymbolRepository import MungSymbolRepository
+from ..mung.utils.link_nodes_to_staves import \
+    link_nodes_to_staves
+from ..mung.utils.link_stafflines_to_staves import link_stafflines_to_staves
 from .OmniOMRSymbolExtractor import OmniOMRSymbolExtractor
 
 
@@ -41,17 +45,25 @@ class OmniOMRGlyphs(AssetBundle):
 
         # go through all the MuNG XML files
         for document_path in tqdm(document_paths):
+            print(document_path.stem)
             document = MungDocument.load(
                 document_path,
                 dpi=300 # TODO: extract DPI for each sample into a separate CSV
             )
-            # TODO: run a correction on the document! (assign things to staves)
-            extractor = OmniOMRSymbolExtractor(document=document, bag=bag)
-            extractor.extract_all_symbols()
+
+            # correct for things missing in the proto dataset
+            try:
+                link_stafflines_to_staves(document.graph)
+                link_nodes_to_staves(document.graph)
+
+                extractor = OmniOMRSymbolExtractor(document=document, bag=bag)
+                extractor.extract_all_symbols()
+            except Exception as e:
+                print(traceback.format_exc())
 
             # TODO: DEBUG
-            print("DEBUG! BREAKING AFTER THE FIRST DOCUMENT")
-            break
+            # print("DEBUG! BREAKING AFTER THE FIRST DOCUMENT")
+            # break
 
         # build the repository
         repository = bag.build_symbol_repository()
