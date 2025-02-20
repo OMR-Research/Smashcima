@@ -2,7 +2,7 @@ import pickle
 
 from smashcima.scene import Glyph
 
-from .MungGlyphMetadata import MungGlyphMetadata
+from ..MungGlyphMetadata import MungGlyphMetadata
 
 
 class PackedGlyph:

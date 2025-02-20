@@ -1,4 +1,4 @@
-from ..mung.MungSymbolRepository import MungSymbolRepository
+from ..mung.repository.MungSymbolRepository import MungSymbolRepository
 from smashcima.scene import Glyph, LineGlyph
 from ...AssetBundle import AssetBundle
 from ...datasets.MuscimaPP import MuscimaPP

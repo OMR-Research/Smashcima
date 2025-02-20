@@ -11,7 +11,7 @@ from smashcima.exporting.DebugGlyphRenderer import DebugGlyphRenderer
 from ...AssetBundle import AssetBundle
 from ...datasets.OmniOMRProto import OmniOMRProto
 from ..mung.MungGlyphMetadata import MungGlyphMetadata
-from ..mung.MungSymbolRepository import MungSymbolRepository
+from ..mung.repository.MungSymbolRepository import MungSymbolRepository
 from .get_symbols import get_full_noteheads
 from .OmniOMRDocument import OmniOMRDocument
 
