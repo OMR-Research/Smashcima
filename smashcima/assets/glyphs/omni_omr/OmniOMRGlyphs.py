@@ -1,7 +1,7 @@
 import pickle
 import shutil
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import List, Optional
 
 import cv2
 from tqdm import tqdm
@@ -10,10 +10,11 @@ from smashcima.exporting.DebugGlyphRenderer import DebugGlyphRenderer
 
 from ...AssetBundle import AssetBundle
 from ...datasets.OmniOMRProto import OmniOMRProto
+from ..mung.extraction.ExtractedBag import ExtractedBag
+from ..mung.extraction.MungDocument import MungDocument
 from ..mung.MungGlyphMetadata import MungGlyphMetadata
 from ..mung.repository.MungSymbolRepository import MungSymbolRepository
-from .get_symbols import get_full_noteheads
-from .OmniOMRDocument import OmniOMRDocument
+from .OmniOMRSymbolExtractor import OmniOMRSymbolExtractor
 
 
 class OmniOMRGlyphs(AssetBundle):
@@ -35,21 +36,25 @@ class OmniOMRGlyphs(AssetBundle):
             self.omni_omr_proto.mung_directory.glob("*.xml")
         )
 
-        items: List[Any] = []
+        # collects extracted symbols
+        bag = ExtractedBag()
 
-        # go through all the MUSCIMA++ XML files
+        # go through all the MuNG XML files
         for document_path in tqdm(document_paths):
-            document = OmniOMRDocument.load(document_path)
+            document = MungDocument.load(
+                document_path,
+                dpi=300 # TODO: extract DPI for each sample into a separate CSV
+            )
+            # TODO: run a correction on the document! (assign things to staves)
+            extractor = OmniOMRSymbolExtractor(document=document, bag=bag)
+            extractor.extract_all_symbols()
 
-            items += get_full_noteheads(document)
-            # ...
-            
             # TODO: DEBUG
             print("DEBUG! BREAKING AFTER THE FIRST DOCUMENT")
             break
 
         # build the repository
-        repository = MungSymbolRepository.build_from_items(items)
+        repository = bag.build_symbol_repository()
 
         # dump the repository into a pickle file
         with open(self.symbol_repository_path, "wb") as file:
