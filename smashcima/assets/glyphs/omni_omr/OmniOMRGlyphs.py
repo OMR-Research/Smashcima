@@ -1,8 +1,9 @@
+import csv
 import pickle
 import shutil
 import traceback
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional
 
 import cv2
 from tqdm import tqdm
@@ -40,19 +41,21 @@ class OmniOMRGlyphs(AssetBundle):
             self.omni_omr_proto.mung_directory.glob("*.xml")
         )
 
+        dpi_lookup = self._load_dpi_lookup()
+
         # collects extracted symbols
         bag = ExtractedBag()
 
         # go through all the MuNG XML files
         for document_path in tqdm(document_paths):
-            print(document_path.stem)
+            print(document_path.stem, "@", dpi_lookup[document_path.stem])
             document = MungDocument.load(
                 document_path,
-                dpi=300 # TODO: extract DPI for each sample into a separate CSV
+                dpi=dpi_lookup[document_path.stem]
             )
 
-            # correct for things missing in the proto dataset
             try:
+                # correct for things missing in the proto dataset
                 link_stafflines_to_staves(document.graph)
                 link_nodes_to_staves(document.graph)
 
@@ -72,6 +75,26 @@ class OmniOMRGlyphs(AssetBundle):
         with open(self.symbol_repository_path, "wb") as file:
             pickle.dump(repository, file)
             print("Writing...", self.symbol_repository_path)
+    
+    def _load_dpi_lookup(self) -> Dict[str, float]:
+        """Loads the 'dpi_values.csv' lookup table"""
+        index_path = Path(__file__).parent / "dpi_values.csv"
+
+        lookup: Dict[str, float] = {}
+
+        with open(index_path, "r") as f:
+            reader = csv.reader(f, delimiter=",", quotechar='"')
+
+            # header
+            assert next(reader) == [
+                "document", "dpi"
+            ]
+
+            # records
+            for record in reader:
+                lookup[record[0]] = float(record[1])
+        
+        return lookup
     
     def load_symbol_repository(self) -> MungSymbolRepository:
         """Loads the symbol repository from its pickle file"""

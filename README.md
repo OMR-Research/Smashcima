@@ -68,6 +68,8 @@ Smashcima is primarily a framework and a set of crafted interfaces for building 
     - [Line glyphs](docs/line-glyphs.md)
     - Style control
 - Asset bundles
+- Miscelaneous
+    - [Determining scanned artifact DPI](docs/determining-scanned-artifact-dpi.md)
 
 If you feel like improving the library, take a look at the [TODO List](docs/todo-list.md).
 
