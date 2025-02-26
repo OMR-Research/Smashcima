@@ -64,10 +64,6 @@ class OmniOMRGlyphs(AssetBundle):
             except Exception as e:
                 print(traceback.format_exc())
 
-            # TODO: DEBUG
-            # print("DEBUG! BREAKING AFTER THE FIRST DOCUMENT")
-            # break
-
         # build the repository
         repository = bag.build_symbol_repository()
 

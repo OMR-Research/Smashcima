@@ -21,7 +21,6 @@ def link_stafflines_to_staves(graph: NotationGraph):
 
     assert len(all_lines) % 5 == 0, \
         "Staffline count is not divisible by 5"
-    print(len(all_lines), len(all_staves))
     assert len(all_lines) == len(all_staves) * 5, \
         "Staves and stafflines cannot be paired up"
 

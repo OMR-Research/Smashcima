@@ -1,3 +1,5 @@
+from typing import Dict
+
 from smashcima.geometry import Point
 from smashcima.geometry.units import px_to_mm
 from smashcima.scene.SmashcimaLabels import SmashcimaLabels
@@ -153,6 +155,7 @@ class MungSymbolExtractor(BaseSymbolExtractor):
             )
     
     def extract_beams(self):
+        # TODO: separate beam hooks by notation graph, not size
         for node in self.iterate_nodes(["beam"],
             lambda n: px_to_mm(n.width, dpi=self.document.dpi) \
                 > self.BEAM_HOOK_MAX_WIDTH_MM
@@ -165,6 +168,7 @@ class MungSymbolExtractor(BaseSymbolExtractor):
             )
     
     def extract_beam_hooks(self):
+        # TODO: separate beam hooks by notation graph, not size
         for node in self.iterate_nodes(["beam"],
             lambda n: px_to_mm(n.width, dpi=self.document.dpi) \
                 <= self.BEAM_HOOK_MAX_WIDTH_MM
@@ -184,3 +188,48 @@ class MungSymbolExtractor(BaseSymbolExtractor):
                 horizontal_line=True, # horizontal line
                 in_increasing_direction=True # pointing to the right
             )
+
+    def extract_brackets_and_braces(self):
+        for node in self.iterate_nodes(["bracket"]):
+            self.emit_line_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmuflLabels.bracket.value,
+                horizontal_line=False, # vertical line
+                in_increasing_direction=True # drawn top-to-bottom
+            )
+        
+        for node in self.iterate_nodes(["brace"]):
+            self.emit_line_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmuflLabels.brace.value,
+                horizontal_line=False, # vertical line
+                in_increasing_direction=True # drawn top-to-bottom
+            )
+
+    def extract_time_marks(self) -> None:
+        _GLYPH_CLASS_LOOKUP: Dict[str, str] = {
+            "numeral0": SmuflLabels.timeSig0.value,
+            "numeral1": SmuflLabels.timeSig1.value,
+            "numeral2": SmuflLabels.timeSig2.value,
+            "numeral3": SmuflLabels.timeSig3.value,
+            "numeral4": SmuflLabels.timeSig4.value,
+            "numeral5": SmuflLabels.timeSig5.value,
+            "numeral6": SmuflLabels.timeSig6.value,
+            "numeral7": SmuflLabels.timeSig7.value,
+            "numeral8": SmuflLabels.timeSig8.value,
+            "numeral9": SmuflLabels.timeSig9.value,
+            # TODO: what about numeral "12" which is present in OmniOMR?
+            "timeSigCommon": SmuflLabels.timeSigCommon.value,
+            "timeSigCutCommon": SmuflLabels.timeSigCutCommon.value,
+        }
+
+        for time_signature in self.iterate_nodes(["timeSignature"]):
+            for time_mark in self.graph.children(
+                time_signature,
+                list(_GLYPH_CLASS_LOOKUP.keys())
+            ):
+                self.emit_glyph_from_mung_node(
+                    node=time_mark,
+                    glyph_label=_GLYPH_CLASS_LOOKUP[time_mark.class_name],
+                    sprite_origin=Point(0.5, 0.5)
+                )

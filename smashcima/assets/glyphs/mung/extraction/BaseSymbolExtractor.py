@@ -187,6 +187,10 @@ class BaseSymbolExtractor(ABC):
     
     def extract_all_symbols(self):
         """Executes extraction logic for all implemented symbols"""
+        # TODO: refactor the names of these methods
+        # to have one for each output glyph type - currently they are grouped
+        # according to the MUSCIMA++ dataset ease-of-extraction
+
         self.extract_full_noteheads()
         self.extract_empty_noteheads()
         self.extract_whole_rests()
@@ -202,10 +206,12 @@ class BaseSymbolExtractor(ABC):
         self.extract_beams()
         self.extract_beam_hooks()
         self.extract_leger_lines()
-        # ...
+        # ... flags
         self.extract_duration_dots()
         self.extract_staccato_dots()
-        # ...
+        # ... accidentals
+        self.extract_brackets_and_braces()
+        self.extract_time_marks()
 
     @abstractmethod
     def extract_full_noteheads(self):
@@ -275,4 +281,14 @@ class BaseSymbolExtractor(ABC):
     
     @abstractmethod
     def extract_staccato_dots(self):
+        raise NotImplementedError
+    
+    # ...
+
+    @abstractmethod
+    def extract_brackets_and_braces(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def extract_time_marks(self):
         raise NotImplementedError
