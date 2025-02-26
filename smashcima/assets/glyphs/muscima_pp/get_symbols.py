@@ -10,7 +10,7 @@ from smashcima.scene.AffineSpace import AffineSpace
 from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from smashcima.scene.SmuflLabels import SmuflLabels
 
-from .get_line_endpoints import get_line_endpoints
+from ..mung.extraction.get_line_endpoints import get_line_endpoints
 from .MppGlyphMetadata import MppGlyphMetadata
 from .MppPage import MppPage
 

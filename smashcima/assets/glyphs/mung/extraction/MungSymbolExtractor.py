@@ -1,10 +1,11 @@
-from smashcima.geometry.units import px_to_mm
-from .MungDocument import MungDocument
-from .ExtractedBag import ExtractedBag
 from smashcima.geometry import Point
+from smashcima.geometry.units import px_to_mm
+from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from smashcima.scene.SmuflLabels import SmuflLabels
 
 from .BaseSymbolExtractor import BaseSymbolExtractor
+from .ExtractedBag import ExtractedBag
+from .MungDocument import MungDocument
 
 
 class MungSymbolExtractor(BaseSymbolExtractor):
@@ -17,6 +18,9 @@ class MungSymbolExtractor(BaseSymbolExtractor):
         self.TALL_BARLINE_THRESHOLD_MM = 16.0
         """When do we start considering barlines to be 'tall' (i.e. multi-staff).
         The average size of a staff (the 5 lines) is cca 8 millimeters."""
+
+        self.BEAM_HOOK_MAX_WIDTH_MM = 2.0
+        """Threshold that separates beams from beam hooks"""
     
     def extract_full_noteheads(self):
         for node in self.iterate_nodes(["noteheadFull"],
@@ -137,4 +141,46 @@ class MungSymbolExtractor(BaseSymbolExtractor):
                 node=node,
                 glyph_label=SmuflLabels.articStaccatoBelow.value,
                 sprite_origin=Point(0.5, 0.5)
+            )
+    
+    def extract_stems(self):
+        for node in self.iterate_nodes(["stem"]):
+            self.emit_line_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmuflLabels.stem.value,
+                horizontal_line=False, # vertical line
+                in_increasing_direction=False # pointing upwards
+            )
+    
+    def extract_beams(self):
+        for node in self.iterate_nodes(["beam"],
+            lambda n: px_to_mm(n.width, dpi=self.document.dpi) \
+                > self.BEAM_HOOK_MAX_WIDTH_MM
+        ):
+            self.emit_line_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmashcimaLabels.beam.value,
+                horizontal_line=True, # horizontal line
+                in_increasing_direction=True # pointing to the right
+            )
+    
+    def extract_beam_hooks(self):
+        for node in self.iterate_nodes(["beam"],
+            lambda n: px_to_mm(n.width, dpi=self.document.dpi) \
+                <= self.BEAM_HOOK_MAX_WIDTH_MM
+        ):
+            self.emit_line_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmashcimaLabels.beamHook.value,
+                horizontal_line=True, # horizontal line
+                in_increasing_direction=True # pointing to the right
+            )
+    
+    def extract_ledger_lines(self):
+        for node in self.iterate_nodes(["legerLine"]):
+            self.emit_line_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmashcimaLabels.ledgerLine.value,
+                horizontal_line=True, # horizontal line
+                in_increasing_direction=True # pointing to the right
             )
