@@ -46,6 +46,7 @@ class Sprite(SceneObject):
         assert len(bitmap.shape) == 3 # [H, W, C]
         assert bitmap.shape[2] == 4 # BGRA
         assert bitmap.dtype == np.uint8
+        assert bitmap.shape[0] > 0 and bitmap.shape[1] > 0
         self.bitmap = bitmap
         """The numpy opencv BGRA bitmap for the sprite"""
 

@@ -69,6 +69,12 @@ class BitmapRenderer:
             height=ceil(mm_to_px(view_box.rectangle.height, dpi=self.dpi)),
         )
 
+        # canvas cannot be zero-sized
+        if canvas_px_bbox.width == 0:
+            canvas_px_bbox.width = 1
+        if canvas_px_bbox.height == 0:
+            canvas_px_bbox.height = 1
+
         # the canvas pixel array in alpha premultiplied float32 format
         canvas = np.zeros(
             shape=(int(canvas_px_bbox.height), int(canvas_px_bbox.width), 4),

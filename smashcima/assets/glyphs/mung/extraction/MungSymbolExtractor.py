@@ -1,3 +1,6 @@
+from smashcima.geometry.units import px_to_mm
+from .MungDocument import MungDocument
+from .ExtractedBag import ExtractedBag
 from smashcima.geometry import Point
 from smashcima.scene.SmuflLabels import SmuflLabels
 
@@ -7,6 +10,13 @@ from .BaseSymbolExtractor import BaseSymbolExtractor
 class MungSymbolExtractor(BaseSymbolExtractor):
     """Defines methods for extracting symbols from one MuNG document.
     Still needs to be overriden to define the metadata stamping logic."""
+
+    def __init__(self, document: MungDocument, bag: ExtractedBag):
+        super().__init__(document=document, bag=bag)
+
+        self.TALL_BARLINE_THRESHOLD_MM = 16.0
+        """When do we start considering barlines to be 'tall' (i.e. multi-staff).
+        The average size of a staff (the 5 lines) is cca 8 millimeters."""
     
     def extract_full_noteheads(self):
         for node in self.iterate_nodes(["noteheadFull"],
@@ -66,6 +76,17 @@ class MungSymbolExtractor(BaseSymbolExtractor):
                 node=node,
                 glyph_label=SmuflLabels.rest16th.value,
                 staffline_index_from_top=2 # middle line
+            )
+
+    def extract_normal_barlines(self):
+        for node in self.iterate_nodes(["barline"],
+            lambda n: px_to_mm(n.height, dpi=self.document.dpi) \
+                < self.TALL_BARLINE_THRESHOLD_MM
+        ):
+            self.emit_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmuflLabels.barlineSingle.value,
+                sprite_origin=Point(0.5, 0.5)
             )
 
     # ...

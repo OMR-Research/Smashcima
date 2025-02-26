@@ -98,12 +98,6 @@ class BaseSymbolExtractor(ABC):
             "There is no linked staff for the given MuNG node"
         staff_node = linked_staff_nodes[0]
         staffline_nodes = self.graph.children(staff_node, ["staffLine"])
-        
-        # TODO: DEBUG
-        if len(staffline_nodes) != 5:
-            print(staff_node)
-            print(staffline_nodes)
-            exit()
 
         assert len(staffline_nodes) == 5, \
             "The linked staff does not have 5 stafflines"
@@ -135,7 +129,9 @@ class BaseSymbolExtractor(ABC):
         self.extract_quarter_rests()
         self.extract_eighth_rests()
         self.extract_sixteenth_rests()
+        self.extract_normal_barlines()
         # ...
+
         self.extract_c_clefs()
         # ...
 
@@ -165,6 +161,10 @@ class BaseSymbolExtractor(ABC):
     
     @abstractmethod
     def extract_sixteenth_rests(self):
+        raise NotImplementedError
+
+    @abstractmethod
+    def extract_normal_barlines(self):
         raise NotImplementedError
 
     # ...
