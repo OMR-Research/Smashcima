@@ -79,6 +79,8 @@ class MungSymbolExtractor(BaseSymbolExtractor):
             )
 
     def extract_normal_barlines(self):
+        # TODO: barlines should be line glyphs with vertical position to
+        # the edge stafflines recorded in a distribution (I guess)
         for node in self.iterate_nodes(["barline"],
             lambda n: px_to_mm(n.height, dpi=self.document.dpi) \
                 < self.TALL_BARLINE_THRESHOLD_MM
@@ -89,12 +91,50 @@ class MungSymbolExtractor(BaseSymbolExtractor):
                 sprite_origin=Point(0.5, 0.5)
             )
 
-    # ...
+    def extract_g_clefs(self):
+        # TODO: non-standard clefs need to know which staffline to pick!
+        for node in self.iterate_nodes(["gClef"]):
+            self.emit_glyph_on_staffline(
+                node=node,
+                glyph_label=SmuflLabels.gClef.value,
+                staffline_index_from_top=3 # second lowest line
+            )
+    
+    def extract_f_clefs(self):
+        # TODO: non-standard clefs need to know which staffline to pick!
+        for node in self.iterate_nodes(["fClef"]):
+            self.emit_glyph_on_staffline(
+                node=node,
+                glyph_label=SmuflLabels.fClef.value,
+                staffline_index_from_top=1 # second highest line
+            )
 
     def extract_c_clefs(self):
+        # TODO: non-standard clefs need to know which staffline to pick!
+        # TODO: c-clef origin should also be picked by the staffline
         for node in self.iterate_nodes(["cClef"]):
             self.emit_glyph_from_mung_node(
                 node=node,
                 glyph_label=SmuflLabels.cClef.value,
+                sprite_origin=Point(0.5, 0.5)
+            )
+    
+    # ...
+
+    def extract_duration_dots(self):
+        for node in self.iterate_nodes(["augmentationDot"]):
+            self.emit_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmuflLabels.augmentationDot.value,
+                sprite_origin=Point(0.5, 0.5)
+            )
+    
+    def extract_staccato_dots(self):
+        # TODO: staccato is annotated as an accent???
+        # TODO: all accents are - need to be disambiguated
+        for node in self.iterate_nodes(["articulationAccent"]):
+            self.emit_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmuflLabels.articStaccatoBelow.value,
                 sprite_origin=Point(0.5, 0.5)
             )

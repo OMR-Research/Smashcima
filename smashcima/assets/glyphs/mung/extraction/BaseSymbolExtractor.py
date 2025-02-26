@@ -130,9 +130,12 @@ class BaseSymbolExtractor(ABC):
         self.extract_eighth_rests()
         self.extract_sixteenth_rests()
         self.extract_normal_barlines()
-        # ...
-
+        self.extract_g_clefs()
+        self.extract_f_clefs()
         self.extract_c_clefs()
+        # ...
+        self.extract_duration_dots()
+        self.extract_staccato_dots()
         # ...
 
     @abstractmethod
@@ -167,8 +170,24 @@ class BaseSymbolExtractor(ABC):
     def extract_normal_barlines(self):
         raise NotImplementedError
 
-    # ...
+    @abstractmethod
+    def extract_g_clefs(self):
+        raise NotImplementedError
+    
+    @abstractmethod
+    def extract_f_clefs(self):
+        raise NotImplementedError
 
     @abstractmethod
     def extract_c_clefs(self):
+        raise NotImplementedError
+    
+    # ...
+
+    @abstractmethod
+    def extract_duration_dots(self):
+        raise NotImplementedError
+    
+    @abstractmethod
+    def extract_staccato_dots(self):
         raise NotImplementedError
