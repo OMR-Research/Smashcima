@@ -418,14 +418,14 @@ def get_beam_hooks(page: MppPage) -> List[LineGlyph]:
     )
 
 
-def get_ledger_lines(page: MppPage) -> List[LineGlyph]:
+def get_leger_lines(page: MppPage) -> List[LineGlyph]:
     return _crop_objects_to_line_glyphs(
         crop_objects=[
             o for o in page.crop_objects
             if o.clsname in ["ledger_line"]
         ],
         page=page,
-        label=SmashcimaLabels.ledgerLine.value,
+        label=SmashcimaLabels.legerLine.value,
         horizontal_line=True, # horizontal line
         in_increasing_direction=True # pointing to the right
     )

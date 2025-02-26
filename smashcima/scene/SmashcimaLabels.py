@@ -11,7 +11,10 @@ class SmashcimaLabels(str, Enum):
     # are slightly different. But the class names are analogous.
     # https://www.w3.org/2019/03/smufl13/tables/staves.html
     staffLine = "smashcima::staffLine"
-    ledgerLine = "smashcima::ledgerLine"
+    # leGer or leDGer, there is ambiguity, but SMuFL uses "leger"
+    # https://w3c.github.io/smufl/latest/tables/staves.html
+    # https://musescore.org/en/node/167521
+    legerLine = "smashcima::legerLine"
 
     # Line Glyphs
     #

@@ -201,7 +201,7 @@ class BaseSymbolExtractor(ABC):
         self.extract_stems()
         self.extract_beams()
         self.extract_beam_hooks()
-        self.extract_ledger_lines()
+        self.extract_leger_lines()
         # ...
         self.extract_duration_dots()
         self.extract_staccato_dots()
@@ -264,7 +264,7 @@ class BaseSymbolExtractor(ABC):
         raise NotImplementedError
     
     @abstractmethod
-    def extract_ledger_lines(self):
+    def extract_leger_lines(self):
         raise NotImplementedError
 
     # ...

@@ -27,11 +27,11 @@ This documentation page lists all `LineGlyph` classification labels explicitly k
     - End point = right tip of the line
     - Origin = undefined, can be anywhere (default to sprite center)
     - <img src="assets/line-glyphs/smashcima_beamHook.png"/>
-- `smashcima::ledgerLine`
+- `smashcima::legerLine`
     - Start point = left tip of the line
     - End point = right tip of the line
     - Origin = undefined, can be anywhere (default to sprite center)
-    - <img src="assets/line-glyphs/smashcima_ledgerLine.png"/>
+    - <img src="assets/line-glyphs/smashcima_legerLine.png"/>
 - `smufl::bracket`
     - Start point = top tip of the bracket
     - End point = bottom tip of the bracket

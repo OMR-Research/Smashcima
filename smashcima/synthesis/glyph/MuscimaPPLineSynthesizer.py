@@ -11,7 +11,7 @@ import random
 
 
 _QUERY_TO_MPP_LOOKUP: Dict[str, str] = {
-    SmashcimaLabels.ledgerLine.value: SmashcimaLabels.ledgerLine.value,
+    SmashcimaLabels.legerLine.value: SmashcimaLabels.legerLine.value,
     SmuflLabels.stem.value: SmuflLabels.stem.value,
     SmashcimaLabels.beam.value: SmashcimaLabels.beam.value,
     SmashcimaLabels.beamHook.value: SmashcimaLabels.beamHook.value,

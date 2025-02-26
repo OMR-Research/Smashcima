@@ -15,7 +15,7 @@ class SmuflLabels(str, Enum):
 
     # Staves
     # https://www.w3.org/2019/03/smufl13/tables/staves.html
-    # IMPORTANT: The stafflines and ledger lines section in SMuFL is intended
+    # IMPORTANT: The stafflines and leger lines section in SMuFL is intended
     # only for text-based applications. Use Smashcima label to represent
     # staves and stafflines instead.
 

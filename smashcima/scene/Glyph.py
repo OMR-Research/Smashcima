@@ -20,8 +20,8 @@ class Glyph(SceneObject):
     A glyph is a visual unit of the notation. It can be detected, segmented,
     classified.
 
-    It is: notehead, stem, flag, ledger line, staffline,
-    But it's also: notehead-stem-flag ligature, ledger-notehead-stem ligature
+    It is: notehead, stem, flag, leger line, staffline,
+    But it's also: notehead-stem-flag ligature, leger-notehead-stem ligature
     Since a ligature cannot be easily broken down into its parts,
     it's a glyph of its own.
 

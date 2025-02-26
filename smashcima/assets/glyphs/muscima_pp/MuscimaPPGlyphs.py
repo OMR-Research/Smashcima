@@ -21,7 +21,7 @@ from .get_symbols import \
     get_stems, \
     get_beams, \
     get_beam_hooks, \
-    get_ledger_lines, \
+    get_leger_lines, \
     get_flags, \
     get_duration_dots, \
     get_staccato_dots, \
@@ -78,7 +78,7 @@ class MuscimaPPGlyphs(AssetBundle):
             items += get_stems(page)
             items += get_beams(page)
             items += get_beam_hooks(page)
-            items += get_ledger_lines(page)
+            items += get_leger_lines(page)
             items += get_duration_dots(page)
             items += get_staccato_dots(page)
             items += get_accidentals(page)

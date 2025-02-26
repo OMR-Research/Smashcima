@@ -6,7 +6,7 @@ from smashcima.scene.semantic.ScoreEvent import ScoreEvent
 from smashcima.scene.semantic.RestSemantic import RestSemantic
 from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.visual.RestVisual import RestVisual
-from smashcima.scene.visual.LedgerLine import LedgerLine
+from smashcima.scene.visual.LedgerLine import LegerLine
 from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
 from smashcima.synthesis.LineSynthesizer import LineSynthesizer
@@ -95,9 +95,9 @@ def synthesize_rests_column(
             )
             column.add_rest(rest)
 
-            # create ledger line for whole/half rests
+            # create leger line for whole/half rests
             # (and attach it under the glyph space for simplicity)
-            _synthesize_ledger_line_if_necessary(
+            _synthesize_leger_line_if_necessary(
                 rest=rest,
                 label=label,
                 line_synthesizer=line_synthesizer,
@@ -105,17 +105,17 @@ def synthesize_rests_column(
             )
 
 
-def _synthesize_ledger_line_if_necessary(
+def _synthesize_leger_line_if_necessary(
     rest: RestVisual,
     label: SmuflLabels,
     line_synthesizer: LineSynthesizer,
     rng: random.Random
 ):
-    # the rest is not whole nor half, no ledger line needed
+    # the rest is not whole nor half, no leger line needed
     if label not in [SmuflLabels.restWhole, SmuflLabels.restHalf]:
         return
 
-    # the rest is still within the staff, no ledgerline needed
+    # the rest is still within the staff, no legerline needed
     if abs(rest.pitch_position) < 4:
         return
 
@@ -123,12 +123,12 @@ def _synthesize_ledger_line_if_necessary(
         * random_between(1.2, 2.5, rng)
     
     glyph = line_synthesizer.synthesize_line(
-        label=SmashcimaLabels.ledgerLine.value,
+        label=SmashcimaLabels.legerLine.value,
         parent_space=rest.glyph.space,
         start_point=Point(-width / 2, 0),
         end_point=Point(width / 2, 0)
     )
-    LedgerLine(
+    LegerLine(
         glyph=glyph,
         affected_noteheads=[], # none
         affected_rest=rest

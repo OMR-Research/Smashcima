@@ -4,7 +4,7 @@ from .BeamCoordinateSystem import BeamCoordinateSystem
 from .BeamHook import BeamHook
 from .Beam import Beam
 from .Flag import Flag
-from .LedgerLine import LedgerLine
+from .LedgerLine import LegerLine
 from .Notehead import Notehead
 from .NoteheadSide import NoteheadSide
 from .Page import Page

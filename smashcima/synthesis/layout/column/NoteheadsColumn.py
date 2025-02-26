@@ -9,7 +9,7 @@ from smashcima.scene.semantic.Note import Note
 from smashcima.scene.visual.StaffVisual import StaffVisual
 from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.visual.NoteheadSide import NoteheadSide
-from smashcima.scene.visual.LedgerLine import LedgerLine
+from smashcima.scene.visual.LedgerLine import LegerLine
 from smashcima.scene.SmuflLabels import SmuflLabels
 from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
 from smashcima.synthesis.LineSynthesizer import LineSynthesizer
@@ -48,7 +48,7 @@ class _NoteheadContext:
 class NoteheadsColumn(ColumnBase):
     def __post_init__(self) -> None:
         self.notehead_contexts: List[_NoteheadContext] = []
-        self.ledger_lines: List[LedgerLine] = []
+        self.leger_lines: List[LegerLine] = []
     
     def set_line_synthesizer(self, line_synthesizer: LineSynthesizer):
         self.line_synthesizer = line_synthesizer
@@ -83,10 +83,10 @@ class NoteheadsColumn(ColumnBase):
             self.kick_off_noteheads_on_staff(staff)
         self.position_noteheads()
         
-        # ledger lines
-        self.delete_current_ledger_lines()
+        # leger lines
+        self.delete_current_leger_lines()
         for staff in self.staves:
-            self.place_ledger_lines(staff)
+            self.place_leger_lines(staff)
 
     def kick_off_noteheads_on_staff(self, staff: StaffVisual):
         contexts = [
@@ -156,7 +156,7 @@ class NoteheadsColumn(ColumnBase):
                     + (ctx.kick_off * kick_off_distance)
             )
     
-    def place_ledger_lines(self, staff: StaffVisual):
+    def place_leger_lines(self, staff: StaffVisual):
         contexts = [
             c for c in self.notehead_contexts
             if c.notehead.staff is staff
@@ -165,18 +165,18 @@ class NoteheadsColumn(ColumnBase):
         if len(contexts) == 0:
             return
         
-        def _ledger_line_temporal_bounds(
+        def _leger_line_temporal_bounds(
             ctx: _NoteheadContext
         ) -> Tuple[float, float]:
             """Gets the time position of the two start and end of a basic
-            ledger line for a given (already placed) notehead"""
+            leger line for a given (already placed) notehead"""
             bbox = ctx.notehead.glyph.get_bbox_in_space(ctx.notehead.staff.space)
             pos_x = ctx.notehead.staff.staff_coordinate_system.get_transform(
                 pitch_position=0, time_position=self.time_position
             ).apply_to(Point(0, 0)).x
             center = self.time_position + (bbox.center.x - pos_x)
             
-            # determine the ledger line width
+            # determine the leger line width
             # TODO: get from some distribution
             width = bbox.width * random_between(1.2, 2.5, self.rng)
             
@@ -206,14 +206,14 @@ class NoteheadsColumn(ColumnBase):
                 for ctx in contexts:
                     if ctx.notehead.pitch_position == pitch_position:
                         affected_noteheads.append(ctx.notehead)
-                        start, end = _ledger_line_temporal_bounds(ctx)
+                        start, end = _leger_line_temporal_bounds(ctx)
                         time_position_start = min(time_position_start, start)
                         time_position_end = max(time_position_end, end)
                 
-                # create ledger line
+                # create leger line
                 # (if on even position and if we have some affected noteheads)
                 if pitch_position % 2 == 0 and len(affected_noteheads) > 0:
-                    line = self.synthesize_ledger_line(
+                    line = self.synthesize_leger_line(
                         staff,
                         pitch_position=pitch_position,
                         time_position_start=time_position_start,
@@ -221,19 +221,19 @@ class NoteheadsColumn(ColumnBase):
                     )
                     line.affected_noteheads = [*affected_noteheads] # copy
     
-    def delete_current_ledger_lines(self):
-        for line in self.ledger_lines:
+    def delete_current_leger_lines(self):
+        for line in self.leger_lines:
             self.glyphs.remove(line.glyph)
             line.detach()
-        self.ledger_lines = []
+        self.leger_lines = []
     
-    def synthesize_ledger_line(
+    def synthesize_leger_line(
         self,
         staff: StaffVisual,
         pitch_position: int,
         time_position_start: float,
         time_position_end: float
-    ) -> LedgerLine:
+    ) -> LegerLine:
         start_point = staff.staff_coordinate_system.get_transform(
             pitch_position=pitch_position,
             time_position=time_position_start
@@ -245,19 +245,19 @@ class NoteheadsColumn(ColumnBase):
         ).apply_to(Point(0, 0))
 
         glyph = self.line_synthesizer.synthesize_line(
-            label=SmashcimaLabels.ledgerLine.value,
+            label=SmashcimaLabels.legerLine.value,
             parent_space=staff.space,
             start_point=start_point,
             end_point=end_point
         )
-        line = LedgerLine(
+        line = LegerLine(
             glyph=glyph,
             affected_noteheads=[], # populated later
             affected_rest=None
         )
 
         self.glyphs.append(glyph)
-        self.ledger_lines.append(line)
+        self.leger_lines.append(line)
 
         return line
 

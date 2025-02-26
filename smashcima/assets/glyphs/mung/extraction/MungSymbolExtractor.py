@@ -24,7 +24,7 @@ class MungSymbolExtractor(BaseSymbolExtractor):
     
     def extract_full_noteheads(self):
         for node in self.iterate_nodes(["noteheadFull"],
-            lambda n: not self.graph.has_children(n, ["ledgerLine"])
+            lambda n: not self.graph.has_children(n, ["legerLine"])
         ):
             self.emit_glyph_from_mung_node(
                 node=node,
@@ -34,7 +34,7 @@ class MungSymbolExtractor(BaseSymbolExtractor):
     
     def extract_empty_noteheads(self):
         for node in self.iterate_nodes(["noteheadHalf"],
-            lambda n: not self.graph.has_children(n, ["ledgerLine"])
+            lambda n: not self.graph.has_children(n, ["legerLine"])
         ):
             self.emit_glyph_from_mung_node(
                 node=node,
@@ -176,11 +176,11 @@ class MungSymbolExtractor(BaseSymbolExtractor):
                 in_increasing_direction=True # pointing to the right
             )
     
-    def extract_ledger_lines(self):
+    def extract_leger_lines(self):
         for node in self.iterate_nodes(["legerLine"]):
             self.emit_line_glyph_from_mung_node(
                 node=node,
-                glyph_label=SmashcimaLabels.ledgerLine.value,
+                glyph_label=SmashcimaLabels.legerLine.value,
                 horizontal_line=True, # horizontal line
                 in_increasing_direction=True # pointing to the right
             )

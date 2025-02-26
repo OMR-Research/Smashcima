@@ -57,7 +57,7 @@ MXL_FILES: List[Path] = [
     REPO_FOLDER / "jupyter" / "layout_synthesis" / "stems.musicxml",
     REPO_FOLDER / "jupyter" / "layout_synthesis" / "beams.musicxml",
     REPO_FOLDER / "jupyter" / "layout_synthesis" / "flags.musicxml",
-    REPO_FOLDER / "jupyter" / "layout_synthesis" / "ledger_lines.musicxml",
+    REPO_FOLDER / "jupyter" / "layout_synthesis" / "leger_lines.musicxml",
     REPO_FOLDER / "jupyter" / "layout_synthesis" / "duration_dots.musicxml",
     REPO_FOLDER / "jupyter" / "layout_synthesis" / "accidentals.musicxml",
 ]
