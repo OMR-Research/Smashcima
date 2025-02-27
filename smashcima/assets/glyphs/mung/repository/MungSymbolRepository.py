@@ -23,8 +23,8 @@ class MungSymbolRepository:
     line_glyphs_index: LineGlyphsIndex
     """Holds all line glyphs"""
 
-    # vectors_index = None
-    # """TODO: holds all 2D vector distributions"""
+    # deltas_index = None
+    # """TODO: holds all delta vector distributions"""
     
     def get_all_styles(self) -> Set[str]:
         all_styles = set()
@@ -32,8 +32,22 @@ class MungSymbolRepository:
             all_styles.add(style)
         for _, style in self.line_glyphs_index.glyphs_by_label_and_style.keys():
             all_styles.add(style)
-        # TODO: vectors styles
+        # TODO: delta vectors styles
         return all_styles
+    
+    def get_all_glyph_labels(self) -> Set[str]:
+        return set(
+            label for label, _
+            in self.glyphs_index.glyphs_by_label_and_style.keys()
+        )
+    
+    def get_all_line_glyph_labels(self) -> Set[str]:
+        return set(
+            label for label, _
+            in self.line_glyphs_index.glyphs_by_label_and_style.keys()
+        )
+    
+    # TODO: delta vectors labels
 
     @staticmethod
     def build_from_items(items: List[Any]) -> "MungSymbolRepository":

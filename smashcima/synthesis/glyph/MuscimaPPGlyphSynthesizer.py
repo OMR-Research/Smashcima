@@ -1,14 +1,15 @@
+import random
 from typing import Dict
-from ..GlyphSynthesizer import GlyphSynthesizer
-from smashcima.scene.Glyph import Glyph
+
 from smashcima.assets.AssetRepository import AssetRepository
 from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
-from ...scene.SmuflLabels import SmuflLabels
+from smashcima.scene.Glyph import Glyph
 from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
-import random
 
+from ...scene.SmuflLabels import SmuflLabels
+from .RepositoryGlyphSynthesizer import RepositoryGlyphSynthesizer
 
-_QUERY_TO_MPP_LOOKUP: Dict[str, str] = {
+LABEL_MAP: Dict[str, str] = {
     # barlines
     SmuflLabels.barlineSingle.value: SmuflLabels.barlineSingle.value,
 
@@ -48,59 +49,33 @@ _QUERY_TO_MPP_LOOKUP: Dict[str, str] = {
 }
 
 
-class MuscimaPPGlyphSynthesizer(GlyphSynthesizer):
+class MuscimaPPGlyphSynthesizer(RepositoryGlyphSynthesizer):
     """Synthesizes glyphs by sampling from the MUSCIMA++ dataset"""
     
     def __init__(
         self,
         assets: AssetRepository,
-        mpp_style_domain: MuscimaPPStyleDomain,
-        rng: random.Random,
+        style_domain: MuscimaPPStyleDomain,
+        rng: random.Random
     ):
-        bundle = assets.resolve_bundle(MuscimaPPGlyphs)
-        self.symbol_repository = bundle.load_symbol_repository()
-        "The symbol repository used for synthesis"
+        symbol_repository = (
+            assets.resolve_bundle(MuscimaPPGlyphs).load_symbol_repository()
+        )
 
-        self.mpp_style_domain = mpp_style_domain
-        "Dictates which MUSCIMA++ writer to use for synthesis"
-        
-        self.rng = rng
-        "RNG used for randomization"
+        super().__init__(
+            symbol_repository=symbol_repository,
+            style_domain=style_domain,
+            rng=rng
+        )
 
     def supports_label(self, label: str) -> bool:
-        return label in _QUERY_TO_MPP_LOOKUP
+        return label in LABEL_MAP
 
     def create_glyph(self, label: str) -> Glyph:
-        # pick a glyph from the symbol repository
-        if label in _QUERY_TO_MPP_LOOKUP:
-            glyph = self.pick(_QUERY_TO_MPP_LOOKUP[label])
-        else:
-            raise Exception("Unsupported glyph label: " + label)
+        glyph = super().create_glyph(LABEL_MAP[label])
 
-        # adjust its glyph class to match what the user wants
-        # (because the mapping dictionary is not really 1:1)
+        # adjust glyph label to match what the user wants
+        # (because the label map is not 1:1)
         glyph.label = label
 
         return glyph
-    
-    def pick(self, label: str) -> Glyph:
-        """Picks a random glyph from the symbol repository according to the
-        current writer"""
-        # get the list of glyphs to choose from
-        # (if writer is missing this class, fall back on all writers)
-        glyphs_index = self.symbol_repository.glyphs_index
-        packed_glyphs = glyphs_index.glyphs_by_label_and_style.get(
-            (label, str(self.mpp_style_domain.current_writer))
-        ) or glyphs_index.glyphs_by_label.get(label)
-
-        if packed_glyphs is None or len(packed_glyphs) == 0:
-            raise Exception(
-                f"The glyph class {label} is not present in " + \
-                "the symbol repository"
-            )
-        
-        # pick a random glyph from the list
-        packed_glyph = self.rng.choice(packed_glyphs)
-        
-        # deserialization here makes sure we create a new instance
-        return packed_glyph.unpack()

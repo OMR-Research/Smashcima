@@ -11,6 +11,14 @@ from smashcima.scene import AffineSpace, LineGlyph
 class LineSynthesizer(abc.ABC):
     """Interface for a line glyph synthesizer"""
 
+    @abc.abstractmethod
+    def supports_label(self, label: str) -> bool:
+        """Returns true if the given glyph type can be synthesized.
+        
+        Override this when building custom line glyph synthesizers.
+        """
+        raise NotImplementedError
+
     def synthesize_line(
         self,
         label: str,

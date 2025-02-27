@@ -1,35 +1,30 @@
 import random
-from typing import Dict
 
 from smashcima.assets.AssetRepository import AssetRepository
-from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
+from smashcima.assets.glyphs.omni_omr.OmniOMRGlyphs import OmniOMRGlyphs
 from smashcima.geometry.Vector2 import Vector2
 from smashcima.scene.LineGlyph import LineGlyph
-from smashcima.scene.SmashcimaLabels import SmashcimaLabels
-from smashcima.scene.SmuflLabels import SmuflLabels
-from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
+from smashcima.synthesis.style.OmniOMRStyleDomain import OmniOMRStyleDomain
 
+from .MuscimaPPLineSynthesizer import LABEL_MAP as MPP_LABEL_MAP
 from .RepositoryLineSynthesizer import RepositoryLineSynthesizer
 
-LABEL_MAP: Dict[str, str] = {
-    SmashcimaLabels.legerLine.value: SmashcimaLabels.legerLine.value,
-    SmuflLabels.stem.value: SmuflLabels.stem.value,
-    SmashcimaLabels.beam.value: SmashcimaLabels.beam.value,
-    SmashcimaLabels.beamHook.value: SmashcimaLabels.beamHook.value,
+LABEL_MAP = {
+    **MPP_LABEL_MAP
 }
 
 
-class MuscimaPPLineSynthesizer(RepositoryLineSynthesizer):
-    """Synthesizes line glyphs by sampling from the MUSCIMA++ dataset"""
+class OmniOMRLineSynthesizer(RepositoryLineSynthesizer):
+    """Synthesizes line glyphs by sampling from the OmniOMR dataset"""
     
     def __init__(
         self,
         assets: AssetRepository,
-        style_domain: MuscimaPPStyleDomain,
+        style_domain: OmniOMRStyleDomain,
         rng: random.Random
     ):
         symbol_repository = (
-            assets.resolve_bundle(MuscimaPPGlyphs).load_symbol_repository()
+            assets.resolve_bundle(OmniOMRGlyphs).load_symbol_repository()
         )
 
         super().__init__(
@@ -37,7 +32,7 @@ class MuscimaPPLineSynthesizer(RepositoryLineSynthesizer):
             style_domain=style_domain,
             rng=rng
         )
-    
+
     def supports_label(self, label: str) -> bool:
         return label in LABEL_MAP
     

@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Callable, Iterable, Iterator, Optional
 
 import cv2
+import numpy as np
 from mung.node import Node
 
 from smashcima.geometry import Point
@@ -12,7 +13,7 @@ from .get_line_endpoints import get_line_endpoints
 from .mung_mask_to_smashcima_sprite_bitmap import \
     mung_mask_to_smashcima_sprite_bitmap
 from .MungDocument import MungDocument
-from .PointCloud import PointCloud, ORIGIN_POINT, START_POINT, END_POINT
+from .PointCloud import END_POINT, ORIGIN_POINT, START_POINT, PointCloud
 
 
 class BaseSymbolExtractor(ABC):
@@ -155,6 +156,12 @@ class BaseSymbolExtractor(ABC):
         )
         self.point_cloud[node][ORIGIN_POINT] = Point(0.5, 0.5)
         return True
+    
+    def sprite_bitmap_from_mung_node(self, node: Node) -> np.ndarray:
+        """This method creates the smashcima sprite bitmap for the given
+        mung node. The default behaviour is to convert the mask to black
+        on transparent. You can override this method to alter this logic."""
+        return mung_mask_to_smashcima_sprite_bitmap(node.mask)
 
     def emit_glyph_from_mung_node(
         self,
@@ -173,7 +180,7 @@ class BaseSymbolExtractor(ABC):
         space = AffineSpace()
         sprite = Sprite(
             space=space,
-            bitmap=mung_mask_to_smashcima_sprite_bitmap(node.mask),
+            bitmap=self.sprite_bitmap_from_mung_node(node),
             bitmap_origin=self.point_cloud[node][ORIGIN_POINT],
             dpi=self.document.dpi
         )
@@ -210,7 +217,7 @@ class BaseSymbolExtractor(ABC):
         space = AffineSpace()
         sprite = Sprite(
             space=space,
-            bitmap=mung_mask_to_smashcima_sprite_bitmap(node.mask),
+            bitmap=self.sprite_bitmap_from_mung_node(node),
             bitmap_origin=points.get_in_relative_ratio(ORIGIN_POINT),
             dpi=self.document.dpi
         )
