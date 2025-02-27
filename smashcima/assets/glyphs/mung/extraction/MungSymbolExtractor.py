@@ -5,6 +5,8 @@ from smashcima.geometry.units import px_to_mm
 from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from smashcima.scene.SmuflLabels import SmuflLabels
 
+from .accidentals import (get_accidental_center_from_notehead,
+                          get_accidental_center_from_central_hole)
 from .BaseSymbolExtractor import BaseSymbolExtractor
 from .ExtractedBag import ExtractedBag
 from .MungDocument import MungDocument
@@ -187,6 +189,60 @@ class MungSymbolExtractor(BaseSymbolExtractor):
                 glyph_label=SmashcimaLabels.legerLine.value,
                 horizontal_line=True, # horizontal line
                 in_increasing_direction=True # pointing to the right
+            )
+    
+    def extract_accidentalSharp(self):
+        for node in self.iterate_nodes(["accidentalSharp"]):
+            sprite_origin = get_accidental_center_from_central_hole(node) \
+                or get_accidental_center_from_notehead(node, self.graph) \
+                or Point(0.5, 0.5) # center
+            self.emit_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmuflLabels.accidentalSharp.value,
+                sprite_origin=sprite_origin
+            )
+
+    def extract_accidentalFlat(self):
+        for node in self.iterate_nodes(["accidentalFlat"]):
+            sprite_origin = get_accidental_center_from_central_hole(node) \
+                or get_accidental_center_from_notehead(node, self.graph) \
+                or Point(0.5, 0.75) # slightly lower than center
+            self.emit_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmuflLabels.accidentalFlat.value,
+                sprite_origin=sprite_origin
+            )
+
+    def extract_accidentalNatural(self):
+        for node in self.iterate_nodes(["accidentalNatural"]):
+            sprite_origin = get_accidental_center_from_central_hole(node) \
+                or get_accidental_center_from_notehead(node, self.graph) \
+                or Point(0.5, 0.5) # center
+            self.emit_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmuflLabels.accidentalNatural.value,
+                sprite_origin=sprite_origin
+            )
+
+    def extract_accidentalDoubleSharp(self):
+        for node in self.iterate_nodes(["accidentalDoubleSharp"]):
+            sprite_origin = get_accidental_center_from_notehead(node, self.graph) \
+                or Point(0.5, 0.5) # center
+            self.emit_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmuflLabels.accidentalDoubleSharp.value,
+                sprite_origin=sprite_origin
+            )
+    
+    def extract_accidentalDoubleFlat(self):
+        for node in self.iterate_nodes(["accidentalDoubleFlat"]):
+            sprite_origin = get_accidental_center_from_central_hole(node) \
+                or get_accidental_center_from_notehead(node, self.graph) \
+                or Point(0.5, 0.75) # slightly lower than center
+            self.emit_glyph_from_mung_node(
+                node=node,
+                glyph_label=SmuflLabels.accidentalDoubleFlat.value,
+                sprite_origin=sprite_origin
             )
 
     def extract_brackets_and_braces(self):

@@ -209,7 +209,11 @@ class BaseSymbolExtractor(ABC):
         # ... flags
         self.extract_duration_dots()
         self.extract_staccato_dots()
-        # ... accidentals
+        self.extract_accidentalSharp()
+        self.extract_accidentalFlat()
+        self.extract_accidentalNatural()
+        self.extract_accidentalDoubleSharp()
+        self.extract_accidentalDoubleFlat()
         self.extract_brackets_and_braces()
         self.extract_time_marks()
 
@@ -283,7 +287,25 @@ class BaseSymbolExtractor(ABC):
     def extract_staccato_dots(self):
         raise NotImplementedError
     
-    # ...
+    @abstractmethod
+    def extract_accidentalSharp(self):
+        raise NotImplementedError
+    
+    @abstractmethod
+    def extract_accidentalFlat(self):
+        raise NotImplementedError
+    
+    @abstractmethod
+    def extract_accidentalNatural(self):
+        raise NotImplementedError
+    
+    @abstractmethod
+    def extract_accidentalDoubleSharp(self):
+        raise NotImplementedError
+    
+    @abstractmethod
+    def extract_accidentalDoubleFlat(self):
+        raise NotImplementedError
 
     @abstractmethod
     def extract_brackets_and_braces(self):
