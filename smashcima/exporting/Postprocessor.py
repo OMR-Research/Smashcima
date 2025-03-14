@@ -11,8 +11,7 @@ class Postprocessor(ABC):
     @abstractmethod
     def process_extracted_layers(
         self,
-        layers: LayerSet,
-        dpi: float
+        layers: LayerSet
     ) -> LayerSet:
         """Processes layers separately right after they are extracted
         from the scene."""
@@ -21,8 +20,7 @@ class Postprocessor(ABC):
     @abstractmethod
     def process_final_layer(
         self,
-        final_layer: ImageLayer,
-        dpi: float
+        final_layer: ImageLayer
     ) -> ImageLayer:
         """Processes the final composed layer before it exits the compositor."""
         raise NotImplementedError

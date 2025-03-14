@@ -16,9 +16,12 @@ from .ImageLayer import ImageLayer
 class ImageLayerBuilder:
     """Gradually builds an ImageLayer by accepting sprites and regions"""
     
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int, dpi: float):
         self.canvas = Canvas(width, height)
         """Builds up the bitmap"""
+
+        self.dpi = dpi
+        """DPI of the build up image layer"""
 
         self.space = AffineSpace()
         """The spce to which all the built up regions belong"""
@@ -30,6 +33,7 @@ class ImageLayerBuilder:
         """Builds up a layer instance from the so-far received objects"""
         return ImageLayer(
             bitmap=self.canvas.read(),
+            dpi=self.dpi,
             space=self.space,
             regions=self.regions
         )
@@ -124,11 +128,17 @@ class ImageLayerBuilder:
         assert len(layers) > 0, "There must be at least one layer"
         width = layers[0].width
         height = layers[0].height
+        dpi = layers[0].dpi
 
-        builder = ImageLayerBuilder(width=width, height=height)
+        builder = ImageLayerBuilder(
+            width=width,
+            height=height,
+            dpi=dpi
+        )
         identity = Transform.identity()
         
         for layer in layers:
+            assert builder.dpi == layer.dpi, "All layers must have the same DPI"
             builder.canvas.place_layer(layer.bitmap)
             
             for region in layer.regions:

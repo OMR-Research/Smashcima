@@ -17,6 +17,8 @@ dependencies = [
     "mung",
     "muscima",
     "scikit-image", # needed for `muscima`
+    "albumentations",
+    "augraphy"
 ]
 description = "Training data synthesizer for OMR"
 readme = "README.md"

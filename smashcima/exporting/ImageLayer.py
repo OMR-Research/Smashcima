@@ -19,6 +19,9 @@ class ImageLayer:
     bitmap: np.ndarray
     """The BGRA pixel-level image data for this layer"""
 
+    dpi: float
+    """DPI of the image"""
+
     space: AffineSpace
     """The (root) affine space that aligns with pixel-coordinates.
     It is needed for the other geometric objects to have a parent.

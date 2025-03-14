@@ -15,5 +15,8 @@ class LayerSet:
     def __getitem__(self, name: str) -> ImageLayer:
         return self.__layers[name]
     
+    def __setitem__(self, name: str, layer: ImageLayer):
+        self.__layers[name] = layer
+    
     def __contains__(self, name: str) -> bool:
         return name in self.__layers

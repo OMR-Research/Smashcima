@@ -37,7 +37,7 @@ class DefaultCompositor(Compositor):
         extracted_layers = self.extract_layers(view_box, dpi)
         
         processed_layers = self.postprocessor.process_extracted_layers(
-            extracted_layers, dpi
+            extracted_layers
         )
         
         final_layer = ImageLayerBuilder.merge_layers([
@@ -47,7 +47,7 @@ class DefaultCompositor(Compositor):
         ])
     
         processed_final_layer = self.postprocessor.process_final_layer(
-            final_layer, dpi
+            final_layer
         )
 
         return processed_final_layer
@@ -55,7 +55,8 @@ class DefaultCompositor(Compositor):
     def extract_layers(self, view_box: ViewBox, dpi: float) -> LayerSet:
         accumulator = VisitorAccumulator(
             width=ceil(mm_to_px(view_box.rectangle.width, dpi=dpi)),
-            height=ceil(mm_to_px(view_box.rectangle.height, dpi=dpi))
+            height=ceil(mm_to_px(view_box.rectangle.height, dpi=dpi)),
+            dpi=dpi
         )
 
         # converts from scene millimeter coordinate system
@@ -81,11 +82,11 @@ class DefaultCompositor(Compositor):
 
 class VisitorAccumulator:
     """Accumulates data extracted by the visitor"""
-    def __init__(self, width: int, height: int):
+    def __init__(self, width: int, height: int, dpi: float):
         # the three extracted layers
-        self.paper = ImageLayerBuilder(width=width, height=height)
-        self.stafflines = ImageLayerBuilder(width=width, height=height)
-        self.ink = ImageLayerBuilder(width=width, height=height)
+        self.paper = ImageLayerBuilder(width=width, height=height, dpi=dpi)
+        self.stafflines = ImageLayerBuilder(width=width, height=height, dpi=dpi)
+        self.ink = ImageLayerBuilder(width=width, height=height, dpi=dpi)
     
     def build_layer_set(self) -> LayerSet:
         return LayerSet({

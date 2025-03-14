@@ -10,6 +10,9 @@ smashcima_assets/
 # gradio folders
 .gradio
 
+# augraphy
+augraphy_cache
+
 
 ###############################
 # Default gitignore by GitHub #

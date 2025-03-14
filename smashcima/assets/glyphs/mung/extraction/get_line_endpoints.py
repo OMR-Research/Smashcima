@@ -22,6 +22,11 @@ def get_line_endpoints(mask: np.ndarray) -> List[Point]:
 
     # get the skeleton (image of 0s and 1s)
     skeleton = cv2.ximgproc.thinning(mask * 255) // 255
+    # TODO: replace the skeletonization algorithm with this one:
+    # https://opencvpython.blogspot.com/2012/05/skeletonization-using-opencv-python.html
+    # To get rid of the opencv-contrib-python dependency any only depend
+    # on the core opencv-python package. Verify that the new algorithm
+    # does not make any mistakes.
     
     # count the number of neighbors for each pixel (using a convolution)
     kernel = np.ones(shape=(3, 3), dtype=np.uint8)
