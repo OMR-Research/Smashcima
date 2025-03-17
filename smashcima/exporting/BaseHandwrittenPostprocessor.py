@@ -1,15 +1,12 @@
 import random
+import sys
 import time
-from tkinter import Image
-from turtle import back
 from typing import Tuple
 
 import albumentations as A
 import augraphy
 import cv2
 import numpy as np
-from augraphy import (AugraphyPipeline, BleedThrough, DirtyDrum, DirtyRollers,
-                      InkBleed, default_augraphy_pipeline)
 
 from smashcima.geometry.units import mm_to_px
 
@@ -27,25 +24,31 @@ class BaseHandwrittenPostprocessor(Postprocessor):
         
         self.f_stafflines = FilterStack([
             _DilateStafflines(rng),
-            _Letterpress(rng),
+            _Letterpress(rng, p=0.5),
             _InkColor(rng, reduce_opacity_by=(0.4, 0.9))
         ], rng)
 
         self.f_inkstyle = FilterStack([
-            # caligraphy
-            # median vs. inkbleed vs. letterpress
-            _Letterpress(rng)
+            # add caligraphy here (p=0.3)
+            _Median(rng, p=0.3),
+            _InkBleed(rng, p=0.3),
+            _Letterpress(rng, p=0.5)
         ], rng)
+
+        self.f_bleed_through = _BleedThrough(rng, p=0.5)
 
         self.f_ink_color = _InkColor(rng, reduce_opacity_by=(0.0, 0.3))
 
-        self.f_folding = _Folding(rng)
+        self.f_scribbles = _Scribbles(rng, p=0.5)
+
+        self.f_folding = _Folding(rng, p=0.5)
 
         self.f_camera = FilterStack([
-            _Geometric(rng),
-            _ShadowCast(rng),
-            _LightingGradient(rng)
-            # blur vs. subtle noise
+            _Geometric(rng, p=0.5),
+            _ShadowCast(rng, p=0.5),
+            _LightingGradient(rng, p=0.5),
+            _Blur(rng, p=0.5)
+            # add subtle noise here
         ], rng)
     
     def process_extracted_layers(
@@ -61,60 +64,8 @@ class BaseHandwrittenPostprocessor(Postprocessor):
 
         # process ink
         ink = self.f_inkstyle(ink)
-        # TODO: bleed through
+        ink = self.f_bleed_through(ink)
         ink = self.f_ink_color(ink)
-
-        # transform = A.Compose([
-        #     A.ThinPlateSpline(p=1)
-        #     # A.Blur(blur_limit=31, p=1)
-        #     # A.GridElasticDeform(
-        #     #     num_grid_xy=(10, 10),
-        #     #     magnitude=int(mm_to_px(20, dpi=dpi)),
-        #     #     p=1
-        #     # )
-        # ], seed=42)
-        
-        # # do the transform
-        # layers["ink"].bitmap = transform(
-        #     image=layers["ink"].bitmap
-        # )["image"]
-
-        # transform = A.Compose([
-        #     A.ThinPlateSpline(p=1)
-        #     # A.Blur(blur_limit=31, p=1)
-        #     # A.GridElasticDeform(
-        #     #     num_grid_xy=(10, 10),
-        #     #     magnitude=int(mm_to_px(20, dpi=dpi)),
-        #     #     p=1
-        #     # )
-        # ], seed=42)
-        
-        # layers["stafflines"].bitmap = transform(
-        #     image=layers["stafflines"].bitmap
-        # )["image"]
-
-        ################################
-
-        # pipeline = AugraphyPipeline(
-        #     ink_phase=[
-        #         BleedThrough(
-        #             intensity_range=(0.1, 0.3),
-        #             color_range=(32, 224),
-        #             ksize=(17, 17),
-        #             sigmaX=1,
-        #             alpha=random.uniform(0.1, 0.2),
-        #             offsets=(10, 20),
-        #         ),
-        #     ],
-        #     paper_phase=[],
-        #     post_phase=[]
-        # )
-
-        # augmentation = DirtyRollers()
-
-        # layers["paper"].bitmap = augmentation(
-        #     image=layers["paper"].bitmap
-        # )
 
         return LayerSet({
             "ink": ink,
@@ -126,34 +77,149 @@ class BaseHandwrittenPostprocessor(Postprocessor):
         self,
         final_layer: ImageLayer
     ) -> ImageLayer:
-        
-        # TODO: scribbles and stains
+        final_layer = self.f_scribbles(final_layer)
         final_layer = self.f_folding(final_layer)
         final_layer = self.f_camera(final_layer)
-        
-        # transform = A.Compose([
-        #     A.ThinPlateSpline(p=1)
-        # ], seed=42)
-
-        # final_layer.bitmap = transform(
-        #     image=final_layer.bitmap
-        # )["image"]
-
-        #################x
-
-        # pipeline = default_augraphy_pipeline()
-
-        # pipeline = AugraphyPipeline(
-        #     ink_phase=[],
-        #     paper_phase=[],
-        #     post_phase=[]
-        # )
-
-        # final_layer.bitmap = pipeline(
-        #     image=final_layer.bitmap
-        # )
-
         return final_layer
+
+
+class _Blur(Filter):
+    """Applies the Albumentations Blur filter to the composed image"""
+    def apply_to(self, input: ImageLayer) -> ImageLayer:
+        ksize = max(int(mm_to_px(self.rng.uniform(0.5, 3.0), dpi=input.dpi)), 1)
+
+        transform = A.Compose([
+            A.Blur(
+                blur_limit=ksize,
+                p=1
+            )
+        ], seed=self.rng.randint(0, sys.maxsize))
+
+        bitmap = transform(image=input.bitmap)["image"]
+        
+        return ImageLayer(
+            bitmap=bitmap,
+            dpi=input.dpi,
+            space=input.space,
+            regions=input.regions
+        )
+
+
+class _Median(Filter):
+    """Applies a median filter to a layer to simulate liquid ink shape smoothing"""
+    def apply_to(self, input: ImageLayer) -> ImageLayer:
+        ksize = max(int(mm_to_px(self.rng.uniform(0.05, 0.5), dpi=input.dpi)), 1)
+
+        bitmap = cv2.medianBlur(
+            input.bitmap,
+            ksize=ksize*2+1
+        )
+        
+        return ImageLayer(
+            bitmap=bitmap,
+            dpi=input.dpi,
+            space=input.space,
+            regions=input.regions
+        )
+
+
+class _InkBleed(Filter):
+    """Applies the Augraphy InkBleed filter to the composed image"""
+    def apply_to(self, input: ImageLayer) -> ImageLayer:
+        # collapse alpha to grayscale image (the augraphy ink format)
+        gray = smashcima_bgra_to_augraphy_gray(input.bitmap)
+
+        ksize = max(int(mm_to_px(self.rng.uniform(0.05, 0.3), dpi=input.dpi)), 1)
+
+        # make augraphy deterministic and call it
+        random.seed(self.rng.random())
+        augmentation = augraphy.InkBleed(
+            intensity_range=(0.4, 0.7),
+            kernel_size=(ksize*2+1, ksize*2+1),
+            severity=(0.2, 0.4)
+        )
+        gray = augmentation(gray)
+
+        # re-intorduce the alpha
+        bitmap = augraphy_gray_to_smashcima_bgra(gray)
+        # bitmap = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGRA)
+        
+        return ImageLayer(
+            bitmap=bitmap,
+            dpi=input.dpi,
+            space=input.space,
+            regions=input.regions
+        )
+
+
+class _Scribbles(Filter):
+    """Applies the Augraphy Scribbles filter to the composed image"""
+    def apply_to(self, input: ImageLayer) -> ImageLayer:
+        size_from_px = int(mm_to_px(10.0, dpi=input.dpi)) # 1 cm
+        size_to_px = int(mm_to_px(50.0, dpi=input.dpi)) # 5 cm
+        
+        # make augraphy deterministic and call it
+        random.seed(self.rng.random())
+        augmentation = augraphy.Scribbles(
+            scribbles_type="random",
+            scribbles_ink="random",
+            scribbles_location="random",
+            scribbles_size_range=(size_from_px, size_to_px),
+            scribbles_count_range=(1, 6),
+            scribbles_thickness_range=(1, 3),
+            scribbles_brightness_change=[8, 16],
+            scribbles_skeletonize=0,
+            scribbles_skeletonize_iterations=(2, 3),
+            scribbles_color="random",
+            scribbles_text="random",
+            scribbles_text_font="random",
+            scribbles_text_rotate_range=(0, 360),
+            scribbles_lines_stroke_count_range=(1, 6),
+        )
+        bitmap = augmentation(input.bitmap)
+        
+        return ImageLayer(
+            bitmap=bitmap,
+            dpi=input.dpi,
+            space=input.space,
+            regions=input.regions
+        )
+
+
+class _BleedThrough(Filter):
+    """Applies the Augraphy BleedThrough filter to the composed image"""
+    def apply_to(self, input: ImageLayer) -> ImageLayer:
+        # collapse alpha to grayscale image (the augraphy ink format)
+        gray = smashcima_bgra_to_augraphy_gray(input.bitmap)
+
+        ksize = max(int(mm_to_px(self.rng.uniform(0.1, 0.7), dpi=input.dpi)), 1)
+        offsets=(
+            int(mm_to_px(self.rng.uniform(-10, 10), dpi=input.dpi)),
+            int(mm_to_px(self.rng.uniform(-5, 5), dpi=input.dpi))
+        )
+
+        # make augraphy deterministic and call it
+        random.seed(self.rng.random())
+        augmentation = augraphy.BleedThrough(
+            intensity_range=(0.1, 0.3),
+            color_range=(32, 224),
+            ksize=(ksize*2+1, ksize*2+1),
+            sigmaX=1,
+            alpha=self.rng.uniform(0.1, 0.5),
+            offsets=offsets,
+        )
+        gray = augmentation(gray)
+
+        # re-intorduce the alpha
+        bitmap = augraphy_gray_to_smashcima_bgra(gray)
+        # bitmap = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGRA)
+        
+        return ImageLayer(
+            bitmap=bitmap,
+            dpi=input.dpi,
+            space=input.space,
+            regions=input.regions
+        )
 
 
 class _ShadowCast(Filter):
@@ -186,6 +252,7 @@ class _LightingGradient(Filter):
             space=input.space,
             regions=input.regions
         )
+
 
 class _Geometric(Filter):
     """Applies the Augraphy Geometric filter to the composed image"""
@@ -302,13 +369,7 @@ class _Letterpress(Filter):
         # TODO: make it DPI independend
 
         # collapse alpha to grayscale image (the augraphy ink format)
-        c = Canvas(
-            width=input.width,
-            height=input.height,
-            background_color=(255, 255, 255, 255) # white
-        )
-        c.place_layer(input.bitmap)
-        gray = cv2.cvtColor(c.read(), cv2.COLOR_BGRA2GRAY)
+        gray = smashcima_bgra_to_augraphy_gray(input.bitmap)
 
         # make augraphy deterministic and call it
         random.seed(self.rng.random())
@@ -316,8 +377,7 @@ class _Letterpress(Filter):
         gray = augmentation(gray)
         
         # re-intorduce the alpha
-        bitmap = np.zeros_like(input.bitmap)
-        bitmap[:,:,3] = 255 - gray
+        bitmap = augraphy_gray_to_smashcima_bgra(gray)
 
         # print("Letterpress seconds:", (time.time() - start_time))
 
@@ -362,3 +422,26 @@ class _DilateStafflines(Filter):
             space=input.space,
             regions=input.regions
         )
+
+
+def smashcima_bgra_to_augraphy_gray(bitmap: np.ndarray) -> np.ndarray:
+    """Converts smashcima BGRA image with black ink on transparent to the
+    augraphy ink grayscale, where white means kinda-transparent"""
+    c = Canvas(
+        width=bitmap.shape[1],
+        height=bitmap.shape[0],
+        background_color=(255, 255, 255, 255) # white
+    )
+    c.place_layer(bitmap)
+    gray = cv2.cvtColor(c.read(), cv2.COLOR_BGRA2GRAY)
+    return gray
+
+
+def augraphy_gray_to_smashcima_bgra(gray: np.ndarray) -> np.ndarray:
+    """Converts augraphy grayscale black on white to smashcima BGRA transparent
+    by interpreting the lightness as transparency and setting color everywhere
+    to pitch black"""
+    assert len(gray.shape) == 2
+    bitmap = np.zeros(shape=(*gray.shape, 4), dtype=np.uint8)
+    bitmap[:,:,3] = 255 - gray
+    return bitmap

@@ -8,14 +8,12 @@ class NullPostprocessor(Postprocessor):
     
     def process_extracted_layers(
         self,
-        layers: LayerSet,
-        dpi: float
+        layers: LayerSet
     ) -> LayerSet:
         return layers
     
     def process_final_layer(
         self,
-        final_layer: ImageLayer,
-        dpi: float
+        final_layer: ImageLayer
     ) -> ImageLayer:
         return final_layer
