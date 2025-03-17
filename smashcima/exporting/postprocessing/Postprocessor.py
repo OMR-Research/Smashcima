@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from .ImageLayer import ImageLayer
-from .LayerSet import LayerSet
+from ..image.ImageLayer import ImageLayer
+from ..image.LayerSet import LayerSet
 
 
 class Postprocessor(ABC):

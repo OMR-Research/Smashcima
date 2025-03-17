@@ -1,12 +1,14 @@
 import copy
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import numpy as np
 
+from smashcima.exporting.BitmapRenderer import BitmapRenderer
+from smashcima.exporting.compositing.Compositor import Compositor
+from smashcima.exporting.image.ImageLayer import ImageLayer
 from smashcima.geometry import Vector2
 from smashcima.loading import load_score
-from smashcima.exporting import BitmapRenderer
 from smashcima.scene import AffineSpace, Page, Scene, Score
 from smashcima.synthesis import (BeamStemSynthesizer, ColumnLayoutSynthesizer,
                                  LineSynthesizer, MuscimaPPGlyphSynthesizer,
@@ -33,7 +35,7 @@ class BaseHandwrittenScene(Scene):
         mpp_writer: int,
         mzk_background_patch: Patch,
         pages: List[Page],
-        renderer: BitmapRenderer
+        compositor: Compositor
     ):
         super().__init__(root_space)
         
@@ -49,16 +51,36 @@ class BaseHandwrittenScene(Scene):
         self.pages = pages
         """All the pages of music that were synthesized"""
 
-        self.renderer = renderer
-        """The renderer to be used for page rasterization"""
+        self.compositor = compositor
+        """The compositor to be used to flatten the scene into an image"""
+
+        self.dpi: float = 300.0
+        """The DPI at which to rasterize the scene"""
+
+        self.__compositor_cache: Dict[int, ImageLayer] = {}
+        """Caches composed image layers fr pages"""
 
         # add to the list of scene objects
         self.add_many([score, *pages])
+    
+    def compose_page(self, page: Page) -> ImageLayer:
+        """Runs the given page through the compositor and returns the image.
+        Caches the resulting image layer so that it can be used by multiple
+        exporters without recomputing it many times over."""
+        assert page in self.pages, "Given page is not in this scene"
+        key = self.pages.index(page)
+
+        if key not in self.__compositor_cache:
+            self.__compositor_cache[key] \
+                = self.compositor.run(page.view_box, dpi=self.dpi)
+
+        return self.__compositor_cache[key]
 
     def render(self, page: Page) -> np.ndarray:
         """Renders the bitmap BGRA image of a page"""
-        assert page in self.pages, "Given page is not in this scene"
-        return self.renderer.render(page.view_box)
+        layer = self.compose_page(page)
+        renderer = BitmapRenderer()
+        return renderer.render(layer)
 
 
 class BaseHandwrittenModel(Model[BaseHandwrittenScene]):
@@ -215,5 +237,5 @@ class BaseHandwrittenModel(Model[BaseHandwrittenScene]):
             mpp_writer=self.mpp_style_domain.current_writer,
             mzk_background_patch=self.mzk_paper_style_domain.current_patch,
             pages=pages,
-            renderer=BitmapRenderer(dpi=300)
+            compositor=self.compositor
         )

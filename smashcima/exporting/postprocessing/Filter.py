@@ -1,7 +1,7 @@
 import random
 from abc import ABC, abstractmethod
 
-from smashcima.exporting.ImageLayer import ImageLayer
+from ..image.ImageLayer import ImageLayer
 
 
 class Filter(ABC):

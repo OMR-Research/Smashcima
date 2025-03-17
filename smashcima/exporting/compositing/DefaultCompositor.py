@@ -15,10 +15,10 @@ from smashcima.scene.ViewBox import ViewBox
 from smashcima.scene.visual.StaffVisual import StaffVisual
 
 from .Compositor import Compositor
-from .ImageLayer import ImageLayer
-from .ImageLayerBuilder import ImageLayerBuilder
-from .LayerSet import LayerSet
-from .Postprocessor import Postprocessor
+from ..image.ImageLayer import ImageLayer
+from ..image.ImageLayerBuilder import ImageLayerBuilder
+from ..image.LayerSet import LayerSet
+from ..postprocessing.Postprocessor import Postprocessor
 
 
 class DefaultCompositor(Compositor):

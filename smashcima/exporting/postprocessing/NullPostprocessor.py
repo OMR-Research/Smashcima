@@ -1,5 +1,5 @@
-from .ImageLayer import ImageLayer
-from .LayerSet import LayerSet
+from ..image.ImageLayer import ImageLayer
+from ..image.LayerSet import LayerSet
 from .Postprocessor import Postprocessor
 
 

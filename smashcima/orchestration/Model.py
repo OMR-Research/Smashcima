@@ -3,6 +3,10 @@ import random
 from typing import Generic, Optional, TypeVar
 
 from smashcima.assets.AssetRepository import AssetRepository
+from smashcima.exporting.compositing.Compositor import Compositor
+from smashcima.exporting.compositing.DefaultCompositor import DefaultCompositor
+from smashcima.exporting.postprocessing.NullPostprocessor import NullPostprocessor
+from smashcima.exporting.postprocessing.Postprocessor import Postprocessor
 from smashcima.synthesis.style.Styler import Styler
 
 from .Container import Container
@@ -54,6 +58,12 @@ class Model(Generic[T], abc.ABC):
         # register the styler
         self.container.type(Styler)
 
+        # register default compositor
+        self.container.interface(Compositor, DefaultCompositor)
+
+        # register null postprocessor
+        self.container.interface(Postprocessor, NullPostprocessor)
+
     def resolve_services(self) -> None:
         """Defines model fields that hold specific services.
         
@@ -69,6 +79,16 @@ class Model(Generic[T], abc.ABC):
 
         self.styler: Styler = self.container.resolve(Styler)
         """Controls the style selection for all the synthesizers"""
+
+        self.compositor: Compositor = self.container.resolve(
+            Compositor # type: ignore
+        )
+        """Defines the pipeline that converts the scene into an ImageLayer"""
+
+        self.postprocessor: Postprocessor = self.container.resolve(
+            Postprocessor # type: ignore
+        )
+        """Applies augmentation filters during the compositing process"""
     
     def configure_services(self):
         """Modifies and configures resolved servies.

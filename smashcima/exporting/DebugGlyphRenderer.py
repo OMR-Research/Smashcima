@@ -1,9 +1,12 @@
+import copy
+
+import numpy as np
+
 from smashcima.scene.AffineSpace import AffineSpace
 from smashcima.scene.Glyph import Glyph
 from smashcima.scene.ViewBox import ViewBox
+
 from .BitmapRenderer import BitmapRenderer
-import numpy as np
-import copy
 
 
 class DebugGlyphRenderer:
@@ -23,5 +26,7 @@ class DebugGlyphRenderer:
         )
         dpi = max(s.dpi for s in glyph.sprites)
 
-        renderer = BitmapRenderer(dpi=dpi)
-        return renderer.render(view_box)
+        return BitmapRenderer.default_viewbox_render(
+            view_box=view_box,
+            dpi=dpi
+        )

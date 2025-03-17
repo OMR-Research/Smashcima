@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from smashcima.scene.ViewBox import ViewBox
 
-from .ImageLayer import ImageLayer
+from ..image.ImageLayer import ImageLayer
 
 
 class Compositor(ABC):

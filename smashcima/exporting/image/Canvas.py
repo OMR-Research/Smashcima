@@ -4,7 +4,7 @@ from typing import Union
 import numpy as np
 import cv2
 
-from smashcima.geometry import Rectangle
+from smashcima.geometry.Rectangle import Rectangle
 
 
 def _premultiplied_float32_alpha_overlay(

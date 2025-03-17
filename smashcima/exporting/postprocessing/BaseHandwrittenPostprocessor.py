@@ -10,11 +10,11 @@ import numpy as np
 
 from smashcima.geometry.units import mm_to_px
 
-from .Canvas import Canvas
+from ..image.Canvas import Canvas
+from ..image.ImageLayer import ImageLayer
+from ..image.LayerSet import LayerSet
 from .Filter import Filter
 from .FilterStack import FilterStack
-from .ImageLayer import ImageLayer
-from .LayerSet import LayerSet
 from .Postprocessor import Postprocessor
 
 
@@ -108,7 +108,7 @@ class _Blur(Filter):
 class _Median(Filter):
     """Applies a median filter to a layer to simulate liquid ink shape smoothing"""
     def apply_to(self, input: ImageLayer) -> ImageLayer:
-        ksize = max(int(mm_to_px(self.rng.uniform(0.05, 0.5), dpi=input.dpi)), 1)
+        ksize = max(int(mm_to_px(self.rng.uniform(0.05, 0.4), dpi=input.dpi)), 1)
 
         bitmap = cv2.medianBlur(
             input.bitmap,

@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 
-from .ImageLayer import ImageLayer
+from .image.ImageLayer import ImageLayer
 
 
 class MungExporter:
