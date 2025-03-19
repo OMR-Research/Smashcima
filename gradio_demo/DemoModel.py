@@ -1,8 +1,12 @@
-from smashcima.orchestration.BaseHandwrittenModel import BaseHandwrittenModel
-from smashcima.synthesis.style.MzkPaperStyleDomain import MzkPaperStyleDomain
-from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
-from smashcima.synthesis.style.Styler import Styler
 from smashcima.assets.AssetRepository import AssetRepository
+from smashcima.exporting.postprocessing.BaseHandwrittenPostprocessor import \
+    BaseHandwrittenPostprocessor
+from smashcima.exporting.postprocessing.Postprocessor import Postprocessor
+from smashcima.orchestration.BaseHandwrittenModel import BaseHandwrittenModel
+from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
+from smashcima.synthesis.style.MzkPaperStyleDomain import MzkPaperStyleDomain
+from smashcima.synthesis.style.Styler import Styler
+
 from .asset_bundles import ASSET_REPO
 
 
@@ -20,10 +24,14 @@ class DemoModel(BaseHandwrittenModel):
 
         # use one shared asset repository for the demo
         self.container.instance(AssetRepository, ASSET_REPO)
+
+        # NOTE: postprocessor is not used from the model,
+        # but run externally in the demo because the demo lets you synthesize
+        # a scene and then apply only the postprocessing step separately
     
     def resolve_services(self):
         super().resolve_services()
 
-        # keep style domains as fields
+        # expose style domains as fields
         self.mpp_style_domain = self.container.resolve(MuscimaPPStyleDomain)
         self.paper_style_domain = self.container.resolve(MzkPaperStyleDomain)

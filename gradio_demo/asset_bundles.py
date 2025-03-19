@@ -17,7 +17,7 @@ ASSET_REPO = AssetRepository.default()
 
 mpp_glyphs = ASSET_REPO.resolve_bundle(MuscimaPPGlyphs)
 mpp_symbol_repo = mpp_glyphs.load_symbol_repository()
-WRITERS = list(sorted(mpp_symbol_repo.all_writers))
+WRITERS = list(sorted(mpp_symbol_repo.get_all_styles()))
 
 
 ######################
