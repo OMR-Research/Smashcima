@@ -1,8 +1,11 @@
-from typing import Optional
-import unittest
-from smashcima.orchestration.Container import Container
-import punq
 import abc
+import unittest
+from typing import Optional
+
+import punq
+
+from smashcima.orchestration.Container import (
+    Container, MissingInterfaceBindingTargetError)
 
 
 class _MyAbstractInterface(abc.ABC):
@@ -31,8 +34,14 @@ class ContainerTest(unittest.TestCase):
         with self.assertRaises(punq.MissingDependencyError):
             c.resolve(_MyCoreService)
 
+        # check it can not be resolved
+        assert not c.has(_MyCoreService)
+
         # register
         c.type(_MyCoreService)
+
+        # check it can be resolved
+        assert c.has(_MyCoreService)
 
         # now resolution succeeds
         core = c.resolve(_MyCoreService)
@@ -44,6 +53,10 @@ class ContainerTest(unittest.TestCase):
         c.type(_MyCoreService)
         c.type(_MyChildService)
 
+        # check it can be resolved
+        assert c.has(_MyCoreService)
+        assert c.has(_MyChildService)
+
         child = c.resolve(_MyChildService)
         assert isinstance(child, _MyChildService)
         assert isinstance(child.core, _MyCoreService)
@@ -51,21 +64,37 @@ class ContainerTest(unittest.TestCase):
     def test_it_can_resolve_service_via_interface(self):
         c = Container()
 
+        # we cannot bind interface to a type without first registering that type
+        with self.assertRaises(MissingInterfaceBindingTargetError):
+            c.interface(_MyAbstractInterface, _MyCoreService)
+        
+        # register the implementation type
+        c.type(_MyCoreService)
+
+        # now can bind the interface
         c.interface(_MyAbstractInterface, _MyCoreService)
+
+        # check both can be resolved
+        assert c.has(_MyCoreService)
+        assert c.has(_MyAbstractInterface)
 
         # we can resolve the interface and we get the service
         core = c.resolve(_MyAbstractInterface)
         assert isinstance(core, _MyCoreService)
 
-        # but we cannot resolve the service directly
-        with self.assertRaises(punq.MissingDependencyError):
-            c.resolve(_MyCoreService)
+        # but can also resolve the service directly and it's the same one
+        assert c.resolve(_MyCoreService) is core
     
     def test_it_can_resolve_service_with_interface_dependency(self):
         c = Container()
 
-        c.interface(_MyAbstractInterface, _MyCoreService)
+        c.interface(_MyAbstractInterface, _MyCoreService, register_impl=True)
         c.type(_MyChildServiceWithInterface)
+
+        # check all can be resolved
+        assert c.has(_MyCoreService)
+        assert c.has(_MyAbstractInterface)
+        assert c.has(_MyChildServiceWithInterface)
 
         child = c.resolve(_MyChildServiceWithInterface)
         assert isinstance(child, _MyChildServiceWithInterface)
@@ -76,6 +105,8 @@ class ContainerTest(unittest.TestCase):
 
         core = _MyCoreService()
         c.instance(_MyCoreService, core)
+
+        assert c.has(_MyCoreService)
 
         assert c.resolve(_MyCoreService) is core
     
@@ -100,7 +131,7 @@ class ContainerTest(unittest.TestCase):
     
     def test_it_registers_interfaces_as_singletons(self):
         c = Container()
-        c.interface(_MyAbstractInterface, _MyCoreService)
+        c.interface(_MyAbstractInterface, _MyCoreService, register_impl=True)
 
         core = c.resolve(_MyAbstractInterface)
         assert isinstance(core, _MyCoreService)
@@ -110,11 +141,13 @@ class ContainerTest(unittest.TestCase):
     
     def test_it_resolves_itself(self):
         c = Container(register_itself=True)
+        assert c.has(Container)
         resolved = c.resolve(Container)
         assert resolved is c
     
     def test_it_can_prevent_self_registration(self):
         c = Container(register_itself=False)
+        assert not c.has(Container)
         with self.assertRaises(punq.MissingDependencyError):
             c.resolve(Container)
 
@@ -130,6 +163,30 @@ class ContainerTest(unittest.TestCase):
         c.factory(_MyAbstractInterface, _factory)
 
         assert core is None
+
+        assert not c.has(_MyCoreService)
+        assert c.has(_MyAbstractInterface)
+
+        resolved = c.resolve(_MyAbstractInterface)
+
+        assert core is not None
+        assert resolved is core
+    
+    def test_it_can_register_factory_via_interface(self) -> None:
+        c = Container()
+        core: Optional[_MyCoreService] = None
+
+        def _factory():
+            nonlocal core
+            core = _MyCoreService()
+            return core
+
+        c.interface(_MyAbstractInterface, _factory)
+
+        assert core is None
+
+        assert not c.has(_MyCoreService)
+        assert c.has(_MyAbstractInterface)
 
         resolved = c.resolve(_MyAbstractInterface)
 

@@ -100,16 +100,43 @@ class BaseHandwrittenModel(Model[BaseHandwrittenScene]):
         super().register_services()
         c = self.container
         
+        # stafflines
+        c.interface(
+            StafflinesSynthesizer, NaiveStafflinesSynthesizer, register_impl=True
+        )
+
+        # glyphs
+        c.interface(
+            GlyphSynthesizer, MuscimaPPGlyphSynthesizer, register_impl=True
+        )
+        c.interface(
+            LineSynthesizer, MuscimaPPLineSynthesizer, register_impl=True
+        )
+
+        # notation
         c.type(ColumnLayoutSynthesizer)
         c.type(BeamStemSynthesizer)
-        c.interface(StafflinesSynthesizer, NaiveStafflinesSynthesizer)
-        c.interface(GlyphSynthesizer, MuscimaPPGlyphSynthesizer)
-        c.interface(LineSynthesizer, MuscimaPPLineSynthesizer)
+
+        # page
         c.type(SimplePageSynthesizer)
+
+        # style domains
         c.type(MuscimaPPStyleDomain)
         c.type(MzkPaperStyleDomain)
-        # c.interface(PaperSynthesizer, SolidColorPaperSynthesizer)
+
+        # paper
+        c.type(SolidColorPaperSynthesizer)
+        c.type(MzkQuiltingPaperSynthesizer)
+
+        # === interfaces ===
+
+        # glyphs
+        c.interface(GlyphSynthesizer, MuscimaPPGlyphSynthesizer)
+        c.interface(LineSynthesizer, MuscimaPPLineSynthesizer)
+        
+        # paper
         c.interface(PaperSynthesizer, MzkQuiltingPaperSynthesizer)
+        # c.interface(PaperSynthesizer, SolidColorPaperSynthesizer)
 
     def resolve_services(self):
         super().resolve_services()

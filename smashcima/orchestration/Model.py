@@ -59,10 +59,14 @@ class Model(Generic[T], abc.ABC):
         self.container.type(Styler)
 
         # register default compositor
-        self.container.interface(Compositor, DefaultCompositor)
+        self.container.interface(
+            Compositor, DefaultCompositor, register_impl=True
+        )
 
         # register null postprocessor
-        self.container.interface(Postprocessor, NullPostprocessor)
+        self.container.interface(
+            Postprocessor, NullPostprocessor, register_impl=True
+        )
 
     def resolve_services(self) -> None:
         """Defines model fields that hold specific services.

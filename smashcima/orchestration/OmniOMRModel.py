@@ -16,23 +16,17 @@ from .BaseHandwrittenModel import BaseHandwrittenModel
 class OmniOMRModel(BaseHandwrittenModel):
     def register_services(self):
         super().register_services()
-        
-        # register the style domain
+
+        # additional style domain
         self.container.type(OmniOMRStyleDomain)
+        
+        # additional glyph synthesizers
+        self.container.type(OmniOMRGlyphSynthesizer)
+        self.container.type(OmniOMRLineSynthesizer)
 
-        # register the different implementation for the interfaces
-        self.container.interface(
-            GlyphSynthesizer,
-            OmniOMRGlyphSynthesizer
-        )
-        self.container.interface(
-            LineSynthesizer,
-            OmniOMRLineSynthesizer
-        )
-
-        # register the fallback synthesizers
-        self.container.type(MuscimaPPGlyphSynthesizer)
-        self.container.type(MuscimaPPLineSynthesizer)
+        # re-bind glyph synthesizer interfaces
+        self.container.interface(GlyphSynthesizer, OmniOMRGlyphSynthesizer)
+        self.container.interface(LineSynthesizer, OmniOMRLineSynthesizer)
 
     def resolve_services(self) -> None:
         super().resolve_services()
