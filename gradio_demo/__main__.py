@@ -18,7 +18,7 @@ from smashcima.scene.visual import RestVisual
 from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.visual.Page import Page
 
-from .asset_bundles import BACKGROUND_SAMPLES, MXL_FILES, WRITERS, GLYPH_STYLES
+from .asset_bundles import BACKGROUND_SAMPLES, MXL_FILES, GLYPH_STYLES
 from .DemoModel import DemoModel
 from .utils import img_smashcima2gradio
 
@@ -82,7 +82,8 @@ with gr.Blocks() as demo:
                     Here are interesting styles to try:
                     - `w01` The default, clean writer.
                     - `w28` Has big and round noteheads.
-                    - TODO
+                    - `afa71e12` Is a 19th century, quill-written document.
+                    - `334c2e20` Is a typeset (printed) document.
                 """)
                 glyph_style_radio = gr.Radio(
                     label=None,
@@ -145,11 +146,11 @@ with gr.Blocks() as demo:
     
     def randomize():
         new_mxl_file_name = random.choice(MXL_FILES).name
-        new_writer = random.choice(WRITERS)
+        new_glyph_style = random.choice(GLYPH_STYLES)
         new_background = random.randint(0, len(BACKGROUND_SAMPLES) - 1)
         return (
             gr.Radio(value=new_mxl_file_name),
-            gr.Radio(value=new_writer),
+            gr.Radio(value=new_glyph_style.title),
             gr.Gallery(selected_index=new_background)
         )
 
@@ -167,13 +168,14 @@ with gr.Blocks() as demo:
         mxl_path = str(next(f for f in MXL_FILES if f.name == mxl_file_name))
 
         # set the glyph style
-        glyph_style = GLYPH_STYLES[glyph_style_index]
-        assert glyph_style.dataset == "muscima_pp"
-        model.mpp_style_domain.current_style = glyph_style.style
+        model.demo_style_domain.apply_glyph_style(
+            GLYPH_STYLES[glyph_style_index]
+        )
 
         # set the background paper style
-        model.paper_style_domain.current_patch \
-            = BACKGROUND_SAMPLES[background].patch
+        model.demo_style_domain.apply_paper_style(
+            BACKGROUND_SAMPLES[background]
+        )
         
         # run the synthesizer
         scene = model(mxl_path)
@@ -254,19 +256,10 @@ with gr.Blocks() as demo:
         randomize, [],
         [mxl_file_radio, glyph_style_radio, background_gallery]
     )
+    background_gallery.select(change_background, [], [background_state])
     synthesize_btn.click(*synth_evt_args)
-
     scene_state.change(*render_evt_args)
-
     render_btn.click(*render_evt_args)
-
-    # Synthesis on value change:
-    # (disabled now, since it takes quite some time to render)
-    #
-    # mxl_file_radio.change(*synth_evt_args)
-    # writer_radio.change(*synth_evt_args)
-    background_gallery.select(change_background, [], [background_state]) #\
-    #     .then(*synth_evt_args)
 
 
 # .venv/bin/python3 -m gradio_demo

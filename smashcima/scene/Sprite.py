@@ -119,8 +119,8 @@ class Sprite(SceneObject):
         dpi: float = 300
     ) -> "Sprite":
         """Creates a rectangular box image sprite with the desired properties"""
-        pixel_width = int(mm_to_px(rectangle.width, dpi=dpi))
-        pixel_height = int(mm_to_px(rectangle.height, dpi=dpi))
+        pixel_width = max(int(mm_to_px(rectangle.width, dpi=dpi)), 1)
+        pixel_height = max(int(mm_to_px(rectangle.height, dpi=dpi)), 1)
         border_width_px = int(round(mm_to_px(border_width, dpi=dpi)))
 
         # border is at least 1 px if width is non-zero

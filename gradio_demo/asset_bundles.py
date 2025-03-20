@@ -1,4 +1,5 @@
 from smashcima.assets.AssetRepository import AssetRepository
+from smashcima.assets.glyphs.omni_omr.OmniOMRGlyphs import OmniOMRGlyphs
 from smashcima.assets.textures.MzkPaperPatches import MzkPaperPatches, Patch
 from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
 from pathlib import Path
@@ -15,18 +16,17 @@ ASSET_REPO = AssetRepository.default()
 # Writer Styles #
 #################
 
-mpp_glyphs = ASSET_REPO.resolve_bundle(MuscimaPPGlyphs)
-mpp_symbol_repo = mpp_glyphs.load_symbol_repository()
-WRITERS = list(sorted(mpp_symbol_repo.get_all_styles()))
-
-####
-
 @dataclass
 class GlyphStyle:
     title: str
     dataset: Union[Literal["muscima_pp"], Literal["omni_omr"]]
     style: str
 
+mpp_glyphs = ASSET_REPO.resolve_bundle(MuscimaPPGlyphs)
+mpp_symbol_repo = mpp_glyphs.load_symbol_repository()
+
+omni_omr_glyphs = ASSET_REPO.resolve_bundle(OmniOMRGlyphs)
+omni_omr_symbol_repo = omni_omr_glyphs.load_symbol_repository()
 
 GLYPH_STYLES: List[GlyphStyle] = [
     GlyphStyle(
@@ -36,6 +36,15 @@ GLYPH_STYLES: List[GlyphStyle] = [
     )
     for writer_number in sorted(
         map(int, mpp_symbol_repo.get_all_styles())
+    )
+] + [
+    GlyphStyle(
+        title=book_uuid[0:8],
+        dataset="omni_omr",
+        style=book_uuid
+    )
+    for book_uuid in sorted(
+        omni_omr_symbol_repo.get_all_styles()
     )
 ]
 
