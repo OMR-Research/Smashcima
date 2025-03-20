@@ -55,8 +55,9 @@ class Model(Generic[T], abc.ABC):
         # register the default RNG to use during randomization
         self.container.instance(random.Random, random.Random())
 
-        # register the styler
-        self.container.type(Styler)
+        # register the styler,
+        # with the container reference provided
+        self.container.factory(Styler, lambda: Styler(self.container))
 
         # register default compositor
         self.container.interface(
@@ -100,7 +101,10 @@ class Model(Generic[T], abc.ABC):
         Called from the consturctor after services are resolved.
         Here, services should be set-up after their instantiation.
         """
-        pass
+        
+        # let the styler pick out all the style domains so that it
+        # controls them properly
+        self.styler.register_domains_from_container()
     
     def __call__(self, *args, **kwargs) -> T:
         """Synthesizes a new scene based on the arguments and returns it.

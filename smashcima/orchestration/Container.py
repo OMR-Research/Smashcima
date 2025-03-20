@@ -1,6 +1,6 @@
 from types import FunctionType
 import punq
-from typing import Callable, Set, TypeVar, Type, Union
+from typing import Callable, List, Optional, Set, TypeVar, Type, Union
 
 
 T = TypeVar("T")
@@ -27,6 +27,11 @@ class Container:
         # register the container itself into the container
         if register_itself:
             self.instance(Container, self)
+    
+    @property
+    def registered_types(self) -> List[Type]:
+        """Returns all types that are registered in the container"""
+        return list(self._registered_types)
     
     def instance(self, instance_type: Type[T], instance: T):
         """Registers an existing instance to be used for a given service type.

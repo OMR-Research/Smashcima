@@ -3,7 +3,7 @@ from smashcima.assets.textures.MzkPaperPatches import MzkPaperPatches, Patch
 from smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs import MuscimaPPGlyphs
 from pathlib import Path
 from dataclasses import dataclass
-from typing import List
+from typing import List, Literal, Union
 from .utils import REPO_FOLDER, random_name, img_smashcima2gradio
 import numpy as np
 
@@ -18,6 +18,26 @@ ASSET_REPO = AssetRepository.default()
 mpp_glyphs = ASSET_REPO.resolve_bundle(MuscimaPPGlyphs)
 mpp_symbol_repo = mpp_glyphs.load_symbol_repository()
 WRITERS = list(sorted(mpp_symbol_repo.get_all_styles()))
+
+####
+
+@dataclass
+class GlyphStyle:
+    title: str
+    dataset: Union[Literal["muscima_pp"], Literal["omni_omr"]]
+    style: str
+
+
+GLYPH_STYLES: List[GlyphStyle] = [
+    GlyphStyle(
+        title="w" + str(writer_number).zfill(2),
+        dataset="muscima_pp",
+        style=str(writer_number)
+    )
+    for writer_number in sorted(
+        map(int, mpp_symbol_repo.get_all_styles())
+    )
+]
 
 
 ######################

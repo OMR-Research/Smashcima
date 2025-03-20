@@ -3,6 +3,8 @@ from smashcima.exporting.postprocessing.BaseHandwrittenPostprocessor import \
     BaseHandwrittenPostprocessor
 from smashcima.exporting.postprocessing.Postprocessor import Postprocessor
 from smashcima.orchestration.BaseHandwrittenModel import BaseHandwrittenModel
+from smashcima.orchestration.OmniOMRModel import OmniOMRModel
+from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
 from smashcima.synthesis.style.MuscimaPPStyleDomain import MuscimaPPStyleDomain
 from smashcima.synthesis.style.MzkPaperStyleDomain import MzkPaperStyleDomain
 from smashcima.synthesis.style.Styler import Styler
@@ -15,11 +17,19 @@ class StaticStyler(Styler):
         pass # do nothing, keep the current style unchanged
 
 
+# class ForkGlyphSynthesizer(GlyphSynthesizer):
+#     def __init__(self):
+#         pass
+
+
 class DemoModel(BaseHandwrittenModel):
     def register_services(self):
         super().register_services()
 
         # change the styler used by the model
+        self.container.factory(
+            StaticStyler, lambda: StaticStyler(self.container)
+        )
         self.container.interface(Styler, StaticStyler)
 
         # use one shared asset repository for the demo

@@ -1,6 +1,4 @@
-from collections import OrderedDict
 import copy
-from pathlib import Path
 import random
 from typing import List, Optional, Tuple
 
@@ -8,7 +6,6 @@ import gradio as gr
 import numpy as np
 
 from smashcima.exporting.BitmapRenderer import BitmapRenderer
-from smashcima.exporting.SvgExporter import SvgExporter
 from smashcima.exporting.compositing.DefaultCompositor import DefaultCompositor
 from smashcima.exporting.postprocessing.BaseHandwrittenPostprocessor import \
     BaseHandwrittenPostprocessor
@@ -16,15 +13,12 @@ from smashcima.exporting.postprocessing.Filter import Filter
 from smashcima.orchestration.BaseHandwrittenModel import BaseHandwrittenScene
 from smashcima.scene.Glyph import Glyph
 from smashcima.scene.Sprite import Sprite
-from smashcima.scene.semantic.Measure import Measure
-from smashcima.scene.semantic.Note import Note
 from smashcima.scene.semantic.Part import Part
-from smashcima.scene.semantic.RestSemantic import RestSemantic
 from smashcima.scene.visual import RestVisual
 from smashcima.scene.visual.Notehead import Notehead
 from smashcima.scene.visual.Page import Page
 
-from .asset_bundles import BACKGROUND_SAMPLES, MXL_FILES, WRITERS
+from .asset_bundles import BACKGROUND_SAMPLES, MXL_FILES, WRITERS, GLYPH_STYLES
 from .DemoModel import DemoModel
 from .utils import img_smashcima2gradio
 
@@ -67,25 +61,46 @@ with gr.Blocks() as demo:
     
     with gr.Row():
         with gr.Column(scale=1):
-            # with gr.Row():
             synthesize_btn = gr.Button("Synthesize ↱", variant="primary")
             randomize_btn = gr.Button("Randomize")
 
-            mxl_file_radio = gr.Radio(
-                label="Input MusicXML Files",
-                choices=[p.name for p in MXL_FILES],
-                value=MXL_FILES[0].name
-            )
+            with gr.Accordion("Input MusicXML Files", open=False):
+                mxl_file_radio = gr.Radio(
+                    label=None,
+                    container=False,
+                    choices=[p.name for p in MXL_FILES],
+                    value=MXL_FILES[0].name
+                )
             
-            with gr.Accordion("Style Controls", open=False):
-                writer_radio = gr.Radio(
-                    label="Handwriting Style",
-                    choices=WRITERS,
-                    value=WRITERS[0]
+            with gr.Accordion("Glyph Style", open=False):
+                gr.Markdown("""
+                    There are two symbol repositories: MUSCIMA++ and OmniOMR
+                    proto dataset. MUSCIMA++ has 50 writers with labels `w01`
+                    up to `w50`. OmniOMR is a collection of pages from books,
+                    where each book as a UUID, e.g. `1d507bc2`.
+                    
+                    Here are interesting styles to try:
+                    - `w01` The default, clean writer.
+                    - `w28` Has big and round noteheads.
+                    - TODO
+                """)
+                glyph_style_radio = gr.Radio(
+                    label=None,
+                    container=False,
+                    choices=[s.title for s in GLYPH_STYLES],
+                    value=GLYPH_STYLES[0].title,
+                    type="index"
                 )
 
+            with gr.Accordion("Paper Texture", open=False):
+                gr.Markdown(
+                    value=lambda b: \
+                        f"Currently selected: {BACKGROUND_SAMPLES[b].title}",
+                    inputs=[background_state]
+                )
                 background_gallery = gr.Gallery(
-                    label="Background Sample",
+                    label=None,
+                    container=False,
                     columns=3,
                     value=[(s.gradio_image, s.title) for s in BACKGROUND_SAMPLES],
                     interactive=False, # disable user's uploads
@@ -96,9 +111,10 @@ with gr.Blocks() as demo:
                 "*(there is no synthesized scene yet)*"
             )
 
-            with gr.Accordion("Postprocessing", open=False):
+            with gr.Accordion("Postprocessing Filters", open=False):
                 postprocessing_radio = gr.Radio(
-                    label="Postprocessing Filters",
+                    label=None,
+                    container=False,
                     choices=["random", "manual"],
                     value="random"
                 )
@@ -140,7 +156,7 @@ with gr.Blocks() as demo:
     def synthesize_scene(
         model: Optional[DemoModel],
         mxl_file_name: str,
-        writer: int,
+        glyph_style_index: int,
         background: int
     ) -> Tuple[np.ndarray, DemoModel, str]:
         # create the model with the first user request
@@ -150,8 +166,10 @@ with gr.Blocks() as demo:
         # full path to the input MusicXML file
         mxl_path = str(next(f for f in MXL_FILES if f.name == mxl_file_name))
 
-        # set the writer style
-        model.mpp_style_domain.current_style = writer
+        # set the glyph style
+        glyph_style = GLYPH_STYLES[glyph_style_index]
+        assert glyph_style.dataset == "muscima_pp"
+        model.mpp_style_domain.current_style = glyph_style.style
 
         # set the background paper style
         model.paper_style_domain.current_patch \
@@ -222,7 +240,7 @@ with gr.Blocks() as demo:
 
     synth_evt_args = (
         synthesize_scene,
-        [model_state, mxl_file_radio, writer_radio, background_state],
+        [model_state, mxl_file_radio, glyph_style_radio, background_state],
         [scene_state, model_state, scene_preview_image, scene_info_md]
     )
 
@@ -234,7 +252,7 @@ with gr.Blocks() as demo:
 
     randomize_btn.click(
         randomize, [],
-        [mxl_file_radio, writer_radio, background_gallery]
+        [mxl_file_radio, glyph_style_radio, background_gallery]
     )
     synthesize_btn.click(*synth_evt_args)
 

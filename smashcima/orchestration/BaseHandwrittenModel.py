@@ -147,18 +147,6 @@ class BaseHandwrittenModel(Model[BaseHandwrittenScene]):
 
         self.mpp_style_domain = c.resolve(MuscimaPPStyleDomain)
         self.mzk_paper_style_domain = c.resolve(MzkPaperStyleDomain)
-    
-    def configure_services(self):
-        super().configure_services()
-        
-        self.styler.register_domain(
-            MuscimaPPStyleDomain,
-            self.container.resolve(MuscimaPPStyleDomain)
-        )
-        self.styler.register_domain(
-            MzkPaperStyleDomain,
-            self.container.resolve(MzkPaperStyleDomain)
-        )
 
     def __call__(
         self,

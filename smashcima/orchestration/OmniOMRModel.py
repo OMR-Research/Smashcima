@@ -30,25 +30,18 @@ class OmniOMRModel(BaseHandwrittenModel):
 
     def resolve_services(self) -> None:
         super().resolve_services()
+        c = self.container
     
-        self.omni_omr_glyph_synthesizer: OmniOMRGlyphSynthesizer \
-            = self.container.resolve(GlyphSynthesizer) # type: ignore
-        self.muscima_pp_glyph_synthesizer \
-            = self.container.resolve(MuscimaPPGlyphSynthesizer)
+        self.omni_omr_glyph_synthesizer = c.resolve(OmniOMRGlyphSynthesizer)
+        self.omni_omr_line_synthesizer = c.resolve(OmniOMRLineSynthesizer)
         
-        self.omni_omr_line_synthesizer: OmniOMRLineSynthesizer \
-            = self.container.resolve(LineSynthesizer) # type: ignore
-        self.muscima_pp_line_synthesizer \
-            = self.container.resolve(MuscimaPPLineSynthesizer)
+        self.muscima_pp_glyph_synthesizer = c.resolve(MuscimaPPGlyphSynthesizer)
+        self.muscima_pp_line_synthesizer = c.resolve(MuscimaPPLineSynthesizer)
+        
+        self.omni_omr_style_domain = c.resolve(OmniOMRStyleDomain)
 
     def configure_services(self):
         super().configure_services()
-
-        # register the new style domain into the styler
-        self.styler.register_domain(
-            OmniOMRStyleDomain,
-            self.container.resolve(OmniOMRStyleDomain)
-        )
 
         # configure the fallback synthesizer
         self.omni_omr_glyph_synthesizer.fallback_synthesizer \
