@@ -26,7 +26,18 @@ RUN pip install --no-cache-dir .[gradio]
 # configure the assets folder path and
 # download and install all necessary demo asset bundles
 ENV MC_ASSETS_CACHE=/app/smashcima_assets
-RUN python -m gradio_demo.asset_bundles
+# RUN python -m gradio_demo.asset_bundles
+
+# NOPE, instead, copy these over from the local folders,
+# since the OmniOMR proto dataset cannot be downloaded
+COPY ./smashcima_assets/MuscimaPPGlyphs/bundle.json ./smashcima_assets/MuscimaPPGlyphs/bundle.json
+COPY ./smashcima_assets/MuscimaPPGlyphs/symbol_repository.pkl ./smashcima_assets/MuscimaPPGlyphs/symbol_repository.pkl
+COPY ./smashcima_assets/OmniOMRGlyphs/bundle.json ./smashcima_assets/OmniOMRGlyphs/bundle.json
+COPY ./smashcima_assets/OmniOMRGlyphs/symbol_repository.pkl ./smashcima_assets/OmniOMRGlyphs/symbol_repository.pkl
+COPY ./smashcima_assets/MzkPaperPatches ./smashcima_assets/MzkPaperPatches
+# fake-install sub-dependencies by only providing the bundle.json:
+COPY ./smashcima_assets/MuscimaPP/bundle.json ./smashcima_assets/MuscimaPP/bundle.json
+COPY ./smashcima_assets/OmniOMRProto/bundle.json ./smashcima_assets/OmniOMRProto/bundle.json
 
 # configure networking
 EXPOSE 7860
