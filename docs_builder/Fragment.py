@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup, Tag
 class Fragment:
     """Fragment = one markdown file, being processed"""
     def __init__(self, path: Path, soup: BeautifulSoup):
-        self.path = path.absolute()
+        self.path = path.absolute().resolve()
         """Absolute path to the original markdown"""
 
         self.soup = soup
@@ -19,14 +19,14 @@ class Fragment:
     
     @staticmethod
     def load(path: Path) -> "Fragment":
-        assert path.is_file()
+        assert path.is_file(), f"No fragment at {path}"
         
         markdown = path.read_text()
         html = markdown_to_html(markdown)
         soup = BeautifulSoup(html, "html.parser")
 
         return Fragment(path=path, soup=soup)
-    
+
     def insert_fragment_anchor(self):
         """Adds an anchor tag at the beginning of the fragment"""
         anchor_element = self.soup.new_tag(
@@ -34,6 +34,19 @@ class Fragment:
             attrs={"name": self.anchor_name}
         )
         self.soup.insert(0, anchor_element)
+    
+    def insert_page_break_at_beginning(self):
+        """Adds a page break at the beginning of the fragment, unless there is
+        a comment saying otherwise"""
+        disable_flag = self.soup.find("div", attrs={"data-no-page-break": ""})
+        if disable_flag is not None:
+            disable_flag.decompose()
+            return
+        break_element = self.soup.new_tag(
+            "div",
+            attrs={"style": "break-after: page;"}
+        )
+        self.soup.insert(0, break_element)
     
     def make_links_absolute(self):
         """Converts image and link URLs to be absolute paths"""
@@ -91,7 +104,7 @@ def make_link_absolute(link: str, absolute_fragment_dir: Path) -> str:
     if not is_path_link(link):
         return link
     
-    return str(Path(absolute_fragment_dir / link).absolute())
+    return str(Path(absolute_fragment_dir / link).absolute().resolve())
 
 
 def markdown_to_html(markdown: str) -> str:

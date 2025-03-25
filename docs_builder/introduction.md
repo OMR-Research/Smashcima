@@ -1,28 +1,20 @@
-[![License Apache 2.0](https://badgen.net/badge/license/apache2.0/blue)](https://github.com/OMR-Research/Smashcima/blob/main/LICENSE)
-[![PyPI version](https://badge.fury.io/py/smashcima.svg)](https://pypi.org/project/smashcima/)
-[![Downloads](https://static.pepy.tech/badge/smashcima)](https://pepy.tech/project/smashcima)
-![Python Version](https://badgen.net/badge/python/3.8+/cyan)
+<div data-no-page-break=""></div>
 
-<div align="center">
-    <br/>
-    <img src="docs/assets/smashcima-logo.svg" width="600px">
-    <br/>
-    <br/>
-    <br/>
-</div>
+# Introduction
 
 Smashcima is a library and framework for synthesizing images containing handwritten music for creating synthetic training data for OMR models.
 
 **Try out the demo on [🤗 Huggingface Spaces](https://huggingface.co/spaces/Jirka-Mayer/Smashcima) right now!**<br/>
 Example output with MUSCIMA++ writer no. 28 style:
 
-<img src="docs/assets/readme-example.jpg"><br/>
+<img src="../docs/assets/readme-example.jpg"><br/>
 
 **Install from [pypi](https://pypi.org/project/smashcima/) with:**
 
 ```bash
 pip install smashcima
 ```
+
 
 ## What is Smashcima, and how is it novel?
 
@@ -41,55 +33,6 @@ Smashcima is the only tool that simultaneously:
 Therefore, Smashcima brings a unique new capability for optical music recognition (OMR): synthesizing a near-realistic image of handwritten sheet music from just a MusicXML file. As opposed to notation editors, which work with a fixed set of fonts and a set of layout rules, it can adapt handwriting styles from existing OMR datasets to arbitrary music (beyond the music encoded in existing OMR datasets), and randomize layout to simulate the imprecisions of handwriting, while guaranteeing the semantic correctness of the output rendering. Crucially, the rendered image is provided also with the positions of all the visual elements of music notation, so that both object detection-based and sequence-to-sequence OMR pipelines can utilize Smashcima as a synthesizer of training data.
 
 (In combination with the [LMX canonical linearization of MusicXML](https://github.com/Jirka-Mayer/lmx), one can imagine the endless possibilities of running Smashcima on inputs from a MusicXML generator.)
-
-## Getting started (User documentation)
-
-To quickly learn how to start using Smashcima for your project, start with the tutorials:
-
-1. [Producing music notation images](docs/tutorials/1-producing-music-notation-images.md)
-2. [Changing background texture](docs/tutorials/2-changing-background-texture.md)
-3. [Using custom glyphs](docs/tutorials/3-using-custom-glyphs.md)
-
-
-## How it works (Technical documentation)
-
-Smashcima is primarily a framework and a set of crafted interfaces for building custom visual-data related synthesizers.
-
-- [Design overview](docs/design-overview.md)
-- [Models and service orchestration](docs/models-and-service-orchestration.md)
-- Scene
-    - [Scene objects](docs/scene-objects.md)
-    - [Affine spaces and rendering](docs/affine-spaces-and-rendering.md)
-- Synthesis
-    - [Synthesizer interfaces](docs/synthesizer-interfaces.md)
-        - [`MusicNotationSynthesizer` interface](docs/music-notation-synthesizer.md)
-        - [`GlyphSynthesizer` interface](docs/glyph-synthesizer.md)
-    - [Glyphs](docs/glyphs.md)
-    - [Line glyphs](docs/line-glyphs.md)
-    - Style control
-- Asset bundles
-- Miscelaneous
-    - [Determining scanned artifact DPI](docs/determining-scanned-artifact-dpi.md)
-
-If you feel like improving the library, take a look at the [TODO List](docs/todo-list.md).
-
-
-## Development
-
-Create a virtual environment and install dependencies:
-
-```bash
-python3 -m venv .venv
-.venv/bin/pip3 install -e .
-
-# to run jupyter notebooks:
-.venv/bin/pip3 install -e .[jupyter]
-
-# to run the gradio demo:
-.venv/bin/pip3 install -e .[gradio]
-```
-
-Read the [Development Setup](docs/development-setup.md) documentation page to see how to develop, debug, and deploy the project.
 
 
 ## Financing

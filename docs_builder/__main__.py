@@ -36,6 +36,7 @@ def process_fragments(fragments: List[Fragment]):
         print(f"Processing fragment {f.path.name} ...")
         f.make_links_absolute()
         f.insert_fragment_anchor()
+        f.insert_page_break_at_beginning()
         f.convert_fragment_links_to_hash_links(fragments_lookup)
         f.remove_ids_from_headings()
 
