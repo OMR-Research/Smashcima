@@ -1,0 +1,2 @@
+pdfkit
+beautifulsoup4

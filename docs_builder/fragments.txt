@@ -1,0 +1,23 @@
+# This file defines the order of markdown fragments in the final docs PDF
+
+README.md
+
+docs/tutorials/1-producing-music-notation-images.md
+docs/tutorials/2-changing-background-texture.md
+docs/tutorials/3-using-custom-glyphs.md
+
+docs/introduction.md
+docs/models-and-service-orchestration.md
+docs/scene-objects.md
+docs/affine-spaces-and-rendering.md
+docs/synthesizer-interfaces.md
+docs/music-notation-synthesizer.md
+docs/glyph-synthesizer.md
+docs/glyphs.md
+docs/line-glyphs.md
+docs/determining-scanned-artifact-dpi.md
+docs/todo-list.md
+docs/development-setup.md
+
+docs/checklists/publishing-to-pypi.md
+docs/checklists/deploying-gradio-demo.md

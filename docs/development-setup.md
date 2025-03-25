@@ -74,3 +74,14 @@ make clear-jupyter-outputs
     - `make demo-serve`
     - open the demo in the browser (URL is printed to the console)
 - when the codebase changes, you must restart the server
+
+
+## Build PDF documentation
+
+- install pandoc `sudo apt install pandoc`
+- install pip pdfkit dependency `sudo apt install wkhtmltopdf`
+- install pip packages `.venv/bin/pip3 install -r docs_builder/requirements.txt`
+- documentation is built via `docs_builder/__main__.py`, can be run via
+    - `make build-docs`
+- if you get any missing fragment links, include them in the proper place in the `fragments.txt` file. These are paths relative to the repo root and they define the order of documents inside the final PDF file.
+- get the documentation at `docs_builder/smashcima-docs.pdf`

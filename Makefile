@@ -1,4 +1,4 @@
-.PHONY: build push-prod push-test demo-serve clear-jupyter-outputs
+.PHONY: build push-prod push-test demo-serve build-docs clear-jupyter-outputs
 
 build:
 	rm -rf dist
@@ -15,6 +15,9 @@ push-test:
 
 demo-serve:
 	MC_ASSETS_CACHE=./smashcima_assets .venv/bin/python3 -m gradio_demo
+
+build-docs:
+	.venv/bin/python3 -m docs_builder
 
 clear-jupyter-outputs:
 	.venv/bin/jupyter nbconvert --clear-output --inplace jupyter/*.ipynb jupyter/*/*.ipynb jupyter/*/*/*.ipynb jupyter/*/*/*/*.ipynb
