@@ -65,3 +65,12 @@ make clear-jupyter-outputs
 
 - Package to PyPI: See the [Publishing to PyPI](checklists/publishing-to-pypi.md) page
 - Demo to Huggingface spaces: See the [Deploying Gradio Demo](checklists/deploying-gradio-demo.md) page
+
+
+## Demo development
+
+- install demo dependencies `.venv/bin/pip3 install -e .[gradio]`
+- the demo runs from the `gradio_demo/__main__.py`, can be launched via
+    - `make demo-serve`
+    - open the demo in the browser (URL is printed to the console)
+- when the codebase changes, you must restart the server
