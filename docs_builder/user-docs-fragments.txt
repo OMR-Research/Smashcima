@@ -1,10 +1,7 @@
 # This file defines the order of markdown fragments in the final docs PDF
+# Specifically, this file describes the structure of the USER documentation.
 
 README.md
-
-docs/tutorials/1-producing-music-notation-images.md
-docs/tutorials/2-changing-background-texture.md
-docs/tutorials/3-using-custom-glyphs.md
 
 docs/introduction.md
 docs/models-and-service-orchestration.md

@@ -66,6 +66,14 @@ class Fragment:
 
             # link that fragment's anchor ID
             a["href"] = "#" + fragment.anchor_name
+    
+    def remove_ids_from_headings(self):
+        """Removes all ID attributes from heading tags to prevent warnings
+        from duplicated element IDs"""
+        for i in range(1, 7):
+            for h in self.soup.find_all("h" + str(i)):
+                if not isinstance(h, Tag): continue
+                del h.attrs["id"]
 
     def export_html(self) -> str:
         return str(self.soup)
