@@ -81,12 +81,12 @@ BACKGROUND_SAMPLES: List[BackgroundSample] = [
 
 MXL_FILES: List[Path] = [
     REPO_FOLDER / "testing" / "lc6247269.musicxml", # TODO: move into the demos folder
-    REPO_FOLDER / "jupyter" / "layout_synthesis" / "notehead_placement.musicxml",
-    REPO_FOLDER / "jupyter" / "layout_synthesis" / "rests.musicxml",
-    REPO_FOLDER / "jupyter" / "layout_synthesis" / "stems.musicxml",
-    REPO_FOLDER / "jupyter" / "layout_synthesis" / "beams.musicxml",
-    REPO_FOLDER / "jupyter" / "layout_synthesis" / "flags.musicxml",
-    REPO_FOLDER / "jupyter" / "layout_synthesis" / "leger_lines.musicxml",
-    REPO_FOLDER / "jupyter" / "layout_synthesis" / "duration_dots.musicxml",
-    REPO_FOLDER / "jupyter" / "layout_synthesis" / "accidentals.musicxml",
+    REPO_FOLDER / "jupyter" / "notation_synthesis" / "notehead_placement.musicxml",
+    REPO_FOLDER / "jupyter" / "notation_synthesis" / "rests.musicxml",
+    REPO_FOLDER / "jupyter" / "notation_synthesis" / "stems.musicxml",
+    REPO_FOLDER / "jupyter" / "notation_synthesis" / "beams.musicxml",
+    REPO_FOLDER / "jupyter" / "notation_synthesis" / "flags.musicxml",
+    REPO_FOLDER / "jupyter" / "notation_synthesis" / "leger_lines.musicxml",
+    REPO_FOLDER / "jupyter" / "notation_synthesis" / "duration_dots.musicxml",
+    REPO_FOLDER / "jupyter" / "notation_synthesis" / "accidentals.musicxml",
 ]

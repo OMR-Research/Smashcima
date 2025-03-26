@@ -4,7 +4,7 @@ from smashcima.geometry.Rectangle import Rectangle
 from smashcima.geometry.Transform import Transform
 from smashcima.geometry.Point import Point
 from smashcima.geometry.Vector2 import Vector2
-from .PaperSynthesizer import PaperSynthesizer
+from ..PaperSynthesizer import PaperSynthesizer
 from ..style.MzkPaperStyleDomain import MzkPaperStyleDomain
 from smashcima.assets.AssetRepository import AssetRepository
 from smashcima.assets.textures.MzkPaperPatches import MzkPaperPatches

@@ -5,8 +5,9 @@ from smashcima.geometry.Rectangle import Rectangle
 from smashcima.geometry.Transform import Transform
 from smashcima.scene.ViewBox import ViewBox
 from smashcima.scene.AffineSpace import AffineSpace
-from .StafflinesSynthesizer import StafflinesSynthesizer
-from .PaperSynthesizer import PaperSynthesizer
+from smashcima.synthesis.PageSynthesizer import PageSynthesizer
+from ..StafflinesSynthesizer import StafflinesSynthesizer
+from ..PaperSynthesizer import PaperSynthesizer
 from typing import List
 from dataclasses import dataclass
 
@@ -46,7 +47,7 @@ MUSESCORE_PAGE_SETUP = PageSetup(
 )
 
 
-class SimplePageSynthesizer:
+class SimplePageSynthesizer(PageSynthesizer):
     """Synthesizes page layout"""
     def __init__(
         self,

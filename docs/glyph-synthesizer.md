@@ -167,3 +167,4 @@ class MyFancyGlyphSynthesizer(sc.GlyphSynthesizer):
 ## Implementations
 
 - `smashcima.synthesis.glyph.MuscimaPPGlyphSynthesizer` Synthesizes glyphs by sampling from the MUSCIMA++ dataset.
+- `smashcima.synthesis.glyph.OmniOMRGlyphSynthesizer` Synthesizes glyphs by sampling from the OmniOMR-Proto dataset.

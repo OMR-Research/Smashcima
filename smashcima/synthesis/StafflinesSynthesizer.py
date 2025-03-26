@@ -1,6 +1,6 @@
-from ...geometry.Vector2 import Vector2
-from ...scene.AffineSpace import AffineSpace
-from ...scene.visual.StaffVisual import StaffVisual
+from ..geometry.Vector2 import Vector2
+from ..scene.AffineSpace import AffineSpace
+from ..scene.visual.StaffVisual import StaffVisual
 import abc
 
 

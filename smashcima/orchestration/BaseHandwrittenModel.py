@@ -10,8 +10,10 @@ from smashcima.exporting.image.ImageLayer import ImageLayer
 from smashcima.geometry import Vector2
 from smashcima.loading import load_score
 from smashcima.scene import AffineSpace, Page, Scene, Score
-from smashcima.synthesis import (BeamStemSynthesizer, ColumnLayoutSynthesizer,
-                                 LineSynthesizer, MuscimaPPGlyphSynthesizer,
+from smashcima.synthesis import (BeamStemSynthesizer,
+                                 ColumnMusicNotationSynthesizer,
+                                 GlyphSynthesizer, LineSynthesizer,
+                                 MuscimaPPGlyphSynthesizer,
                                  MuscimaPPLineSynthesizer,
                                  MuscimaPPStyleDomain, MzkPaperStyleDomain,
                                  MzkQuiltingPaperSynthesizer,
@@ -19,8 +21,10 @@ from smashcima.synthesis import (BeamStemSynthesizer, ColumnLayoutSynthesizer,
                                  NaiveStafflinesSynthesizer, PaperSynthesizer,
                                  SimplePageSynthesizer,
                                  SolidColorPaperSynthesizer,
-                                 StafflinesSynthesizer,
-                                 GlyphSynthesizer)
+                                 StafflinesSynthesizer)
+from smashcima.synthesis.MusicNotationSynthesizer import \
+    MusicNotationSynthesizer
+from smashcima.synthesis.PageSynthesizer import PageSynthesizer
 from smashcima.synthesis.style.MzkPaperStyleDomain import Patch
 
 from .Model import Model
@@ -114,7 +118,7 @@ class BaseHandwrittenModel(Model[BaseHandwrittenScene]):
         )
 
         # notation
-        c.type(ColumnLayoutSynthesizer)
+        c.type(ColumnMusicNotationSynthesizer)
         c.type(BeamStemSynthesizer)
 
         # page
@@ -133,7 +137,13 @@ class BaseHandwrittenModel(Model[BaseHandwrittenScene]):
         # glyphs
         c.interface(GlyphSynthesizer, MuscimaPPGlyphSynthesizer)
         c.interface(LineSynthesizer, MuscimaPPLineSynthesizer)
+
+        # notation
+        c.interface(MusicNotationSynthesizer, ColumnMusicNotationSynthesizer)
         
+        # page
+        c.interface(PageSynthesizer, SimplePageSynthesizer)
+
         # paper
         c.interface(PaperSynthesizer, MzkQuiltingPaperSynthesizer)
         # c.interface(PaperSynthesizer, SolidColorPaperSynthesizer)
@@ -142,8 +152,8 @@ class BaseHandwrittenModel(Model[BaseHandwrittenScene]):
         super().resolve_services()
         c = self.container
 
-        self.layout_synthesizer = c.resolve(ColumnLayoutSynthesizer)
-        self.page_synthesizer = c.resolve(SimplePageSynthesizer)
+        self.notation_synthesizer = c.resolve(MusicNotationSynthesizer)
+        self.page_synthesizer = c.resolve(PageSynthesizer)
 
         self.mpp_style_domain = c.resolve(MuscimaPPStyleDomain)
         self.mzk_paper_style_domain = c.resolve(MzkPaperStyleDomain)
@@ -238,7 +248,7 @@ class BaseHandwrittenModel(Model[BaseHandwrittenScene]):
             )
 
             # synthesize music onto the page
-            systems = self.layout_synthesizer.fill_page(
+            systems = self.notation_synthesizer.fill_page(
                 page,
                 score,
                 start_on_measure=next_measure_index

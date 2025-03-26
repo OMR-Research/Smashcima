@@ -4,7 +4,7 @@ from smashcima.geometry.Rectangle import Rectangle
 from smashcima.geometry.Transform import Transform
 from smashcima.geometry.Point import Point
 from smashcima.geometry.Vector2 import Vector2
-from .PaperSynthesizer import PaperSynthesizer
+from ..PaperSynthesizer import PaperSynthesizer
 from smashcima.geometry.units import mm_to_px
 from typing import Tuple
 import numpy as np

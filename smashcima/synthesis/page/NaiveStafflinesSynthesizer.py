@@ -13,7 +13,7 @@ from smashcima.geometry.Vector2 import Vector2
 from smashcima.geometry.Rectangle import Rectangle
 from smashcima.geometry.Transform import Transform
 from smashcima.geometry.units import px_to_mm
-from .StafflinesSynthesizer import StafflinesSynthesizer
+from ..StafflinesSynthesizer import StafflinesSynthesizer
 
 
 MUSCIMA_LINE_THICKNESS = px_to_mm(1.5, dpi=300)

@@ -1,36 +1,36 @@
+import random
+from typing import Dict, List, Optional
+
 from smashcima.geometry.Contours import Contours
 from smashcima.geometry.Point import Point
 from smashcima.geometry.Polygon import Polygon
-from smashcima.geometry.Quad import Quad
-from smashcima.scene.Glyph import Glyph
-from smashcima.scene.LabeledRegion import LabeledRegion
-from smashcima.scene.SmashcimaLabels import SmashcimaLabels
-from smashcima.scene.visual.Flag import Flag
-from smashcima.scene.visual.StaffMeasure import StaffMeasure
-from smashcima.scene.visual.StaffVisual import StaffVisual
-from smashcima.scene.semantic.Score import Score
-from smashcima.scene.visual.System import System
-from smashcima.scene.visual.Page import Page
-from smashcima.scene.visual.Stem import Stem
 from smashcima.scene.AffineSpace import AffineSpace
-from smashcima.scene.semantic.ScoreMeasure import ScoreMeasure
+from smashcima.scene.LabeledRegion import LabeledRegion
 from smashcima.scene.semantic.BeamedGroup import BeamedGroup
 from smashcima.scene.semantic.Chord import Chord
 from smashcima.scene.semantic.Note import Note
+from smashcima.scene.semantic.Score import Score
+from smashcima.scene.semantic.ScoreMeasure import ScoreMeasure
 from smashcima.scene.semantic.TypeDuration import TypeDuration
-from smashcima.geometry.Transform import Transform
+from smashcima.scene.SmashcimaLabels import SmashcimaLabels
 from smashcima.scene.SmuflLabels import SmuflLabels
+from smashcima.scene.visual.Flag import Flag
+from smashcima.scene.visual.Page import Page
+from smashcima.scene.visual.StaffMeasure import StaffMeasure
+from smashcima.scene.visual.StaffVisual import StaffVisual
+from smashcima.scene.visual.Stem import Stem
+from smashcima.scene.visual.System import System
 from smashcima.scene.visual.SystemMeasure import SystemMeasure
-from smashcima.synthesis.GlyphSynthesizer import GlyphSynthesizer
-from ..BeamStemSynthesizer import BeamStemSynthesizer
+
+from ...GlyphSynthesizer import GlyphSynthesizer
 from ...LineSynthesizer import LineSynthesizer
-from .Column import Column
-from .ColumnBase import ColumnBase
+from ...MusicNotationSynthesizer import MusicNotationSynthesizer
+from ..BeamStemSynthesizer import BeamStemSynthesizer
 from .BarlinesColumn import synthesize_barlines_column
 from .ClefsColumn import synthesize_header_clefs
+from .Column import Column
+from .ColumnBase import ColumnBase
 from .EventColumn import synthesize_event_column
-from typing import List, Optional, Dict
-import random
 
 
 class _SystemState:
@@ -131,10 +131,8 @@ def _place_columns_flexbox(
         time_position += width_portion / 2
 
 
-# TODO: define a layout synthesizer interface and inherit
-# IN -> semantic scene object graph
-# OUT -> visual scene object graph
-class ColumnLayoutSynthesizer:
+class ColumnMusicNotationSynthesizer(MusicNotationSynthesizer):
+    """Synthesizes music notation onto empty staves by stacking glyph columns"""
     def __init__(
         self,
         glyph_synthesizer: GlyphSynthesizer,

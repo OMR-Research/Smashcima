@@ -1,6 +1,4 @@
 from .MzkQuiltingPaperSynthesizer import MzkQuiltingPaperSynthesizer
 from .NaiveStafflinesSynthesizer import NaiveStafflinesSynthesizer
-from .PaperSynthesizer import PaperSynthesizer
 from .SimplePageSynthesizer import SimplePageSynthesizer
 from .SolidColorPaperSynthesizer import SolidColorPaperSynthesizer
-from .StafflinesSynthesizer import StafflinesSynthesizer
