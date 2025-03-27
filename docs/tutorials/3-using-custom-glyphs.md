@@ -185,6 +185,7 @@ class RedCircleModel(sc.orchestration.BaseHandwrittenModel):
         super().register_services()
 
         # register a different implementation for the interface        
+        self.container.type(RedCircleGlyphSynth)
         self.container.interface(
             sc.GlyphSynthesizer,
             RedCircleGlyphSynth

@@ -46,6 +46,7 @@ class MyModel(sc.orchestration.BaseHandwrittenModel):
         
         # for paper synthesizer use the solid color synth,
         # instead of the texture-quilting default synthesizer
+        self.container.type(SolidColorPaperSynthesizer)
         self.container.interface(
             PaperSynthesizer, # when people ask for this
             SolidColorPaperSynthesizer # construct this

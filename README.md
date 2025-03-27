@@ -49,6 +49,7 @@ To quickly learn how to start using Smashcima for your project, start with the t
 1. [Producing music notation images](docs/tutorials/1-producing-music-notation-images.md)
 2. [Changing background texture](docs/tutorials/2-changing-background-texture.md)
 3. [Using custom glyphs](docs/tutorials/3-using-custom-glyphs.md)
+4. [Postprocessing](docs/tutorials/4-postprocessing.md)
 
 
 ## How it works (Technical documentation)
