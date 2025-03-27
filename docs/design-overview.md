@@ -59,6 +59,22 @@ The best synthetic data is partially-real data. Therefore almost all synthesizer
 Assets live in the `smashcima.assets` module.
 
 
+## Top-level architecture
+
+Those modules descibed above are stringed together according to the following diagram:
+
+<!-- https://drive.google.com/file/d/1qXYCn5s8ERhTwcBUv4HKwCwd2z75bewX/view?usp=drive_link -->
+<img src="assets/design-overview/smashcima-top-level-architecture.svg" alt="Top-level architecture of Smashcima"/>
+
+
+Another words, you can use a model (such as the `BaseHandwrittenModel`) to create a scene (such as the `BaseHandwrittenScene`) and then render it to the final PNG image. The model under the hood calls a number of synthesizers, which in turn use static assets. An accurate and more detailed diagram for the `BaseHandwrittenModel` can be seen here:
+
+<!-- https://drive.google.com/file/d/1qXYCn5s8ERhTwcBUv4HKwCwd2z75bewX/view?usp=drive_link -->
+<img src="assets/design-overview/smashcima-architecture.svg" alt="Detailed architecture of Smashcima"/>
+
+This blue diagram contains also major synthesizer interfaces, that let you swap out different implementations for particular synthesizers (for example, replacing the set of glyphs used, or modifying the way in which stafflines are synthesized).
+
+
 ## Other submodules
 
 Other Smashcima submodules that have not been covered above:
