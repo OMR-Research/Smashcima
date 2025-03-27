@@ -24,7 +24,7 @@ class Patch:
 
     @staticmethod
     def from_record(record: Sequence[str]) -> "Patch":
-        assert len(record) == 7, "Patch record should have 7 columns"
+        assert len(record) == 8, "Patch record should have 8 columns"
         return Patch(
             is_commented=(record[0] == "#"),
             mzk_uuid=record[1],
@@ -35,6 +35,7 @@ class Patch:
                 height=int(record[5]),
             ),
             dpi=int(record[6])
+            # record[7] is a note, can be ignored
         )
 
 
@@ -72,7 +73,7 @@ class MzkPaperPatches(AssetBundle):
             
             # header
             assert next(reader) == [
-                "commented", "uuid", "x", "y", "width", "height", "dpi"
+                "commented", "uuid", "x", "y", "width", "height", "dpi", "note"
             ]
             
             # records

@@ -26,7 +26,6 @@ class OmniOMRSymbolExtractor(MungSymbolExtractor):
         self.page_image = cv2.imread(str(image_path), cv2.IMREAD_COLOR_BGR)
         """Page image in the BGR format"""
 
-
     def stamp_glyph(self, glyph: Glyph, node: Node):
         OmniOMRGlyphMetadata.stamp_glyph(
             glyph=glyph,
