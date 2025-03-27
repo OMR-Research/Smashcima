@@ -17,6 +17,11 @@ These items are more high-level but there are also more low-level TODO's in the 
 - [ ] all remaining synthesizer interfaces
 - [ ] loaders
 - [ ] exporters
+- [ ] Asset bundles / Building custom asset bundle
+    - implementing the `install` method
+    - exposing public fields to users
+    - testing installation with `.resolve_bundle(MyBundle, force_install=True)`
+    - resolving dependencies in `__post_init__`
 
 
 ## Various
@@ -40,15 +45,15 @@ These items are more high-level but there are also more low-level TODO's in the 
 
 ## Exporting
 
-- [ ] Rendering layers - compositing. Ink interaction with the paper, etc.
+- [x] Rendering layers - compositing. Ink interaction with the paper, etc.
 - [ ] Add a MuNG exporter.
 
 
 ## Synthesis
 
-- [ ] Rename "layout synthesis" to "notation synthesis" and formalize relevant interfaces
+- [x] Rename "layout synthesis" to "notation synthesis" and formalize relevant interfaces
 - [ ] Handle invisible objects (rests in first voice primarily)
-- [ ] Learn position distributions (stems, notehead attachments, beam attachments), currently only hard-coded positioning is used.
+- [ ] Learn position distributions (stems, notehead attachments, beam attachments), currently only hard-coded positioning is used. (called *delta vectors*)
 - [ ] Synthesizer piano brackets
 - [ ] Tall measure separators
 - [ ] Synthesize layout regions properly (measures, staff measures, grandstaves, systems)

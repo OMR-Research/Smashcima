@@ -68,7 +68,7 @@ Smashcima is primarily a framework and a set of crafted interfaces for building 
     - [Glyphs](docs/glyphs.md)
     - [Line glyphs](docs/line-glyphs.md)
     - Style control
-- Asset bundles
+- [Asset bundles](docs/asset-bundles.md)
 - Exporting
     - [Compositing](docs/compositing.md)
     - [Postprocessing](docs/postprocessing.md)
