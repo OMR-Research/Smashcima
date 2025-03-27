@@ -14,8 +14,11 @@
         - [`GlyphSynthesizer` interface](../docs/glyph-synthesizer.md)
     - [Glyphs](../docs/glyphs.md)
     - [Line glyphs](../docs/line-glyphs.md)
-    - Style control
-- Asset bundles
+- [Asset bundles](../docs/asset-bundles.md)
+- Exporting
+    - [Compositing](../docs/compositing.md)
+    - [Postprocessing](../docs/postprocessing.md)
+    - [Rendering via `BitmapRenderer`](../docs/rendering-via-bitmap-renderer.md)
 - Miscelaneous
     - [Determining scanned artifact DPI](../docs/determining-scanned-artifact-dpi.md)
 

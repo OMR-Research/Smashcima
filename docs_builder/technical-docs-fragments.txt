@@ -14,10 +14,9 @@ docs/music-notation-synthesizer.md
 docs/glyph-synthesizer.md
 docs/glyphs.md
 docs/line-glyphs.md
+docs/asset-bundles.md
+docs/compositing.md
+docs/postprocessing.md
+docs/rendering-via-bitmap-renderer.md
 docs/determining-scanned-artifact-dpi.md
-# docs/todo-list.md
-# docs/development-setup.md
-
-docs/checklists/publishing-to-pypi.md
-docs/checklists/deploying-gradio-demo.md
 

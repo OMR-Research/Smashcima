@@ -8,3 +8,4 @@ docs_builder/introduction.md
 docs/tutorials/1-producing-music-notation-images.md
 docs/tutorials/2-changing-background-texture.md
 docs/tutorials/3-using-custom-glyphs.md
+docs/tutorials/4-postprocessing.md
