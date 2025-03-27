@@ -62,6 +62,7 @@ Passes them through the `Postprocessor`, and merges them via their alpha-channel
 
 The pipeline is depicted in this diagram:
 
+<!-- https://drive.google.com/file/d/19HDQV_rK6fH2e5kKUrnLNsxH6QqefdqS/view?usp=drive_link -->
 <img src="assets/compositing/default-compositor-pipeline.svg" alt="Default compositor pipeline."/>
 
 This pipeline lets you define a `Postprocessor` that can filter the major parts of a music document independently or jointly, while still remaining relatively simple and easy to understand.
