@@ -77,7 +77,7 @@ During the registration step, you tell the container what services you wish to b
 - Or you tell the container just the service type, e.g. `MuscimaPPStyleDomain`. It will then figure on its own how to construct the type when asked for its instance (by default using the argument-free constructor, or by recursively resolving all the arguments).
 - Or you tell the container what specific service type it should construct when asked about an abstract service. For example, you tell the container to construct an instance of `MyFancyGlyphSynthesizer` when the user asks for a `GlyphSynthesizer`.
 
-Once all of these registrations take place, you can that resolve a service from the container (e.g. `GlyphSynthesizer`) and it will recursively construct it, together with all of its dependencies (e.g. `random.Random`) and give it back to you.
+Once all of these registrations take place, you can then resolve a service from the container (e.g. `GlyphSynthesizer`) and it will recursively construct it, together with all of its dependencies (e.g. `random.Random`) and give it back to you.
 
 These are the methods you can use to register services into the container:
 
@@ -92,6 +92,7 @@ container.instance(random.Random, my_rng)
 container.type(sc.MuscimaPPStyleDomain)
 
 # register an interface implementation
+# (the implementation type must also be registered by now)
 container.interface(sc.GlyphSynthesizer, MyFancyGlyphSynthesizer)
 ```
 
@@ -176,6 +177,7 @@ class MyModel(sc.Model):
         super().register_services()
         
         # register a service
+        self.container.type(MyFancyGlyphSynthesizer)
         self.container.interface(
             sc.GlyphSynthesizer,
             MyFancyGlyphSynthesizer
@@ -204,6 +206,8 @@ The `Model` base class automatically registers a number of useful services into 
 - `random.Random` instance to generate random numbers
 - `sc.AssetRepository` instance to provide access to asset bundles
 - `sc.Styler` instance to control style parameters for each synthesized sample
+- `sc.Compositor` defines the pipeline for turning a scene into a 2D image (`sc.DefaultCompositor` by default, which defines background, stafflines, and ink layers, calls the postprocessor and merges these layers into one)
+- `sc.Postprocessor` defines filters to be applied to the output image (`sc.NullPostprocessor` by default, which applies no filters)
 
 These instances are likely to be needed by almost all models and they are very common synthesizer dependencies.
 
