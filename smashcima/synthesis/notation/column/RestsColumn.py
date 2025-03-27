@@ -44,6 +44,11 @@ class RestsColumn(ColumnBase):
                     pitch_position=pitch_position,
                     time_position=self.time_position
                 )
+    
+    def detach(self):
+        super().detach()
+        for rest in self.rests:
+            rest.detach()
 
 
 def synthesize_rests_column(

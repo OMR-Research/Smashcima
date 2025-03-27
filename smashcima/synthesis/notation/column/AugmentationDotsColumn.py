@@ -86,6 +86,11 @@ class AugmentationDotsColumn(ColumnBase):
                 pitch_position=dot.pitch_position,
                 time_position=time_position
             )
+    
+    def detach(self):
+        super().detach()
+        for d in self.augmentation_dots:
+            d.detach()
 
 def synthesize_augmentation_dots_column(
     column: AugmentationDotsColumn,

@@ -87,6 +87,11 @@ class AccidentalsColumn(ColumnBase):
                         self.time_position - bbox_local.left - skyline_left
                     )
                 )
+    
+    def detach(self):
+        super().detach()
+        for a in self.accidentals:
+            a.detach()
 
 def synthesize_accidentals_column(
     column: AccidentalsColumn,

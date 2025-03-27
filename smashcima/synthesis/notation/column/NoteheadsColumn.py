@@ -260,6 +260,13 @@ class NoteheadsColumn(ColumnBase):
         self.leger_lines.append(line)
 
         return line
+    
+    def detach(self):
+        super().detach()
+        for ctx in self.notehead_contexts:
+            ctx.notehead.detach()
+        for l in self.leger_lines:
+            l.detach()
 
 
 def synthesize_noteheads_column(

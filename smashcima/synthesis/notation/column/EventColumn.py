@@ -34,6 +34,16 @@ class EventColumn(
         RestsColumn._position_glyphs(self)
         AugmentationDotsColumn._position_glyphs(self)
         AccidentalsColumn._position_glyphs(self)
+    
+    def detach(self):
+        # detach glyphs
+        ColumnBase.detach(self)
+
+        # detach visual scene objects that link to semantic objects
+        NoteheadsColumn.detach(self)
+        RestsColumn.detach(self)
+        AugmentationDotsColumn.detach(self)
+        AccidentalsColumn.detach(self)
 
 
 def synthesize_event_column(
