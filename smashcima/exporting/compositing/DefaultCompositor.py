@@ -59,6 +59,10 @@ class DefaultCompositor(Compositor):
             dpi=dpi
         )
 
+        # TODO: this code assumes the view box is in the root affine space
+        # modify it to relax this assumption (so that we can have,
+        # say view boxes on indivudal glyphs)
+
         # converts from scene millimeter coordinate system
         # to the canvas pixel coordinate system
         scene_to_canvas_transform = (

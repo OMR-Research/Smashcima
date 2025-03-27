@@ -181,22 +181,21 @@ view_box = sc.ViewBox(
 ```
 
 
-## Bitmap renderer
+## Rendering
 
-With the camera defined, we can now use a `BitmapRenderer` to traverse recursively all the affine spaces, find all sprites, transform them into a blank canvas and layer them on top of each other:
+With the camera defined, we can now render the scene into a bitmap image. This process roughly entails going over all `Sprite`s in the scene, transforming them into the `ViewBox` pixel space and flattening them into one image.
+
+In practise, this process a bit more complicated and is desribed in more detail in the [Compositing](compositing.md) documentation page. However all of this is already implemented and you can use a `BitmapRenderer` to get the final image. See the [Rendering via `BitmapRenderer`](rendering-via-bitmap-renderer.md) documentation page for code snippets and further explanation.
+
+However for a simple debugging/visualization usecase, you can use this code to turn a scene through a view box into an OpenCV bitmap image:
 
 ```py
-renderer = sc.BitmapRenderer(
-    dpi=300, # rasterize the scene at this DPI
-    background_color=(0, 0, 0, 0) # BGRA
+bitmap = BitmapRenderer.default_viewbox_render(
+    view_box=view_box,
+    dpi=300
 )
-img = renderer.render(view_box)
-
-# img is a np.ndarray OpenCV BGRA uint8 image
 ```
 
 The renderer is given only the `view_box` but since it links to its affine spaces and affine spaces link to their parents, we can find the root space and iterate from there.
 
 The whole visual scene hangs on the root space and is not garbage collected, because of the double-linking tracked by `SceneObject`s discussed in the previous documetation section.
-
-> **TODO:** View boxes currently assume they are placed in the root affine space. It should be supported that they can be placed in any sub-space. But they must still render the whole scene from its root space. (note it's not view boxes that assume that, it's the BitmapRenderer that assumes that)

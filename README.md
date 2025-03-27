@@ -71,7 +71,7 @@ Smashcima is primarily a framework and a set of crafted interfaces for building 
 - Exporting
     - [Compositing](docs/compositing.md)
     - [Postprocessing](docs/postprocessing.md)
-    - Rendering via `BitmapRenderer`
+    - [Rendering via `BitmapRenderer`](docs/rendering-via-bitmap-renderer.md)
 - Miscelaneous
     - [Determining scanned artifact DPI](docs/determining-scanned-artifact-dpi.md)
 

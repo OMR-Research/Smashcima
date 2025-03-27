@@ -68,3 +68,14 @@ The pipeline is depicted in this diagram:
 This pipeline lets you define a `Postprocessor` that can filter the major parts of a music document independently or jointly, while still remaining relatively simple and easy to understand.
 
 The default `Postprocessor` registered by the `Model` class is the `NullPostprocessor`, which does not apply any filters. This makes the whole compositing pipeline result in just a simple alpha-based flattening of the scene.
+
+
+## Helper services
+
+The compositor uses helper services to perform the scene flattening:
+
+- `AffineSpaceVisitor` extend this class to implement a custom recursive walker over the affine space hierarchy; used to extract and transform sprites and regions
+- `ImageLayerBuilder` builds an `ImageLayer` by layering sprites and regions; implements view-box-culling and windowed-sprite-blending to save performance
+- `Canvas` implements alpha-premultiplied bitmap merging; very low-level
+
+For more details refer to the source code.
