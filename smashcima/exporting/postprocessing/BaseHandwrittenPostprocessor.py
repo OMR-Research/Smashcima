@@ -3,7 +3,6 @@ import sys
 import time
 from typing import Tuple
 
-import albumentations as A
 import augraphy
 import cv2
 import numpy as np
@@ -86,6 +85,9 @@ class BaseHandwrittenPostprocessor(Postprocessor):
 class _Blur(Filter):
     """Applies the Albumentations Blur filter to the composed image"""
     def apply_to(self, input: ImageLayer) -> ImageLayer:
+        # lazy import albumentations (it makes an HTTP version check call)
+        import albumentations as A
+
         ksize = max(int(mm_to_px(self.rng.uniform(0.5, 3.0), dpi=input.dpi)), 1)
 
         transform = A.Compose([
