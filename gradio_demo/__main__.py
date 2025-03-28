@@ -181,17 +181,17 @@ with gr.Blocks() as demo:
         scene = model(mxl_path)
 
         # create the preview image
-        scene_copy = copy.deepcopy(scene)
-        for g in scene_copy.find(Glyph):
-            Sprite.debug_box(
-                g.space,
-                g.get_bbox_in_space(g.space),
-                fill_color=(0, 0, 255, 32),
-                border_color=(0, 0, 255, 128),
-                border_width=0.4
-            )
+        # scene_copy = copy.deepcopy(scene)
+        # for g in scene_copy.find(Glyph):
+        #     Sprite.debug_box(
+        #         g.space,
+        #         g.get_bbox_in_space(g.space),
+        #         fill_color=(0, 0, 255, 32),
+        #         border_color=(0, 0, 255, 128),
+        #         border_width=0.4
+        #    )
         scene_preview_img = BitmapRenderer.default_viewbox_render(
-            view_box=scene_copy.pages[0].view_box,
+            view_box=scene.pages[0].view_box,
             dpi=300
         )
 
