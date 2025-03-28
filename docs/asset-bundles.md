@@ -65,6 +65,6 @@ This is a list of asset bundles provided by Smashcima out of the box:
 
 - `smashcima.assets.datasets.MuscimaPP`
 - `smashcima.assets.datasets.OmniOMRProto`
-- `smashcima.assets.glyphs.MuscimaPPGlyphs`
-- `smashcima.assets.glyphs.OmniOMRGlyphs`
+- `smashcima.assets.glyphs.muscima_pp.MuscimaPPGlyphs`
+- `smashcima.assets.glyphs.omni_omr.OmniOMRGlyphs`
 - `smashcima.assets.textures.MzkPaperPatches`
