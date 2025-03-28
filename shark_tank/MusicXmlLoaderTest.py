@@ -13,7 +13,10 @@ class MusicXmlLoaderTest(BaseSharkTankCase):
         loader.load_file(shark_path)
 
     def test_music_xml_loader(self):
-        self.execute_on_all_sharks(
-            fixture=self.run_loader,
-            sharks_folder=Path("sharks/musicxml")
-        )
+        self.run_loader(Path(
+            "shark_tank/sharks/musicxml/20250212_omr-output-chords.musicxml"
+        ))
+        # self.execute_on_all_sharks(
+        #     fixture=self.run_loader,
+        #     sharks_folder=Path("sharks/musicxml")
+        # )

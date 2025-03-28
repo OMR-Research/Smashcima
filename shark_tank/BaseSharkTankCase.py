@@ -18,17 +18,18 @@ class BaseSharkTankCase(unittest.TestCase):
         shark_tank = Path(__file__).parent.resolve()
         folder_path = shark_tank / sharks_folder
 
-        print()
+        print(flush=True)
         for shark in folder_path.iterdir():
             print(
                 "  >-shark°>",
                 shark.relative_to(shark_tank),
                 "...",
-                end=""
+                end="",
+                flush=True
             )
             
             fixture(shark)
 
-            print(" ok")
+            print(" ok", flush=True)
         
         print("  => ", end="", flush=True)
