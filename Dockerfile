@@ -23,6 +23,16 @@ COPY ./testing ./testing
 # install smashcima and the dependencies for the demo
 RUN pip install --no-cache-dir .[gradio]
 
+# set up environment variables for temporary data
+# (smashcima cache data)
+ENV MC_HOME=/tmp/smashcima
+# (numba jit compiler)
+ENV NUMBA_CACHE_DIR=/tmp/numba
+# (augraphy renders fonts via imagemagick)
+ENV MAGICK_TEMPORARY_PATH=/tmp
+# (augraphy also import matplotlib)
+ENV MPLCONFIGDIR=/tmp/matplotlib
+
 # configure the assets folder path and
 # download and install all necessary demo asset bundles
 ENV MC_ASSETS_CACHE=/app/smashcima_assets

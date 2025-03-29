@@ -1,3 +1,4 @@
+from pathlib import Path
 import random
 import sys
 import time
@@ -8,6 +9,7 @@ import cv2
 import numpy as np
 
 from smashcima.geometry.units import mm_to_px
+from smashcima.config import MC_CACHE_HOME
 
 from ..image.Canvas import Canvas
 from ..image.ImageLayer import ImageLayer
@@ -176,8 +178,14 @@ class _Scribbles(Filter):
             scribbles_text="random",
             scribbles_text_font="random",
             scribbles_text_rotate_range=(0, 360),
-            scribbles_lines_stroke_count_range=(1, 6),
+            scribbles_lines_stroke_count_range=(1, 6)
         )
+        
+        # set the fonts cache dir path into the smashcima cache path
+        augmentation.fonts_directory = str(
+            Path(MC_CACHE_HOME) / "augraphy_fonts"
+        )
+        
         bitmap = augmentation(input.bitmap)
         
         return ImageLayer(
