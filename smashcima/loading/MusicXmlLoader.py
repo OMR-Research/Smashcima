@@ -379,8 +379,8 @@ class MusicXmlLoader:
             self._part_state.part.staff_count = int(staves_element.text)
         
         # key signature
-        key_element = attributes_element.find("key")
-        if key_element is not None:
+        key_elements = attributes_element.findall("key")
+        for key_element in key_elements:
             staff_number = key_element.attrib.get("number")
             fifths = int(key_element.find("fifths").text)
             if staff_number is None:
