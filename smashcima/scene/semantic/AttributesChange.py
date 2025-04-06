@@ -19,4 +19,5 @@ class AttributesChange:
     staff). If a key does not change for the given staff, it is not present."""
 
     time_signature: Optional[TimeSignature] = None
-    "Time signature change, must be at the start of a measure."
+    """Time signature, None means unspecified time signature, i.e. measures
+    have unknown or variable number of beats"""

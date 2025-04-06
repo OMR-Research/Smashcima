@@ -79,14 +79,16 @@ class _MeasureState:
     "The beamed group that is currently being constructed."
 
     def seek_forward(self, fractional_duration: Fraction):
-        assert self.part_state.measure_fractional_duration is not None
         self.fractional_measure_onset += fractional_duration
-        mfd = self.part_state.measure_fractional_duration
-        if self.fractional_measure_onset > mfd:
-            self.fractional_measure_onset = mfd
+
+        # we may know measure fractional duration, but we don't check for its
+        # overstepping, as measures may contain more notes than their
+        # pre-defined duration from the time signature and that's ok
     
     def seek_backup(self, fractional_duration: Fraction):
         self.fractional_measure_onset -= fractional_duration
+        
+        # we check that we don't have negative onset and clamp to zero
         if self.fractional_measure_onset < 0:
             self.fractional_measure_onset = Fraction(0, 1) # zero
 
@@ -313,8 +315,6 @@ class MusicXmlLoader:
 
         # handle measure rests
         if e.is_measure_rest:
-            assert self._part_state.measure_fractional_duration is not None, \
-                "Measure duration has not been loaded, yet we're parsing notes"
             assert onset == 0, "Measure rest should begin at 0 onset"
             self._measure_state.measure.add_durable(
                 durable=MeasureRest(
@@ -551,9 +551,10 @@ class _DecodedNoteElement:
         self.staff_number = self._staff()
         self.beam_values = self._beam()
 
-        assert self._part_state.measure_fractional_duration is not None, \
-            "Time signature is probbably missing in the part"
-        self.fractional_duration = self._part_state.measure_fractional_duration \
+        self.fractional_duration: Fraction = (
+            # use the measure length, or 4 beats as a default if not known
+            self._part_state.measure_fractional_duration or Fraction(4, 1)
+        ) \
             if self.is_measure_rest \
             else self._decode_fractional_duration(
                 type_duration=self.type_duration,

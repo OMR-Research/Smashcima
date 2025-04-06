@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional
 from .Clef import Clef
 from .TimeSignature import TimeSignature
 from .KeySignature import KeySignature
@@ -22,8 +22,9 @@ class Attributes:
     """Key signatures by staff number (staff number starts from 1 for the top
     staff). There's a value for each staff."""
 
-    time_signature: TimeSignature
-    "Time signature change, must be at the start of a measure."
+    time_signature: Optional[TimeSignature]
+    """Time signature, None means unspecified time signature, i.e. measures
+    have unknown or variable number of beats"""
 
     def __post_init__(self):
         assert self.staff_count >= 1, "There must be a positive number of staves"
@@ -55,11 +56,6 @@ class Attributes:
         change: AttributesChange
     ) -> "Attributes":
         """Creates the attributes object from the very first change object"""
-        if change.time_signature is None:
-            raise Exception(
-                "No time signature defined in the first attributes change."
-            )
-        
         return Attributes(
             staff_count=staff_count,
             clefs=change.clefs, # verified in post-init
