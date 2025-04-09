@@ -14,7 +14,7 @@ class MusicXmlLoaderTest(BaseSharkTankCase):
 
     def test_music_xml_loader(self):
         # self.run_loader(Path(
-        #     "shark_tank/sharks/musicxml/20250109_dorico-export-gh-issue-1.musicxml"
+        #     "shark_tank/sharks/musicxml/20250409-grace-chords.musicxml"
         # ))
         self.execute_on_all_sharks(
             fixture=self.run_loader,

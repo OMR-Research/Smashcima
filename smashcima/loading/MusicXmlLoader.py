@@ -271,9 +271,13 @@ class MusicXmlLoader:
         )
         
         # determine onset
-        onset = self._measure_state.fractional_measure_onset \
-            if not e.is_chord else \
-            self._measure_state.last_chord.get_event().fractional_measure_onset
+        onset = self._measure_state.fractional_measure_onset # default
+        if e.is_grace_note: # for grace notes
+            pass
+        elif e.is_chord: # for chord extension notes
+            _last_chord = self._measure_state.last_chord
+            if _last_chord is not None:
+                onset = _last_chord.get_event().fractional_measure_onset
         
         # determine the current chord instance
         current_chord: Optional[Chord] = None
@@ -284,7 +288,6 @@ class MusicXmlLoader:
                 current_chord = self._measure_state.last_chord
             else: # start a new chord
                 current_chord = Chord()
-        self._measure_state.last_chord = current_chord # update state
 
         # load beam information
         # (only the first note in a chord has this information,
@@ -305,6 +308,9 @@ class MusicXmlLoader:
         # advance onset (internal clock)
         if not e.is_chord:
             self._measure_state.seek_forward(e.fractional_duration)
+
+        # remember the last chord
+        self._measure_state.last_chord = current_chord
 
         # === emit proper scene object ===
 
