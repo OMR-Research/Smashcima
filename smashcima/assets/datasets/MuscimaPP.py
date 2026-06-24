@@ -4,8 +4,7 @@ import zipfile
 from pathlib import Path
 
 
-DOWNLOAD_URL = "https://lindat.mff.cuni.cz/repository/xmlui/bitstream/" + \
-    "handle/11372/LRT-2372/MUSCIMA-pp_v1.0.zip"
+DOWNLOAD_URL = "https://lindat.mff.cuni.cz/repository/server/api/core/bitstreams/handle/11372/LRT-2372/MUSCIMA-pp_v1.0.zip"
 
 
 class MuscimaPP(AssetBundle):
