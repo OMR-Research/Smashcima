@@ -106,7 +106,7 @@ class SimplePageSynthesizer(PageSynthesizer):
 
         vertical_step = (content_box.height \
             - self.stafflines_synthesizer.staff_height) \
-            / (self.page_setup.staff_count - 1)
+            / max(1, self.page_setup.staff_count - 1)
 
         staves: List[StaffVisual] = []
         for i in range(self.page_setup.staff_count):
